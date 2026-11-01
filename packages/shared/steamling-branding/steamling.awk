@@ -21,15 +21,15 @@ function scene(file, t, opaque,    env, k, ph, side, x, y, r, o) {
     print "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"776\" height=\"725\" viewBox=\"67.6 48 376.8 352\">" > file
     print "  <defs>" > file
     print "<filter id=\"inkSteam\" x=\"-25%\" y=\"-25%\" width=\"150%\" height=\"150%\" color-interpolation-filters=\"sRGB\">" > file
-    print "    <feMorphology in=\"SourceAlpha\" operator=\"dilate\" radius=\"1.6\" result=\"grow\"/>" > file
+    print "    <feMorphology in=\"SourceAlpha\" operator=\"dilate\" radius=\"1.2\" result=\"grow\"/>" > file
     print "    <feGaussianBlur in=\"grow\" stdDeviation=\"0.3\" result=\"growsoft\"/>" > file
-    print "    <feFlood flood-color=\"#3E4249\"/>" > file
+    print "    <feFlood flood-color=\"#4A5361\"/>" > file
     print "    <feComposite in2=\"growsoft\" operator=\"in\" result=\"line\"/>" > file
     print "    <feOffset in=\"SourceAlpha\" dx=\"-3.0\" dy=\"-4.0\" result=\"up\"/>" > file
     print "    <feComposite in=\"SourceAlpha\" in2=\"up\" operator=\"out\" result=\"low\"/>" > file
     print "    <feGaussianBlur in=\"low\" stdDeviation=\"1.80\"/>" > file
     print "    <feComposite in2=\"SourceAlpha\" operator=\"in\" result=\"lowin\"/>" > file
-    print "    <feFlood flood-color=\"#A7AEB8\" flood-opacity=\"0.45\"/>" > file
+    print "    <feFlood flood-color=\"#93A0B2\" flood-opacity=\"0.6\"/>" > file
     print "    <feComposite in2=\"lowin\" operator=\"in\" result=\"shadow\"/>" > file
     print "    <feOffset in=\"SourceAlpha\" dx=\"2.0\" dy=\"2.0\" result=\"dn\"/>" > file
     print "    <feComposite in=\"SourceAlpha\" in2=\"dn\" operator=\"out\" result=\"high\"/>" > file
