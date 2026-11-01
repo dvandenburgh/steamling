@@ -68,14 +68,35 @@ def gpu(base=DEVFREQ):
     return None
 
 
+_zones = {}
+
+
+def _cpu_gpu_zones(base):
+    """(kind, temp path) for the cpu*/gpu* zones, found once per base and then reused.
+
+    The zones are fixed once the SoC's sensors have probed, and the others include the PMIC's
+    board sensors, whose temp read starts an ADC conversion, so neither the scan nor those reads
+    belong in a two-second loop. An empty result is not kept, in case the sensors are still
+    probing."""
+    zones = _zones.get(base)
+    if zones is None:
+        zones = []
+        for zone in sorted(base.glob("thermal_zone*")):
+            kind = _read(zone / "type")
+            group = "cpu" if kind.startswith("cpu") else "gpu" if kind.startswith("gpu") else None
+            if group:
+                zones.append((group, zone / "temp"))
+        if zones:
+            _zones[base] = zones
+    return zones
+
+
 def temperatures(base=THERMAL):
     # The hottest zone of each kind, in °C. Zone names differ per SoC, but cpu*/gpu* covers them.
     hottest = {}
-    for zone in base.glob("thermal_zone*"):
-        kind = _read(zone / "type")
-        group = "cpu" if kind.startswith("cpu") else "gpu" if kind.startswith("gpu") else None
-        temp = _int(zone / "temp")
-        if group and temp is not None and temp > 0:
+    for group, path in _cpu_gpu_zones(base):
+        temp = _int(path)
+        if temp is not None and temp > 0:
             hottest[group] = max(hottest.get(group, 0), temp)
     return {k: round(v / 1000) for k, v in hottest.items()}
 
