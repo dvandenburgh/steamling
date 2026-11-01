@@ -1,0 +1,43 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] input: rsinput: accept large UART batches instead of dropping them
+
+A serdev callback larger than the receive buffer was thrown away whole,
+and a callback that didn't fit behind a buffered partial frame threw the
+partial frame away. Either way good reports were lost, and after a stall
+(resume, a busy CPU) the backlog arrives in exactly such large batches.
+
+Take only as many bytes as fit and return that count: serdev keeps the
+rest and offers it again after the complete frames have been drained.
+The parser never leaves the buffer full, so there is always room.
+
+Adapted from Armada's 0515a (accept large UART batches) to the parser
+1065 introduced.
+
+Link: https://github.com/armada-os/armada/blob/b58df0a1ae086da5f39ef3647f63db5a2288f82f/packages/kernel/patches/0515a-input-rsinput-accept-large-uart-batches.patch
+---
+--- a/drivers/input/joystick/rsinput.c
++++ b/drivers/input/joystick/rsinput.c
+@@ -500,17 +500,14 @@
+         return count;
+     }
+ 
+-    if (count > sizeof(drv->rx_buf)) {
+-        dev_warn_ratelimited(&serdev->dev, "RX buffer overflow\n");
+-        return count;
+-    }
+-
+     /*
+-     * If the buffered partial frame plus the new bytes would overflow the
+-     * buffer, discard the partial frame and resynchronise on the new bytes.
++     * Take only what fits and leave the rest with serdev, which offers it
++     * again once the complete frames below have been drained. The parser
++     * never leaves a full buffer behind (a frame is at most the buffer's
++     * size and is consumed as soon as it is complete), so there is always
++     * room for at least one byte.
+      */
+-    if (drv->rx_len + count > sizeof(drv->rx_buf))
+-        drv->rx_len = 0;
++    count = min(count, sizeof(drv->rx_buf) - drv->rx_len);
+ 
+     memcpy(drv->rx_buf + drv->rx_len, data, count);
+     drv->rx_len += count;
