@@ -1,7 +1,7 @@
 # steamling.awk - the boot splash frames, drawn from the steamling (steamling-figure.svg): the
 # still pose (logo.svg, which the watermark shows) and the throbber frames particles-NNNN.svg.
 # He sits absorbed in his handheld while puffs of steam rise and fade either side of his face and
-# the screen's glow pulses. The overlay fades to nothing on the last frame, so the loop closes on
+# from the steam cloud at the tip of his tail, and the screen's glow pulses. The overlay fades to nothing on the last frame, so the loop closes on
 # the still pose and the watermark underneath never shows a jump.
 #   awk -v frames=N -v out=DIR -f steamling.awk
 # Every frame is the whole picture on black, in the same box and mapping as the watermark's logo.
@@ -53,19 +53,30 @@ function scene(file, t, opaque,    env, k, ph, side, x, y, r, o) {
     print "  <image x=\"68\" y=\"48\" width=\"376\" height=\"352\" xlink:href=\"steamling-figure.svg\"/>" > file
     env = sin(pi * t)
     if (env > 0.001) {
+        # the figure is drawn at 92% about (240,224): the overlay uses the same mapping
+        print "  <g transform=\"translate(240,224) scale(0.92) translate(-240,-224)\">" > file
         # the screen's light breathing on his face, twice a loop
-        printf "  <ellipse cx=\"240\" cy=\"246\" rx=\"96\" ry=\"46\" fill=\"url(#glow)\" opacity=\"%.3f\"/>\n", env * (0.25 + 0.25 * sin(4 * pi * t)) > file
+        printf "  <ellipse cx=\"240\" cy=\"248\" rx=\"104\" ry=\"48\" fill=\"url(#glow)\" opacity=\"%.3f\"/>\n", env * (0.25 + 0.25 * sin(4 * pi * t)) > file
         # three puffs a side, each rising from the steam beside his face and fading as it goes
         print "  <g filter=\"url(#inkSteam)\">" > file
         for (side = -1; side <= 1; side += 2) {
             for (k = 0; k < 3; k++) {
                 ph = 2 * t + k / 3; ph -= int(ph)
-                x = 240 + side * (96 + 14 * ph); y = 238 - 74 * ph; r = 4 + 6 * ph
+                x = 240 + side * (118 + 14 * ph); y = 240 - 74 * ph; r = 4 + 6 * ph
                 o = env * (1 - ph); if (ph < 0.25) o *= ph * 4
                 if (o > 0.01)
                     printf "    <circle cx=\"%.1f\" cy=\"%.1f\" r=\"%.2f\" fill=\"url(#puffG)\" opacity=\"%.3f\"/>\n", x, y, r, o > file
             }
         }
+        # and three more drifting up off the steam cloud on his tail
+        for (k = 0; k < 3; k++) {
+            ph = 2 * t + k / 3 + 1 / 6; ph -= int(ph)
+            x = 398 + 8 * ph; y = 272 - 64 * ph; r = 4 + 5 * ph
+            o = env * (1 - ph); if (ph < 0.25) o *= ph * 4
+            if (o > 0.01)
+                printf "    <circle cx=\"%.1f\" cy=\"%.1f\" r=\"%.2f\" fill=\"url(#puffG)\" opacity=\"%.3f\"/>\n", x, y, r, o > file
+        }
+        print "  </g>" > file
         print "  </g>" > file
     }
     print "</svg>" > file
