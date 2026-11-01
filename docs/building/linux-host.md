@@ -18,6 +18,10 @@ sudo apt install build-essential bc flex bison python3 git rsync patch dwarves l
   gcc-aarch64-linux-gnu qemu-user-static
 ```
 
+On **Ubuntu 26.04** and later, apt answers `Package 'qemu-user-static' has no installation
+candidate`: it is only a placeholder name there. Put `qemu-user-binfmt` in its place, which installs
+the same qemu and registers it. `make host-setup` picks the right one for you.
+
 **Fedora:**
 
 ```bash

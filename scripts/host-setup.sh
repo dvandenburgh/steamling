@@ -25,8 +25,14 @@ case "${family}" in
   debian)
     pkgs=(build-essential bc flex bison python3 git rsync patch dwarves libssl-dev libelf-dev cpio zstd
           xz-utils curl libarchive-tools parted gdisk dosfstools btrfs-progs ccache)
-    [ "${native}" = 1 ] || pkgs+=(gcc-aarch64-linux-gnu qemu-user-static)
     as_root apt-get update
+    if [ "${native}" = 0 ]; then
+      # Ubuntu 26.04 and newer Debian moved the static qemu into qemu-user and left qemu-user-static
+      # a virtual package, which apt won't install by name. qemu-user-binfmt provides it there.
+      qemu=qemu-user-static
+      apt-cache show --no-all-versions "${qemu}" >/dev/null 2>&1 || qemu=qemu-user-binfmt
+      pkgs+=(gcc-aarch64-linux-gnu "${qemu}")
+    fi
     as_root apt-get install -y "${pkgs[@]}" ;;
   fedora)
     pkgs=(make gcc bc flex bison python3 git rsync patch dwarves openssl-devel elfutils-libelf-devel
@@ -56,7 +62,7 @@ if [ "${native}" = 0 ] && [[ "$(binfmt_flags || true)" != *C* ]]; then
   On WSL, add [boot] systemd=true to /etc/wsl.conf, run 'wsl --shutdown' in PowerShell, reopen
   Ubuntu and run 'make host-setup' again (docs/building/wsl.md)"
   src="$(grep -l ':qemu-aarch64:' /usr/lib/binfmt.d/*.conf 2>/dev/null | head -n 1 || true)"
-  [ -n "${src}" ] || die "no qemu-aarch64 entry in /usr/lib/binfmt.d/: is qemu-user-static's binfmt part installed?"
+  [ -n "${src}" ] || die "no qemu-aarch64 entry in /usr/lib/binfmt.d/: is qemu's binfmt part (qemu-user-static or qemu-user-binfmt) installed?"
   dst="/etc/binfmt.d/${src##*/}"
   if grep -q ':[A-Z]*C[A-Z]*$' "${src}"; then
     log "qemu-aarch64 binfmt: ${src} already has the C flag, reloading it"

@@ -252,16 +252,15 @@ chroot_umount() {
   prune_localrepo_copies
 }
 
-# install qemu-user-static into the rootfs when cross-building from x86_64
+# Put the host's qemu-aarch64 into the rootfs when cross-building from x86_64.
 maybe_install_qemu() {
-  local root="$1" entry flags
+  local root="$1" entry flags interp src
   [ "$(uname -m)" = "aarch64" ] && return 0   # native, nothing to do
-  [ -f "${QEMU_AARCH64_STATIC}" ] || die "cross-building on $(uname -m) needs ${QEMU_AARCH64_STATIC} (install qemu-user-static + binfmt)"
   # The chroots run under qemu via binfmt_misc, and makepkg's `sudo pacman` only gains root if
   # the handler has flag C. Debian/Ubuntu register qemu-aarch64 without it (it shows POF).
   entry="$(grep -l '^magic 7f454c46020101.*0200b700$' /proc/sys/fs/binfmt_misc/* 2>/dev/null | head -n 1 || true)"
   { [ -n "${entry}" ] && grep -qx enabled "${entry}"; } \
-    || die "no enabled aarch64 binfmt handler on $(uname -m): install qemu-user-static with its binfmt registration (systemd-binfmt or binfmt-support)"
+    || die "no enabled aarch64 binfmt handler on $(uname -m): install qemu-user-static (qemu-user-binfmt on Ubuntu 26.04 and later) with its binfmt registration (systemd-binfmt or binfmt-support)"
   flags="$(sed -n 's/^flags: //p' "${entry}")"
   case "${flags}" in
     *C*) ;;
@@ -269,7 +268,14 @@ maybe_install_qemu() {
   Copy its line from /usr/lib/binfmt.d/ into /etc/binfmt.d/ with 'C' added to the flags, then run
   'systemctl restart systemd-binfmt'" ;;
   esac
-  install -Dm755 "${QEMU_AARCH64_STATIC}" "${root}${QEMU_AARCH64_STATIC}"
+  # The registration names the qemu it runs: qemu-aarch64-static on most distros, plain
+  # qemu-aarch64 where qemu-user itself is static (Ubuntu 26.04, Debian's newer qemu). Copy that
+  # one to the same path in the chroot, for a registration without the F flag.
+  interp="$(sed -n 's/^interpreter //p' "${entry}")"
+  src="${interp:-${QEMU_AARCH64_STATIC}}"
+  [ -f "${src}" ] || src="${QEMU_AARCH64_STATIC}"
+  [ -f "${src}" ] || die "cross-building on $(uname -m) needs ${interp:-${QEMU_AARCH64_STATIC}}, the qemu the aarch64 binfmt handler runs: reinstall qemu-user-static (qemu-user-binfmt on Ubuntu 26.04 and later)"
+  install -Dm755 "${src}" "${root}${interp:-${QEMU_AARCH64_STATIC}}"
 }
 
 # --- pinned ALARM base ------------------------------------------------------

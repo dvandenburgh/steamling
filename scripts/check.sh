@@ -26,7 +26,7 @@ if [ "$(uname -s)" = "Linux" ]; then
     have "${cc}" && note "cross compiler" "${cc} ok" || note "cross compiler" "MISSING ${cc} (make kernel)"
     bf="$(grep -l '^magic 7f454c46020101.*0200b700$' /proc/sys/fs/binfmt_misc/* 2>/dev/null | head -n 1 || true)"
     if [ -z "${bf}" ]; then
-      note "qemu aarch64 binfmt" "MISSING (qemu-user-static + its binfmt registration)"
+      note "qemu aarch64 binfmt" "MISSING (qemu-user-static, or qemu-user-binfmt on Ubuntu 26.04+, and its binfmt registration)"
     elif ! grep -qx enabled "${bf}"; then
       note "qemu aarch64 binfmt" "${bf##*/} disabled (sudo systemctl restart systemd-binfmt)"
     elif grep -q '^flags: .*C' "${bf}"; then

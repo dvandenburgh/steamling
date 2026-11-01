@@ -5,6 +5,15 @@ its host lines catch most of these before a build starts.
 
 ## Host setup
 
+**`Package 'qemu-user-static' has no installation candidate`**
+
+Ubuntu 26.04 and later only keep `qemu-user-static` as a placeholder name, so apt refuses it and
+installs nothing else from the same command either (which is why `make check` then also reports
+the cross compiler missing). Update this checkout and run `make host-setup` again: it installs
+`qemu-user-binfmt` there instead. By hand, use the apt line in
+[linux-host.md](linux-host.md#1-host-packages) with `qemu-user-binfmt` in place of
+`qemu-user-static`.
+
 **`sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid' option set ...`**\
 **`error binfmt qemu-aarch64 has flags 'POF', without C: sudo in the build chroot cannot gain root.`**
 
@@ -13,11 +22,11 @@ inside the ARM build chroot. Debian and Ubuntu (WSL included) register it that w
 [The qemu binfmt C flag](linux-host.md#3-the-qemu-binfmt-c-flag-x86_64-hosts).
 
 **`error no enabled aarch64 binfmt handler on x86_64`**\
-**`error cross-building on x86_64 needs /usr/bin/qemu-aarch64-static`**
+**`error cross-building on x86_64 needs /usr/bin/qemu-aarch64-static, the qemu the aarch64 binfmt handler runs`**
 
 qemu-user is not installed, or not registered with the kernel. Install the qemu package for your
 distro from [linux-host.md](linux-host.md#1-host-packages) (on Arch, `qemu-user-static-binfmt` does
-the registration). The registration is done by `systemd-binfmt` at boot, so on WSL make sure
+the registration; on Ubuntu 26.04 and later, `qemu-user-binfmt`). The registration is done by `systemd-binfmt` at boot, so on WSL make sure
 [systemd is running](wsl.md#1-install-wsl-and-ubuntu).
 
 **`error cross-building on x86_64: need aarch64-linux-gnu-gcc (or set CROSS_COMPILE)`**
