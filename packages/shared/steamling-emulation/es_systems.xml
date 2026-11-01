@@ -2,14 +2,17 @@
 <!--
   steamling ES-DE custom system definitions, seeded to ~/ES-DE/custom_systems/ by steamling-roms-init.
   A custom entry REPLACES the bundled system of the same name, so every entry here must be the
-  FULL definition, not a delta. Each one exists because the bundled launch commands name cores or
-  standalones we do not ship: ps2 offers only the LRPS2 core, psx names a DuckStation standalone
+  FULL definition, not a delta. Each one exists because the bundled default command names a core or
+  standalone we do not ship: ps2 offers only the LRPS2 core, psx names a DuckStation standalone
   (ours is the SwanStation libretro core), gc/wii default to the RetroArch dolphin
   core; cps1/cps2/cps3/arcade/mame all default to mame_libretro, which we do not ship.
   All commands go through the /usr/lib/steamling/es-* wrappers: the big-core pin for the
   standalones, the frame-pacing pin (es-retroarch) for the libretro cores (psx and the
   arcade systems). n64, dreamcast and saturn are here only for that pin: the bundled entries
   launch RetroArch bare, and n64's ParaLLEl-RDP needs the Vulkan context the pin gives it. steamling-play mirrors these defaults for the Steam tiles.
+  Our picks come first (the first command is the default), followed by every other RetroArch core
+  the bundled definition offers, through the same wrapper: a replaced system would otherwise hide
+  the alternatives, so a core downloaded in RetroArch's Core Downloader could never be picked.
 -->
 <systemList>
     <system>
@@ -18,6 +21,7 @@
         <path>%ROMPATH%/gc</path>
         <extension>.ciso .CISO .dff .DFF .dol .DOL .elf .ELF .gcm .GCM .gcz .GCZ .iso .ISO .json .JSON .m3u .M3U .rvz .RVZ .tgc .TGC .wad .WAD .wbfs .WBFS .wia .WIA .7z .7Z .zip .ZIP</extension>
         <command label="Dolphin">/usr/lib/steamling/es-dolphin -b -e %ROM%</command>
+        <command label="Dolphin (RetroArch)">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/dolphin_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>gc</platform>
         <theme>gc</theme>
@@ -28,6 +32,7 @@
         <path>%ROMPATH%/wii</path>
         <extension>.ciso .CISO .dff .DFF .dol .DOL .elf .ELF .gcm .GCM .gcz .GCZ .iso .ISO .json .JSON .m3u .M3U .rvz .RVZ .tgc .TGC .wad .WAD .wbfs .WBFS .wia .WIA .7z .7Z .zip .ZIP</extension>
         <command label="Dolphin">/usr/lib/steamling/es-dolphin -b -e %ROM%</command>
+        <command label="Dolphin (RetroArch)">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/dolphin_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>wii</platform>
         <theme>wii</theme>
@@ -39,6 +44,8 @@
         <extension>.bin .BIN .cbn .CBN .ccd .CCD .chd .CHD .cue .CUE .ecm .ECM .exe .EXE .img .IMG .iso .ISO .m3u .M3U .mdf .MDF .mds .MDS .minipsf .MINIPSF .pbp .PBP .psexe .PSEXE .psf .PSF .toc .TOC .z .Z .znx .ZNX .7z .7Z .zip .ZIP</extension>
         <command label="SwanStation">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/swanstation_libretro.so %ROM%</command>
         <command label="PCSX ReARMed">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/pcsx_rearmed_libretro.so %ROM%</command>
+        <command label="Beetle PSX">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_psx_libretro.so %ROM%</command>
+        <command label="Beetle PSX HW">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_psx_hw_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>psx</platform>
         <theme>psx</theme>
@@ -49,6 +56,8 @@
         <path>%ROMPATH%/ps2</path>
         <extension>.bin .BIN .chd .CHD .ciso .CISO .cso .CSO .desktop .dump .DUMP .elf .ELF .gz .GZ .m3u .M3U .mdf .MDF .img .IMG .iso .ISO .isz .ISZ .ngr .NRG .zso .ZSO</extension>
         <command label="ARMSX2">/usr/lib/steamling/es-armsx2 -batch -fullscreen -- %ROM%</command>
+        <command label="PCEE2">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/pcee2_libretro.so %ROM%</command>
+        <command label="LRPS2">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/pcsx2_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>ps2</platform>
         <theme>ps2</theme>
@@ -59,6 +68,7 @@
         <path>%ROMPATH%/psp</path>
         <extension>.chd .CHD .cso .CSO .elf .ELF .iso .ISO .pbp .PBP .prx .PRX .zso .ZSO</extension>
         <command label="PPSSPP">/usr/lib/steamling/es-psp --fullscreen %ROM%</command>
+        <command label="PPSSPP (RetroArch)">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/ppsspp_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>psp</platform>
         <theme>psp</theme>
@@ -79,6 +89,9 @@
         <path>%ROMPATH%/n3ds</path>
         <extension>.3ds .3DS .3dsx .3DSX .app .APP .axf .AXF .cci .CCI .cxi .CXI .elf .ELF .z3dsx .Z3DSX .zcci .ZCCI .zcxi .ZCXI</extension>
         <command label="Azahar">/usr/lib/steamling/es-azahar %ROM%</command>
+        <command label="Azahar (RetroArch)">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/azahar_libretro.so %ROM%</command>
+        <command label="Citra">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/citra_libretro.so %ROM%</command>
+        <command label="Citra 2018">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/citra2018_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>n3ds</platform>
         <theme>n3ds</theme>
@@ -99,6 +112,7 @@
         <path>%ROMPATH%/wiiu</path>
         <extension>.elf .ELF .rpx .RPX .tmd .TMD .wua .WUA .wud .WUD .wuhb .WUHB .wux .WUX</extension>
         <command label="Cemu">/usr/lib/steamling/es-cemu -f -g %ROM%</command>
+        <command label="Cemu (RetroArch)">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/cemu_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>wiiu</platform>
         <theme>wiiu</theme>
@@ -120,6 +134,12 @@
         <extension>.7z .7Z .zip .ZIP</extension>
         <command label="FinalBurn Neo">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
         <command label="MAME 2003-Plus">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_plus_libretro.so %ROM%</command>
+        <command label="MAME - Current">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame_libretro.so %ROM%</command>
+        <command label="MAME 2010">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2010_libretro.so %ROM%</command>
+        <command label="MAME 2003">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_libretro.so %ROM%</command>
+        <command label="MAME 2000">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2000_libretro.so %ROM%</command>
+        <command label="FB Alpha 2012">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbalpha2012_libretro.so %ROM%</command>
+        <command label="FB Alpha 2012 CPS-1">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbalpha2012_cps1_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>arcade</platform>
         <theme>cps1</theme>
@@ -131,6 +151,12 @@
         <extension>.7z .7Z .zip .ZIP</extension>
         <command label="FinalBurn Neo">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
         <command label="MAME 2003-Plus">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_plus_libretro.so %ROM%</command>
+        <command label="MAME - Current">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame_libretro.so %ROM%</command>
+        <command label="MAME 2010">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2010_libretro.so %ROM%</command>
+        <command label="MAME 2003">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_libretro.so %ROM%</command>
+        <command label="MAME 2000">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2000_libretro.so %ROM%</command>
+        <command label="FB Alpha 2012">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbalpha2012_libretro.so %ROM%</command>
+        <command label="FB Alpha 2012 CPS-2">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbalpha2012_cps2_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>arcade</platform>
         <theme>cps2</theme>
@@ -142,6 +168,12 @@
         <extension>.7z .7Z .zip .ZIP</extension>
         <command label="FinalBurn Neo">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
         <command label="MAME 2003-Plus">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_plus_libretro.so %ROM%</command>
+        <command label="MAME - Current">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame_libretro.so %ROM%</command>
+        <command label="MAME 2010">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2010_libretro.so %ROM%</command>
+        <command label="MAME 2003">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_libretro.so %ROM%</command>
+        <command label="MAME 2000">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2000_libretro.so %ROM%</command>
+        <command label="FB Alpha 2012">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbalpha2012_libretro.so %ROM%</command>
+        <command label="FB Alpha 2012 CPS-3">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbalpha2012_cps3_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>arcade</platform>
         <theme>cps3</theme>
@@ -153,6 +185,17 @@
         <extension>.cmd .CMD .desktop .gam .GAM .neo .NEO .sh .7z .7Z .zip .ZIP</extension>
         <command label="FinalBurn Neo">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
         <command label="MAME 2003-Plus">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_plus_libretro.so %ROM%</command>
+        <command label="MAME - Current">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame_libretro.so %ROM%</command>
+        <command label="MAME 2010">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2010_libretro.so %ROM%</command>
+        <command label="MAME 2003">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_libretro.so %ROM%</command>
+        <command label="MAME 2000">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2000_libretro.so %ROM%</command>
+        <command label="HBMAME">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/hbmame_libretro.so %ROM%</command>
+        <command label="FB Alpha 2012">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbalpha2012_libretro.so %ROM%</command>
+        <command label="Geolith">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/geolith_libretro.so %ROM%</command>
+        <command label="Flycast">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/flycast_libretro.so %ROM%</command>
+        <command label="Kronos">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/kronos_libretro.so %ROM%</command>
+        <command label="DICE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/dice_libretro.so %ROM%</command>
+        <command label="Supermodel">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/supermodel_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>arcade</platform>
         <theme>arcade</theme>
@@ -164,6 +207,17 @@
         <extension>.cmd .CMD .desktop .gam .GAM .neo .NEO .sh .7z .7Z .zip .ZIP</extension>
         <command label="FinalBurn Neo">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbneo_libretro.so %ROM%</command>
         <command label="MAME 2003-Plus">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_plus_libretro.so %ROM%</command>
+        <command label="MAME - Current">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame_libretro.so %ROM%</command>
+        <command label="MAME 2010">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2010_libretro.so %ROM%</command>
+        <command label="MAME 2003">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2003_libretro.so %ROM%</command>
+        <command label="MAME 2000">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mame2000_libretro.so %ROM%</command>
+        <command label="HBMAME">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/hbmame_libretro.so %ROM%</command>
+        <command label="FB Alpha 2012">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fbalpha2012_libretro.so %ROM%</command>
+        <command label="Geolith">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/geolith_libretro.so %ROM%</command>
+        <command label="Flycast">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/flycast_libretro.so %ROM%</command>
+        <command label="Kronos">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/kronos_libretro.so %ROM%</command>
+        <command label="DICE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/dice_libretro.so %ROM%</command>
+        <command label="Supermodel">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/supermodel_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>arcade</platform>
         <theme>mame</theme>
@@ -174,6 +228,7 @@
         <path>%ROMPATH%/n64</path>
         <extension>.bin .BIN .d64 .D64 .n64 .N64 .ndd .NDD .u1 .U1 .v64 .V64 .z64 .Z64 .7z .7Z .zip .ZIP</extension>
         <command label="Mupen64Plus-Next">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mupen64plus_next_libretro.so %ROM%</command>
+        <command label="ParaLLEl N64">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/parallel_n64_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>n64</platform>
         <theme>n64</theme>
@@ -194,6 +249,9 @@
         <path>%ROMPATH%/saturn</path>
         <extension>.bin .BIN .ccd .CCD .chd .CHD .cue .CUE .iso .ISO .m3u .M3U .mds .MDS .toc .TOC .7z .7Z .zip .ZIP</extension>
         <command label="YabaSanshiro">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/yabasanshiro_libretro.so %ROM%</command>
+        <command label="Beetle Saturn">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_saturn_libretro.so %ROM%</command>
+        <command label="Kronos">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/kronos_libretro.so %ROM%</command>
+        <command label="Yabause">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/yabause_libretro.so %ROM%</command>
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>saturn</platform>
         <theme>saturn</theme>
