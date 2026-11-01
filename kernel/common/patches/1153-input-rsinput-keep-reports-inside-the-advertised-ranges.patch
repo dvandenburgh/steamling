@@ -1,0 +1,54 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] input: rsinput: keep reports inside the advertised axis ranges
+
+The stick and trigger values are shifted by the calibration's centre and
+anti-deadzone but never limited, while the axis ranges advertised to
+userspace are the calibrated ones. Calibration puts the stick maximum at
+95% of the measured travel and Governor's outer-edge setting shrinks it
+further, so a stick at its edge or a trigger at full pull routinely
+reports past the range it claims. Readers that scale by the advertised
+range (InputPlumber, SDL, emulators reading evdev directly) then see more
+than full deflection, and whether that saturates or not is up to each of
+them.
+
+Clamp every report to the axis's advertised minimum and maximum.
+---
+--- a/drivers/input/joystick/rsinput.c
++++ b/drivers/input/joystick/rsinput.c
+@@ -375,6 +375,17 @@
+     }
+ }
+ 
++/*
++ * Keep every value inside the range the axis advertises. A stick pushed past
++ * its calibrated maximum (or past a shortened outer edge) or a trigger pulled
++ * past its calibrated travel would otherwise report beyond it, and readers
++ * that scale by the advertised range then see more than full deflection.
++ */
++static void rsinput_report_abs(struct input_dev *input, unsigned int code, int value) {
++    input_report_abs(input, code, clamp(value, input_abs_get_min(input, code),
++                                        input_abs_get_max(input, code)));
++}
++
+ static void handle_cmd_status(struct rsinput_driver *drv, const uint8_t *data, size_t payload_length) {
+     if (payload_length >= 6) {
+     static unsigned long prev_states;
+@@ -434,12 +445,12 @@
+     int16_t ry = raw_ry + axis_righty_center;
+     ry = ( abs(ry) < axis_righty_deadzone ) ? 0 : INT_SIGN(ry) * ( abs(ry) - axis_righty_antideadzone );
+ 
+-    input_report_abs(drv->input, ABS_Z, z);
+-    input_report_abs(drv->input, ABS_RZ, rz);
+-    input_report_abs(drv->input, ABS_X, drv->invert_x ? x * (-1) : x);
+-    input_report_abs(drv->input, ABS_Y, drv->invert_y ? y * (-1) : y);
+-    input_report_abs(drv->input, ABS_RX, drv->invert_rx ? rx * (-1) : rx);
+-    input_report_abs(drv->input, ABS_RY, drv->invert_ry ? ry * (-1) : ry);
++    rsinput_report_abs(drv->input, ABS_Z, z);
++    rsinput_report_abs(drv->input, ABS_RZ, rz);
++    rsinput_report_abs(drv->input, ABS_X, drv->invert_x ? x * (-1) : x);
++    rsinput_report_abs(drv->input, ABS_Y, drv->invert_y ? y * (-1) : y);
++    rsinput_report_abs(drv->input, ABS_RX, drv->invert_rx ? rx * (-1) : rx);
++    rsinput_report_abs(drv->input, ABS_RY, drv->invert_ry ? ry * (-1) : ry);
+ 
+     input_sync(drv->input);
+     prev_states = keys;
