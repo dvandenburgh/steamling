@@ -4,6 +4,8 @@ Steamling offers **ES-DE** as the frontend, with RetroArch and a few standalone 
 the work. It is "drop your files in and play": no per-emulator setup, and games you favorite in
 ES-DE show up in your Steam library automatically.
 
+![ES-DE's system carousel on the handheld, with Nintendo GameCube selected](images/emulation-es-de.jpeg)
+
 ## Supported systems
 
 | System | Emulator |
@@ -29,7 +31,10 @@ ES-DE show up in your Steam library automatically.
 
 Emulation is optional, so a fresh install does not have it. Switch to desktop mode, open
 **Steamling Tools** and pick *Install the emulation layer (ES-DE + emulators)*. Everything is
-ready when it finishes, with no restart or logout needed.
+ready when it finishes, with no restart or logout needed. ES-DE then has its own tile in your
+Steam library, under the **Non-Steam** tab.
+
+![The Non-Steam tab in the Steam library with ES-DE (and Heroic Games Launcher) on it](images/emulation-steam-library.jpeg)
 
 The emulators come from your own Steamling build, the same way updates do, so the handheld needs to
 reach your PC while it installs: build with `./build.sh --update`, start the package server and
