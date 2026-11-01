@@ -4,10 +4,10 @@
 pkgbase=mesa
 pkgname=(mesa vulkan-freedreno)
 epoch=2
-pkgver=26.2.5
+pkgver=26.2.6
 # differs from pkgver only for RCs: the tarball keeps the hyphen makepkg forbids in pkgver
 _srcver=${pkgver}
-pkgrel=1.5
+pkgrel=1
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${_srcver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -22,31 +22,12 @@ makedepends=(
 )
 # upstream considers LTO broken until explicit notice
 options=(!lto)
-# Turnip, ir3 and freedreno fixes queued on staging/26.2 for the next point release (verbatim
-# cherry-picks; drop each once a 26.2 point release carries it). 0010 is still an open merge
-# request and 0011 is on main only, adapted to 26.2; both stay until a release has them.
+# Turnip fixes no 26.2 point release has yet. 0001 is still an open merge request and 0002 is on
+# main only, adapted to 26.2; both stay until a release has them.
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
-        '0001-tu-Don-t-bail-after-the-first-instr-when-gathering-p.patch'
-        '0002-tu-Fix-bindless-descriptor-invalidate-sequence.patch'
-        '0003-ir3-Only-call-nir_opt_shrink_vectors-once.patch'
-        '0004-ir3-Fix-potential-out-of-range-load_const_ir3-base-o.patch'
-        '0005-tu-fix-texel-buffer-emulation-bounds-check.patch'
-        '0006-tu-a6xx-Set-correct-value-for-GRAS_MODE_CNTL.patch'
-        '0007-tu-a6xx-Invalidate-shared-consts-before-disabling-th.patch'
-        '0008-freedreno-Fixup-incorrectly-copied-A6XX_TPL1_DBG_ECO.patch'
-        '0009-freedreno-a6xx-Fix-fbfetch-with-msrtt.patch'
-        '0010-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
-        '0011-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch')
-sha256sums=('794b3d1729075dae7ebd47c7283b7ca0cdb5dec668f7f11cc0a5d82f6138a0a5'
-            '1a962317249202e278daae3c7c1f02c685bea8046f8dde76198f6b72006972eb'
-            'c0f383eec232854027587b7a683d39549821b40013a6566fddc50549f069160f'
-            'fe33ef4c9edfa843207d3ba9059ecd1a64823cf89ccebe3b70749c242a8c7e8e'
-            '78f0f327be9173bad5d6690e9155c8417c1b916fda58aedca36b484fcc942fc5'
-            'cca4a04e20e53ebc12e44321698712904a8e3895a673eb26008e62b58488bb00'
-            '0009e6a78c91bc1138a215d922579335007746eedb8bdf9ca38927b6771d6463'
-            'f2eebcd6e4b5f8c6c13f0049d17836f552932400e3a1d6439dd6bb997d4bdb0a'
-            '557deed445a46c1942b6bcf4860f9b31b92cc908adae93b0cca4af03727505fc'
-            '9bbf845ede70e184dc1ffebca886408c3a5a47014a059cdc7ee26918a67c8db4'
+        '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
+        '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch')
+sha256sums=('b9436b3e1a8be76fbd4823dc884f90596ab7c6ac5e1867a305e66ffccfb31a92'
             '9593e966d7b29efa23a547da07d1dae14a9f34a088c7df37214545b4a1bb8313'
             '1079d658026ea175fddf582cb709f4e3925446b3c1512cecc043861b75aa392e')
 
