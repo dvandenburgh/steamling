@@ -1,6 +1,9 @@
 # Dolphin GameCube pad seed (-> ~/.config/dolphin-emu/GCPadNew.ini); Dolphin's own default is
 # keyboard-only, i.e. a dead controller. Face buttons are mapped positionally (GC B = west).
 # The trailing " 0" belongs to the evdev device name — drop it and Dolphin binds nothing.
+# Dolphin's evdev backend numbers axes in event-code order: on that pad X Y Z RX RY RZ HAT0X
+# HAT0Y are Axis 0-7. It has no "Hat" inputs, so the d-pad is Axis 6/7. The triggers rest at
+# their minimum, and "Axis 2+" only covers the top half of travel; "Full Axis" spans all of it.
 [GCPad1]
 Device = evdev/0/Microsoft X-Box 360 pad 0
 Buttons/A = SOUTH
@@ -17,11 +20,12 @@ C-Stick/Up = `Axis 4-`
 C-Stick/Down = `Axis 4+`
 C-Stick/Left = `Axis 3-`
 C-Stick/Right = `Axis 3+`
-Triggers/L = `Axis 2+`
-Triggers/R = `Axis 5+`
-Triggers/L-Analog = `Axis 2+`
-Triggers/R-Analog = `Axis 5+`
-D-Pad/Up = `Hat 0 N`
-D-Pad/Down = `Hat 0 S`
-D-Pad/Left = `Hat 0 W`
-D-Pad/Right = `Hat 0 E`
+Triggers/L = `Full Axis 2+`
+Triggers/R = `Full Axis 5+`
+Triggers/L-Analog = `Full Axis 2+`
+Triggers/R-Analog = `Full Axis 5+`
+D-Pad/Up = `Axis 7-`
+D-Pad/Down = `Axis 7+`
+D-Pad/Left = `Axis 6-`
+D-Pad/Right = `Axis 6+`
+Rumble/Motor = Strong
