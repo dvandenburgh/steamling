@@ -25,9 +25,9 @@ run_emu() {  # $1 = emulator name; remaining args = emulator flags (rom appended
   local app; app="$(emu_path "$1")" || emu_missing "$1"; shift
   case "${app}" in
     *.AppImage|*.appimage)
-      # Steam injects LD_PRELOAD + its runtime LD_LIBRARY_PATH into shortcuts: AppImages with
-      # bundled Qt SIGABRT on that mix and then cannot find fusermount via PATH.
-      exec env -u LD_PRELOAD -u LD_LIBRARY_PATH FUSERMOUNT_PROG=/usr/bin/fusermount \
+      # emu-resolve.sh already dropped Steam's LD_PRELOAD and LD_LIBRARY_PATH; an AppImage also
+      # can't find fusermount through the PATH Steam gives it.
+      exec env FUSERMOUNT_PROG=/usr/bin/fusermount \
         taskset -c "${_big_cores}" "${app}" "$@" ;;
     *) exec taskset -c "${_big_cores}" "${app}" "$@" ;;
   esac

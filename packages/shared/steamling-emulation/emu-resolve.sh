@@ -3,6 +3,12 @@
 EMU_DROP="${HOME}/Emulation/emulators"
 EMU_NAMES="armsx2 eden ryujinx rpcs3 vita3k xemu dolphin cemu azahar ppsspp"
 
+# Steam starts every shortcut with the client's LD_LIBRARY_PATH (its own bundled libraries, an
+# SDL3 among them, ahead of the system's) and its overlay in LD_PRELOAD, and ES-DE hands both on
+# to whatever it launches. The emulators are built against the system libraries and gain nothing
+# from the overlay hooks, so they start without either.
+unset LD_PRELOAD LD_LIBRARY_PATH
+
 # Heavy emulators pin to the board's game cores: scx_lavd otherwise parks the critical thread
 # on a little core (chop + audio crackle). Unlike the game pin, a board without the key still
 # pins, to the cores cores.sh guesses from capacity.
