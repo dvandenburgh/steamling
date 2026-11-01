@@ -240,6 +240,8 @@ target right away, and cards formatted here also work in a real Steam Deck (and 
   nominal rate (panels ship slightly fast or slow, which drifts emulator audio against video).
   The result is kept across reboots; **Reset to Factory** puts the panel's own timing back.
 
+  ![The Display section showing Factory timing, with the Calibrate Display button](images/governor-display.jpeg)
+
 ## Updater
 
 ![The Updater tab: Check for Updates, and the last snapshot under Rollback](images/governor-updater.jpeg)
@@ -272,6 +274,11 @@ The bottom of the tab shows your Steamling OS version, the kernel, and whether t
 on internal storage is the OpenABL this build ships. Handy when you're filing a bug.
 
 ![The About section: Steamling OS version, kernel, bootloader and Restart Game Mode](images/governor-about.jpeg)
+
+Steam's own **Settings → System** page shows the same details too: the OS name, the release
+codename, which handheld it is under **OS Variant**, the version, the build date and the kernel.
+
+![Steam's System settings: Steamling OS, codename hatchling, OS Variant Retroid Pocket 6 (SM8550), version 0.1.0 and kernel 7.3.0](images/steam-settings-system.jpeg)
 
 **Restart Game Mode** closes Steam and brings game mode back up, for the times Steam or the
 screen gets stuck. Anything unsaved in a running game is lost.
