@@ -6,15 +6,18 @@
 -->
 <ruleList>
 
-  <!-- The bundled rule is systempath-only, and that PATH lookup comes up empty under the
-       Steam-launched ES-DE environment: every RetroArch system then fails to find an
-       emulator. The absolute path is what makes it resolve. -->
+  <!-- Every system we don't redefine launches %EMULATOR_RETROARCH% straight from ES-DE's own
+       definitions. Pointing it at es-retroarch gives those launches the same per-core video
+       driver choice and pacing as ours, and starts RetroArch without Steam's library path. The
+       bundled rule is systempath-only, and that PATH lookup comes up empty under the
+       Steam-launched ES-DE environment, so the absolute paths are what make it resolve. -->
   <emulator name="RETROARCH">
+    <rule type="staticpath">
+      <entry>/usr/lib/steamling/es-retroarch</entry>
+      <entry>/usr/bin/retroarch</entry>
+    </rule>
     <rule type="systempath">
       <entry>retroarch</entry>
-    </rule>
-    <rule type="staticpath">
-      <entry>/usr/bin/retroarch</entry>
     </rule>
   </emulator>
 
