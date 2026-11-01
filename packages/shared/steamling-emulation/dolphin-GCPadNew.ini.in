@@ -1,5 +1,8 @@
 # Dolphin GameCube pad seed (-> ~/.config/dolphin-emu/GCPadNew.ini); Dolphin's own default is
 # keyboard-only, i.e. a dead controller. Face buttons are mapped positionally (GC B = west).
+# The pad follows xpad's lettering: X sends code 0x133 and Y 0x134, which evdev names NORTH and
+# WEST, so the west button is "NORTH" here and the north one "WEST" (the same order as the
+# button:2/button:3 indices in Eden's seed).
 # The trailing " 0" belongs to the evdev device name — drop it and Dolphin binds nothing.
 # Dolphin's evdev backend numbers axes in event-code order: on that pad X Y Z RX RY RZ HAT0X
 # HAT0Y are Axis 0-7. It has no "Hat" inputs, so the d-pad is Axis 6/7. The triggers rest at
@@ -7,9 +10,9 @@
 [GCPad1]
 Device = evdev/0/Microsoft X-Box 360 pad 0
 Buttons/A = SOUTH
-Buttons/B = WEST
+Buttons/B = NORTH
 Buttons/X = EAST
-Buttons/Y = NORTH
+Buttons/Y = WEST
 Buttons/Z = TR
 Buttons/Start = START
 Main Stick/Up = `Axis 1-`
