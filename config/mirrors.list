@@ -23,6 +23,9 @@ mupen64plus-libretro-nx.git https://github.com/libretro/mupen64plus-libretro-nx.
 flycast.git                 https://github.com/flyinghead/flycast.git                       blobless
 swanstation.git             https://github.com/libretro/swanstation.git                     full
 libretro-core-info.git      https://github.com/libretro/libretro-core-info.git              full
+# Batocera: its per-emulator configgen (controller mapping, hotkeys, per-system defaults) and
+# the board packages for the same Snapdragon handhelds.
+batocera.git                https://github.com/batocera-linux/batocera.linux.git            blobless
 # Retroid's own trees (retroidpocket/* branches). The kernel fork rides in linux.git as a second
 # remote so it shares mainline's objects instead of being a second multi-GB clone.
 linux.git:retroid           https://github.com/RetroidPocket/linux.git                      blobless  retroidpocket/*
