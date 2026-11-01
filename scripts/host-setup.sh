@@ -30,7 +30,9 @@ case "${family}" in
       # Ubuntu 26.04 and newer Debian moved the static qemu into qemu-user and left qemu-user-static
       # a virtual package, which apt won't install by name. qemu-user-binfmt provides it there.
       qemu=qemu-user-static
-      apt-cache show --no-all-versions "${qemu}" >/dev/null 2>&1 || qemu=qemu-user-binfmt
+      # apt-cache show exits 0 for a virtual name too, so look for the package's own record.
+      apt-cache show --no-all-versions "${qemu}" 2>/dev/null | grep -qx "Package: ${qemu}" \
+        || qemu=qemu-user-binfmt
       pkgs+=(gcc-aarch64-linux-gnu "${qemu}")
     fi
     as_root apt-get install -y "${pkgs[@]}" ;;
