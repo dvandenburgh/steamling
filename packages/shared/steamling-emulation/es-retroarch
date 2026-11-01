@@ -3,6 +3,9 @@
 # config on exit and the seeder keeps drifted values as user edits, so one GL fallback would
 # stick; --appendconfig re-pins pacing every launch. Values must match retroarch.cfg's pacing
 # block and steamling-roms-init's per-panel formula.
+# Steam's library path and overlay come along from the shortcut that started ES-DE; RetroArch
+# is built against the system libraries (emu-resolve.sh does the same for the other emulators).
+unset LD_PRELOAD LD_LIBRARY_PATH
 [ -r /usr/lib/steamling/device.conf ] && . /usr/lib/steamling/device.conf
 [ -r /etc/steamling/device.conf ] && . /etc/steamling/device.conf
 refresh="${STEAMLING_PANEL_REFRESH:-120}"
