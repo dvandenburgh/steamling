@@ -7,7 +7,7 @@ set -euo pipefail
 
 # Bump at each image cut. Each release also gets a codename, lowercase and one word: Steam shows
 # it as is under OS Codename.
-STEAMLING_VERSION=0.1.0
+STEAMLING_VERSION=0.1.1
 STEAMLING_CODENAME=hatchling
 
 osr=/usr/lib/os-release

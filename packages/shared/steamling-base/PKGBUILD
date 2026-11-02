@@ -2,7 +2,7 @@
 # switch and the desktop updater.
 pkgname=steamling-base
 pkgver=0.2.0
-pkgrel=6.6
+pkgrel=6.7
 pkgdesc="Locked/rolling base mode switch, desktop updater and pacman cache trim for steamling"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
