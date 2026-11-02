@@ -25,7 +25,8 @@ if [ -z "$ramdisk" ]; then
   else printf 'dummy' > "$ramdisk"; fi
 fi
 
-python3 "$mkbootimg" \
+# -B: no __pycache__ next to the packaged mkbootimg, which pacman would trip over
+python3 -B "$mkbootimg" \
   --kernel "$tmp/kernel.gz" --ramdisk "$ramdisk" \
   --kernel_offset 0x00000000 --ramdisk_offset 0x00000000 --tags_offset 0x00000000 \
   --os_version 12.0.0 --os_patch_level "$(date '+%Y-%m')" --header_version 0 \
