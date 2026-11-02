@@ -1,7 +1,7 @@
 import { Router } from "@decky/ui";
 import type { Config, DropdownChoice, GameRef } from "../types";
 
-export function gameDisplayName(game: GameRef | null | undefined): string {
+function gameDisplayName(game: GameRef | null | undefined): string {
   if (!game?.appid) return "";
   return game.name || `App ${game.appid}`;
 }

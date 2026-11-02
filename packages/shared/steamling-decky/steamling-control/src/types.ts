@@ -1,4 +1,4 @@
-export interface GameTweak {
+interface GameTweak {
   enabled?: boolean;
   name?: string;
   fexProfile?: string;
@@ -26,12 +26,12 @@ export interface Tweaks {
   games: Record<string, GameTweak>;
 }
 
-export interface InstalledGame {
+interface InstalledGame {
   appid: string;
   name: string;
 }
 
-export interface FexProfile {
+interface FexProfile {
   label: string;
   config?: Record<string, string>;
   /** STEAM_COMPAT_FEX_CONFIG string steamling-game-launch exports for Valve's x86 FEX; "" = none. */
@@ -87,7 +87,7 @@ export interface UpdateStatus {
   exitCode: number | null;
 }
 
-export interface SnapshotInfo {
+interface SnapshotInfo {
   id: string;
   created: string;
   ok: boolean;

@@ -5,7 +5,7 @@ import { findClassModule, findSP, quickAccessMenuClasses } from "@decky/ui";
 // and shifted right by 506px, so 348px of it is on screen. Making the placeholder wider (it is
 // anchored to the right edge) brings more of the menu on screen without touching the slide-in
 // transform. The friends list's expanded view resizes itself and is left alone.
-export const WIDTHS = { standard: 0, wide: 100, wider: 200 } as const;
+const WIDTHS = { standard: 0, wide: 100, wider: 200 } as const;
 export type MenuWidth = keyof typeof WIDTHS;
 
 const KEY = "steamling-control.menu-width";
@@ -46,7 +46,7 @@ function cls(map: Classes, key: string): string {
 }
 
 /** For Steam's main window: the placeholder sets the size and position of the menu's window. */
-export function placeholderCss(width: MenuWidth): string {
+function placeholderCss(width: MenuWidth): string {
   const extra = WIDTHS[width];
   const placeholder = cls(viewClasses, "ViewPlaceholder");
   if (!extra || !placeholder) return "";

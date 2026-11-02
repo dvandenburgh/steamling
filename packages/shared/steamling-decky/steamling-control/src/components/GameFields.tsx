@@ -26,7 +26,7 @@ export const lavdOptions = [
 ];
 const globalChoice = { data: "", label: t("Use global") };
 
-export function EnvVarsModal({ initial, onSave, closeModal }: { initial: string; onSave: (value: string) => void; closeModal?: () => void }) {
+function EnvVarsModal({ initial, onSave, closeModal }: { initial: string; onSave: (value: string) => void; closeModal?: () => void }) {
   const [value, setValue] = useState(initial);
   return (
     <ConfirmModal
@@ -113,7 +113,7 @@ export function PerfFields({ config, values, patch }: {
 }
 
 /** Applies live, like the touchscreen: the backend switches the pad when the game starts or stops. */
-export function GamepadTypeField({ values, patch }: { values: Record<string, any>; patch: (patch: Record<string, any>) => void }) {
+function GamepadTypeField({ values, patch }: { values: Record<string, any>; patch: (patch: Record<string, any>) => void }) {
   const options = [
     { data: "", label: t("Steam Deck (default)") },
     { data: "xb360", label: t("Xbox 360") },

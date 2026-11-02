@@ -35,7 +35,7 @@ function getLaunchOptions(appid: string): Promise<string | null> {
 }
 
 /** null = already wrapped. Keeps the user's own options around %command%. */
-export function wrapLaunchOptions(current: string): string | null {
+function wrapLaunchOptions(current: string): string | null {
   const stripped = current.replace(FEX_TOKEN, "").trim();
   if (stripped.includes(LAUNCHER)) return stripped === current.trim() ? null : stripped;
   if (stripped.includes(COMMAND)) return stripped.replace(COMMAND, `${LAUNCHER} ${COMMAND}`);
