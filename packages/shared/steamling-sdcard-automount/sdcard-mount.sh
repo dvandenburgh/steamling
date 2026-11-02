@@ -52,6 +52,15 @@ notify_steam()
     fi
 }
 
+# With the emulation layer in, a card's Emulation/ROMs joins the ES-DE games list
+# (steamling-roms-sync). Nothing to do without the layer, or with nobody logged in yet: the
+# login's own steamling-roms-init catches up then.
+sync_roms()
+{
+    [[ -x /usr/bin/steamling-roms-sync ]] || return 0
+    systemctl -M ${STEAM_UID}@ --user start --no-block steamling-roms-sync.service 2>/dev/null || true
+}
+
 do_mount()
 {
     if [[ -n ${MOUNT_POINT} ]]; then
@@ -98,6 +107,7 @@ do_mount()
     echo "**** Mounted ${DEVICE} at ${MOUNT_POINT} ****"
 
     notify_steam addlibraryfolder "$(urlencode "${MOUNT_POINT}")"
+    sync_roms
 }
 
 do_unmount()
@@ -120,6 +130,7 @@ do_unmount()
             fi
         fi
     done
+    sync_roms
 }
 
 case "${ACTION}" in
