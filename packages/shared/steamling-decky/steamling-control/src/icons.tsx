@@ -82,12 +82,15 @@ export const tabIcons = {
   ),
 };
 
-/** Governor's own icon: a flyball governor, the spinning regulator that holds a steam engine's speed. */
+/** Governor's own icon: a flyball governor, the spinning regulator that holds a steam engine's speed.
+ * Sized to fill the height of its row in Decky's plugin list; the view box is cropped to the
+ * drawing, so none of that size goes on empty margin. */
 export const pluginIcon = (
   <svg
-    width="1em"
-    height="1em"
-    viewBox="0 0 24 24"
+    style={{ display: "block" }}
+    width="1.75em"
+    height="1.75em"
+    viewBox="1.5 1 21 21"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
