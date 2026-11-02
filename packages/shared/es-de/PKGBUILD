@@ -1,7 +1,7 @@
 # es-de — the ES-DE frontend, vendored from upstream's official aarch64 AppImage. A source
 # build is not an option: it hard-depends on freeimage, which ALARM has no aarch64 build of.
-# The source URL's package_files id is NOT immutable — on a 404 take the new id from the
-# release page's "ES-DE_aarch64.AppImage" link and bump the sha256 with it.
+# ES-DE moved its downloads off GitLab to packages.es-de.org, one folder per release; a new
+# version is the same URL with the version changed, and a new sha256.
 pkgname=es-de
 pkgver=3.5.0
 pkgrel=2
@@ -13,7 +13,7 @@ provides=('emulationstation-de')
 conflicts=('emulationstation-de')
 depends=('fuse2')
 options=('!strip')
-source=("ES-DE-${pkgver}.AppImage::https://gitlab.com/es-de/emulationstation-de/-/package_files/357718204/download"
+source=("ES-DE-${pkgver}.AppImage::https://packages.es-de.org/release/${pkgver}/ES-DE_aarch64.AppImage"
         'es-de-wrapper'
         'es-de.desktop'
         'es-de-icon.png')
