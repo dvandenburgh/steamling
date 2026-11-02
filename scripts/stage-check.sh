@@ -115,7 +115,7 @@ done
 [ "${#LIVE_SOCS[@]}" -gt 0 ] || die "no per-SoC tree is published: nothing to check reach against"
 
 # --- load facts --------------------------------------------------------------
-declare -A ver deps prov repl confl optd     # keyed "name@repo"
+declare -A ver deps repl confl optd          # keyed "name@repo"
 declare -A cands provs                       # name -> "repo ..." / provspec-name -> "repo:pkg:pver ..."
 declare -A staged                            # name -> 1
 while read -r kind repo name rest; do

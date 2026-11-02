@@ -241,7 +241,7 @@ configure() {
 
   # Deltas and assertions every SoC shares (kernel/common), then the tree's own, which live beside
   # its kernel.conf where make sync leaves them alone.
-  local delta assert f
+  local delta assert
   for delta in "${STEAMLING_ROOT}/kernel/common/config-delta" "${KERNEL_DIR}/config-delta"; do
     [ -f "${delta}" ] || continue
     local -a dargs=() words
