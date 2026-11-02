@@ -217,7 +217,13 @@ esac
 [ "${#present[@]}" -gt 0 ] || exit 0
 
 mkdir -p "${EMU}/BIOS" "${EMU}/Saves" "${EMU}/States"
-for s in "${SYSTEMS[@]}"; do mkdir -p "${ROMS}/${s}"; done
+# A ROM folder on a microSD card only gets its system folders while the card is mounted: an
+# empty mount point is not the card.
+_roms_here=1
+case "${ROMS}" in
+  /run/media/*/*) mountpoint -q "$(printf '%s\n' "${ROMS}" | cut -d/ -f1-5)" || _roms_here=0 ;;
+esac
+[ "${_roms_here}" = 0 ] || for s in "${SYSTEMS[@]}"; do mkdir -p "${ROMS}/${s}"; done
 for e in ${EMU_NAMES}; do mkdir -p "${EMU_DROP}/${e}"; done
 # Eden is not shipped any more: hand a device that has it its own copy (cruft.md)
 if [ -x /opt/steamling/emulators/eden/Eden.AppImage ] && [ -z "$(ls -A "${EMU_DROP}/eden" 2>/dev/null)" ]; then
