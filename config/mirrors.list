@@ -23,21 +23,14 @@ mupen64plus-libretro-nx.git https://github.com/libretro/mupen64plus-libretro-nx.
 flycast.git                 https://github.com/flyinghead/flycast.git                       blobless
 swanstation.git             https://github.com/libretro/swanstation.git                     full
 libretro-core-info.git      https://github.com/libretro/libretro-core-info.git              full
-# Batocera: its per-emulator configgen (controller mapping, hotkeys, per-system defaults) and
-# the board packages for the same Snapdragon handhelds.
-batocera.git                https://github.com/batocera-linux/batocera.linux.git            blobless
 # Retroid's own trees (retroidpocket/* branches). The kernel fork rides in linux.git as a second
 # remote so it shares mainline's objects instead of being a second multi-GB clone.
 linux.git:retroid           https://github.com/RetroidPocket/linux.git                      blobless  retroidpocket/*
-retroid-audioreach-topology.git https://github.com/RetroidPocket/audioreach-topology.git    full
 retroid-alsa-ucm-conf.git   https://github.com/RetroidPocket/alsa-ucm-conf.git              full
 umtp-responder.git          https://github.com/viveris/uMTP-Responder.git                   full
-# Valve's Steam Deck sources as evlaV republishes them: SteamOS (holo) packaging, the Steam Frame
-# (deckard) packaging, and two kernel trees that ride in linux.git like Retroid's: Valve's
-# Steam Deck kernel (linux-integration) and the Frame's SM8650 kernel (deckard-linux-no-oopsies).
-holo.git                    https://github.com/evlaV/holo.git                               blobless
+# The Steam Frame's sources as evlaV republishes them: its packaging, and its SM8650 kernel
+# (deckard-linux-no-oopsies), which rides in linux.git like Retroid's.
 deckard.git                 https://github.com/evlaV/deckard.git                            blobless
-linux.git:valve             https://github.com/evlaV/linux-integration.git                  blobless
 linux.git:deckard           https://github.com/evlaV/deckard-linux-no-oopsies.git           blobless
 # The Frame's Mesa (Turnip + zink), its steamos-* release branches inside mesa.git under deckard/.
 mesa.git:deckard            https://github.com/evlav/deckard-mesa.git                       full      steamos-*
