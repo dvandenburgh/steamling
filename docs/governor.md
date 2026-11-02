@@ -11,18 +11,16 @@ tapping the icons:
 
 | Tab (icon) | What it does |
 |---|---|
-| Games (a gauge) | Fan curve, CPU scheduler and game tweaks, globally or per game; suggested settings and the shader cache |
-| Display (a screen) | The performance overlay, a live system monitor, display refresh calibration and the menu width |
-| Library (a plus in a box) | Add non-Steam games, share your files over the network or a USB cable, turn SSH on or off, format a microSD card for Steam |
+| This Game (a cartridge) | One game's settings, or the Default for every game: suggested settings, per-game performance, game tweaks, the shader cache |
+| Performance (a gauge) | The performance overlay, the CPU scheduler and fan curve, a live system monitor |
 | Controller (a gamepad) | Stick and trigger calibration, stick dead zone and full tilt, back paddles, rumble, stick lights |
-| Updater (a download arrow) | Check for and install system updates, roll back the last update, see your versions, restart game mode |
+| Files (a folder) | Add non-Steam games, share your files over the network or a USB cable, format a microSD card for Steam |
+| System (a gear) | System updates and rollback, SSH, display refresh calibration, the menu width, your versions, restart game mode |
 
 Settings save automatically as you change them. The panel only shows what your handheld has:
 no fan, no fan curve; a gamepad driver that can't be calibrated, no calibration; and so on.
 
-## Games
-
-![The Games tab: CPU scheduler and fan curve, then Game Tweaks](images/governor-games.jpeg)
+## This Game
 
 ### Game tweaks
 
@@ -31,17 +29,13 @@ Every installed Steam game is listed, and so are non-Steam shortcuts (marked `·
 If you open the menu while a game is running, that game is preselected. To override the
 defaults for one game, select it and flip **Use Per-Game Settings** on.
 
-Two sections follow: **Performance** (applies live) and **Game Tweaks** (applies on the
-**next game launch**, except where noted). A game's settings are also reachable from its
-library page: **Manage → Governor Settings**.
+For a game, two sections follow: **Performance** and **Game Tweaks** (applies on the **next
+game launch**, except where noted). The Default entry only has Game Tweaks: the handheld-wide
+CPU scheduler and fan curve are on the [Performance](#performance) tab. A game's settings are
+also reachable from its library page: **Manage → Governor Settings**.
 
-**Performance**
-
-- **Fan Curve**: **Quiet**, **Moderate**, or **Performance**. Applies live, no restart.
-- **CPU Scheduler**: **Autopilot** (the `scx_lavd` default - adapts to load on the fly) or
-  **Performance** (keeps the CPU aggressive at the cost of battery and heat).
-
-Per game, either can stay on the global value.
+**Performance** (per game only): the CPU scheduler and fan curve to use while this game runs,
+or **Use system setting** to follow the Performance tab.
 
 **Game Tweaks**
 
@@ -118,7 +112,9 @@ and throws it away. That fixes some graphics glitches and odd stutter after a dr
 update. The game builds its shaders again as it runs, so expect a little stutter the first time
 through. It's greyed out while the game is running.
 
-## Display
+## Performance
+
+How hard the handheld runs, and the numbers that show whether a change helped.
 
 ### Performance overlay
 
@@ -128,7 +124,16 @@ draw) or **Everything**. It's the same overlay as Steam's own **Performance Over
 the quick access menu, so changing either one changes it. The level you pick here stays from
 game to game (Steam's own setting resets with every game it starts).
 
-![The Display tab: the performance overlay set to Detailed, with the system monitor below it](images/governor-overlay.jpeg)
+![The performance overlay set to Detailed, with the system monitor below it](images/governor-overlay.jpeg)
+
+### CPU scheduler and fan curve
+
+- **CPU Scheduler**: **Autopilot** (the `scx_lavd` default - adapts to load on the fly) or
+  **Performance** (keeps the CPU aggressive at the cost of battery and heat).
+- **Fan Curve**: **Quiet**, **Moderate**, or **Performance**.
+
+Both apply right away, to everything. A game with its own Performance settings on the
+[This Game](#this-game) tab uses those while it runs.
 
 ### System monitor
 
@@ -137,87 +142,6 @@ the CPU is and each core cluster's clock, the GPU clock, CPU, GPU and battery te
 battery level and how much power it's drawing or taking in, memory use and the fan. It reads
 every 2 seconds and only while switched on and the menu is open, so it costs nothing otherwise.
 For numbers on top of the game itself, use the performance overlay above.
-
-### Display refresh rate
-
-Only on screens with adjustable timing, which so far means the RP6. **Calibrate Display**, then
-**Calibrate**, measures the screen's refresh rate for up to a minute and trims it onto the
-nominal rate (panels ship slightly fast or slow, which drifts emulator audio against video).
-The result is kept across reboots; **Reset to Factory** puts the panel's own timing back.
-
-### Quick Access Menu width
-
-**Standard** is Steam's own width; **Wide** (the default) and **Wider** make the whole quick
-access menu 100 or 200 pixels wider, Steam's own pages and other plugins included, so text wraps
-less on these small screens.
-
-![Refresh rate on Factory timing with the Calibrate Display button, then the menu width set to Wide](images/governor-display.jpeg)
-
-## Library
-
-### Adding non-Steam games
-
-![The Library tab: Add Non-Steam Game, then File Sharing](images/governor-add-game.jpeg)
-
-Steam's own **Add a Non-Steam Game** dialog does not work on Steamling, so add them here:
-
-1. In the **Library** tab, press **Add Non-Steam Game**.
-2. A file picker opens in your home directory. Navigate to the executable you want
-   (a Linux binary, script, or Windows `.exe`) and select it.
-3. Give it a name, and choose whether to **Launch with Proton**. This switches on
-   automatically for `.exe` files - Windows programs need it, native Linux ones do not.
-4. Press **Add to Library**. The game appears in your Steam library right away, and also
-   shows up in the tweaks dropdown above so you can give it its own FEX/audio settings.
-
-### File sharing
-
-**Share my home folder** turns the device into a network share, so you can drag ROMs, BIOS files
-and emulator firmware onto it from another computer. The first time, it offers a small download.
-The same toggle is in **Steamling Tools** on the desktop side.
-
-> **There is no password.** Anyone on the same network can read and write your home folder, so
-> turn it off when you are done. See
-> [copying files over the network](emulation-setup.md#copying-files-over-the-network) for how to
-> connect.
-
-### USB file transfer
-
-**Show up on a computer** turns the USB-C port into a media device, the way a phone works: plug
-the handheld into a PC or Mac and open **Steamling** to copy ROMs, BIOS files or screenshots
-over the cable. Your home folder is there, and so is the microSD card when you've installed
-Steamling to internal storage. No network, no drivers on Windows or Linux (a Mac needs an MTP
-app such as OpenMTP).
-
-It stays on until you turn it off or restart. While it's on, controllers, hubs and other USB
-devices plugged into that port won't work.
-
-### Remote access
-
-**Allow SSH logins** lets you log in from another computer's terminal, and shows the exact
-`ssh deck@...` line to type once it's on. It's the same switch as in **Steamling Tools**.
-
-![USB file transfer switched off, then Remote Access with SSH logins allowed](images/governor-remote-access.jpeg)
-
-> Every Steamling image ships with the same default password. Change yours first: open Konsole
-> in desktop mode and run `passwd`.
-
-### SD card
-
-Formats a microSD card so Steam can use it as game storage.
-
-Steam's own button does the same job (**Settings → Storage**, pick the card, **Format SD Card**),
-just like on a Steam Deck. This section is another way to get there, and it shows the card's
-current filesystem before you wipe it.
-
-The section shows the detected card (label, size, current filesystem); set a label if you like
-and press **Format SD Card**.
-
-> **Formatting erases everything on the card.** The confirmation dialog makes you type
-> `format` before it will run, so you cannot trigger it by accident.
-
-The card is formatted the same way a Steam Deck would (ext4 with casefolding), mounts
-automatically, and gets added to Steam as a library folder - Steam offers it as an install
-target right away, and cards formatted here also work in a real Steam Deck (and vice versa).
 
 ## Controller
 
@@ -251,9 +175,65 @@ target right away, and cards formatted here also work in a real Steam Deck (and 
 
   ![Stick lights on, with the left stick's hue and saturation](images/governor-stick-lights.jpeg)
 
-## Updater
+## Files
 
-![The Updater tab: Check for Updates, and the last snapshot under Rollback](images/governor-updater.jpeg)
+### Adding non-Steam games
+
+![Add Non-Steam Game, then File Sharing](images/governor-add-game.jpeg)
+
+Steam's own **Add a Non-Steam Game** dialog does not work on Steamling, so add them here:
+
+1. In the **Files** tab, press **Add Non-Steam Game**.
+2. A file picker opens in your home directory. Navigate to the executable you want
+   (a Linux binary, script, or Windows `.exe`) and select it.
+3. Give it a name, and choose whether to **Launch with Proton**. This switches on
+   automatically for `.exe` files - Windows programs need it, native Linux ones do not.
+4. Press **Add to Library**. The game appears in your Steam library right away, and also
+   shows up in the tweaks dropdown above so you can give it its own FEX/audio settings.
+
+### File sharing
+
+**Share my home folder** turns the device into a network share, so you can drag ROMs, BIOS files
+and emulator firmware onto it from another computer. The first time, it offers a small download.
+The same toggle is in **Steamling Tools** on the desktop side.
+
+> **There is no password.** Anyone on the same network can read and write your home folder, so
+> turn it off when you are done. See
+> [copying files over the network](emulation-setup.md#copying-files-over-the-network) for how to
+> connect.
+
+### USB file transfer
+
+**Show up on a computer** turns the USB-C port into a media device, the way a phone works: plug
+the handheld into a PC or Mac and open **Steamling** to copy ROMs, BIOS files or screenshots
+over the cable. Your home folder is there, and so is the microSD card when you've installed
+Steamling to internal storage. No network, no drivers on Windows or Linux (a Mac needs an MTP
+app such as OpenMTP).
+
+It stays on until you turn it off or restart. While it's on, controllers, hubs and other USB
+devices plugged into that port won't work.
+
+### SD card
+
+Formats a microSD card so Steam can use it as game storage.
+
+Steam's own button does the same job (**Settings → Storage**, pick the card, **Format SD Card**),
+just like on a Steam Deck. This section is another way to get there, and it shows the card's
+current filesystem before you wipe it.
+
+The section shows the detected card (label, size, current filesystem); set a label if you like
+and press **Format SD Card**.
+
+> **Formatting erases everything on the card.** The confirmation dialog makes you type
+> `format` before it will run, so you cannot trigger it by accident.
+
+The card is formatted the same way a Steam Deck would (ext4 with casefolding), mounts
+automatically, and gets added to Steam as a library folder - Steam offers it as an install
+target right away, and cards formatted here also work in a real Steam Deck (and vice versa).
+
+## System
+
+![Check for Updates, and the last snapshot under Rollback](images/governor-updater.jpeg)
 
 System updates, without leaving game mode:
 
@@ -276,6 +256,31 @@ Every update takes a snapshot first. If one breaks something, press **Roll Back 
 confirm, and **Reboot Now**: the system comes back as it was before the update, and your games,
 saves and settings are untouched. To go back further, or when game mode itself is broken, see
 [snapshots and rollback](snapshots.md).
+
+### Remote access
+
+**Allow SSH logins** lets you log in from another computer's terminal, and shows the exact
+`ssh deck@...` line to type once it's on. It's the same switch as in **Steamling Tools**.
+
+![USB file transfer switched off, then Remote Access with SSH logins allowed](images/governor-remote-access.jpeg)
+
+> Every Steamling image ships with the same default password. Change yours first: open Konsole
+> in desktop mode and run `passwd`.
+
+### Display refresh rate
+
+Only on screens with adjustable timing, which so far means the RP6. **Calibrate Display**, then
+**Calibrate**, measures the screen's refresh rate for up to a minute and trims it onto the
+nominal rate (panels ship slightly fast or slow, which drifts emulator audio against video).
+The result is kept across reboots; **Reset to Factory** puts the panel's own timing back.
+
+### Quick Access Menu width
+
+**Standard** is Steam's own width; **Wide** (the default) and **Wider** make the whole quick
+access menu 100 or 200 pixels wider, Steam's own pages and other plugins included, so text wraps
+less on these small screens.
+
+![Refresh rate on Factory timing with the Calibrate Display button, then the menu width set to Wide](images/governor-display.jpeg)
 
 ### About
 

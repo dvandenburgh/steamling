@@ -9,7 +9,7 @@ Open an [issue on GitHub](https://github.com/dvandenburgh/steamling/issues).
   Steam can take a *long* while to get ready, especially when running from an SD card. The
   Steamling logo stays on screen while it does; a short black gap before the logo appears
   is normal. Leave the device alone and it will get there.
-- **Steam's "Add a Non-Steam Game" dialog does not work.** Use **Governor → Library** to add
+- **Steam's "Add a Non-Steam Game" dialog does not work.** Use **Governor → Files** to add
   one instead.
 - **MangoHud costs a little performance.** It is fine for dialing in settings, but turn it off
   for real play. Honestly, consider this a feature: stop staring at the numbers and enjoy the

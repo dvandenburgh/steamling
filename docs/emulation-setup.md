@@ -115,13 +115,13 @@ Rather than shuttling a microSD card back and forth, you can turn the device int
 share and drag files straight onto it from another computer. It works out of the box in macOS
 Finder, Windows Explorer and Linux file managers - no extra software on either end.
 
-> **Got a USB-C cable handy?** That's often quicker: turn on **USB file transfer** in Steamling
-> Control's Library tab and the device shows up on your computer like a phone does. See
+> **Got a USB-C cable handy?** That's often quicker: turn on **USB file transfer** in
+> Governor's Files tab and the device shows up on your computer like a phone does. See
 > [USB file transfer](governor.md#usb-file-transfer).
 
 Turn it on in either place:
 
-- **Game Mode**: Quick Access Menu → **Governor** → **Library** → *Share my home folder*
+- **Game Mode**: Quick Access Menu → **Governor** → **Files** → *Share my home folder*
 - **Desktop**: **Steamling Tools** → *File sharing (SMB) is off - turn it on...*
 
 The first time, you will be offered a small download (Samba is not shipped in the image, so

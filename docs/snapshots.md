@@ -10,7 +10,7 @@ If the update brought a new kernel, the old kernel comes back too.
 If your storage is nearly full, the snapshot is skipped. The update still installs, you just
 can't undo that one.
 
-That covers every update, whichever way you install it: the Updater tab, Steamling Updater,
+That covers every update, whichever way you install it: Governor's System tab, Steamling Updater,
 `sudo pacman -Syu`, or a new build from your PC ([Updating Steamling](updating.md)).
 
 ## Rolling back
@@ -45,7 +45,7 @@ sudo steamling-snapshots prune    # delete old snapshots now (updates do this on
   the newer snapshot.
 - Changed your mind about a rollback? Roll back again. The system you left behind is kept until
   the next rollback, in case you want to look at it.
-- After a rollback, the Updater tab shows a *"System was rolled back"* note and hides the
+- After a rollback, Governor's System tab shows a *"System was rolled back"* note and hides the
   rollback button, because you're already on the older system. Your next update clears the note
   and brings the button back.
 - Snapshot times are shown in your local time.

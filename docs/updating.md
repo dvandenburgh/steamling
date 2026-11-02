@@ -18,7 +18,7 @@ You need:
 
 - the PC you build Steamling on, on the same network as the handheld
 - SSH turned on, on the handheld: build with `--ssh`, or turn on **Allow SSH logins** in
-  **Governor → Library → Remote access**
+  **Governor → System → Remote access**
 - a handheld already running Steamling, built from the same checkout
 
 These steps use the RP6, whose chip family is `sm8550`, and a build PC at `192.168.1.50`. Swap in
@@ -119,9 +119,9 @@ To stop updating from your PC:
 sudo sed -i '/^\[steamling\]$/,+3d;/^\[steamling-shared\]$/,+3d' /etc/pacman.conf
 ```
 
-## The Updater tab and Steamling Updater
+## Governor's System tab and Steamling Updater
 
-**Governor → Updater**, the **Steamling Updater** app in desktop mode and
+**Governor → System**, the **Steamling Updater** app in desktop mode and
 `sudo pacman -Syu` all do the same thing: install updates from the repos the handheld knows about.
 On a fresh image that means the Arch Linux ARM side only, never Steamling's own packages:
 

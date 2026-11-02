@@ -86,7 +86,7 @@ Formatting it erases the Steamling system on it, so first:
   Android's internal storage are both fine.
 
 Then format it from Steam: **Settings → Storage**, select the **MicroSD Card**, and pick
-**Format SD Card**. It takes about a minute. (**Governor → Library → SD card** does the
+**Format SD Card**. It takes about a minute. (**Governor → Files → SD card** does the
 same thing; see [SD card](governor.md#sd-card).)
 
 ![Steam formatting the microSD card](images/steam-format-sd-card.jpeg)
