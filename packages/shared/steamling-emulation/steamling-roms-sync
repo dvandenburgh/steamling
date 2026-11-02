@@ -1,0 +1,83 @@
+#!/bin/bash
+# steamling-roms-sync — one games list from two places. Games live in ~/Emulation/ROMs on the
+# handheld and in Emulation/ROMs on any microSD card; ES-DE reads ~/Emulation/Library, which this
+# fills with links to both, one folder per system. Run at login (steamling-roms-init), when a card
+# is mounted or removed (sdcard-mount.sh), and each time ES-DE starts (es-de-wrapper).
+#
+# It creates the per-system folders on the handheld and on every mounted card, so a card is ready
+# to fill as soon as it is in. In Library it only ever adds and removes links, never real files:
+# anything copied straight into Library stays put. A game on both the handheld and a card shows
+# once, from the handheld.
+set -u
+
+EMU="${HOME}/Emulation"
+LOCAL="${EMU}/ROMs"
+LIB="${EMU}/Library"
+CARDS="/run/media/${USER:-deck}"
+
+# ES-DE's own folder names. A folder only gives you a labelled place to put games: ES-DE still
+# shows a system once it has one.
+SYSTEMS=(
+  nes snes n64 gb gbc gba nds n3ds
+  genesis megadrive mastersystem gamegear segacd saturn dreamcast
+  tg16 pcengine neogeo cps1 cps2 cps3 arcade mame
+  atari2600 atari7800 atarilynx atarijaguar wonderswan
+  psx ps2 ps3 psp psvita
+  gc wii wiiu switch xbox
+)
+
+case "${1:-}" in
+  --systems) printf '%s\n' "${SYSTEMS[@]}"; exit 0 ;;
+esac
+
+# Sources, highest priority first: the handheld, then each mounted card.
+sources=("${LOCAL}")
+for d in "${CARDS}"/*/; do
+  d="${d%/}"
+  [ -d "${d}" ] && mountpoint -q "${d}" || continue
+  if mkdir -p "${d}/Emulation/ROMs" 2>/dev/null; then
+    sources+=("${d}/Emulation/ROMs")
+  elif [ -d "${d}/Emulation/ROMs" ]; then
+    sources+=("${d}/Emulation/ROMs")    # read-only card: still list what is on it
+  fi
+done
+
+for src in "${sources[@]}"; do
+  for s in "${SYSTEMS[@]}"; do mkdir -p "${src}/${s}" 2>/dev/null || break; done
+done
+
+# Every system folder any source has, ours and any the user made.
+declare -A systems=()
+for s in "${SYSTEMS[@]}"; do systems["${s}"]=1; done
+for src in "${sources[@]}"; do
+  for d in "${src}"/*/; do [ -d "${d}" ] && systems["$(basename "${d}")"]=1; done
+done
+
+mkdir -p "${LIB}" || exit 1
+shopt -s nullglob dotglob
+for s in "${!systems[@]}"; do
+  mkdir -p "${LIB}/${s}" 2>/dev/null || continue
+  declare -A want=()
+  for src in "${sources[@]}"; do
+    for f in "${src}/${s}"/*; do
+      n="$(basename "${f}")"
+      case "${n}" in .*) continue ;; esac
+      [ -n "${want[${n}]+x}" ] && continue        # the handheld's copy wins
+      want["${n}"]="${f}"
+    done
+  done
+  # Drop links that point nowhere we want any more (a removed card, a deleted game).
+  for l in "${LIB}/${s}"/*; do
+    [ -L "${l}" ] || continue
+    n="$(basename "${l}")"
+    [ "${want[${n}]-}" = "$(readlink "${l}")" ] || rm -f -- "${l}"
+  done
+  for n in "${!want[@]}"; do
+    t="${LIB}/${s}/${n}"
+    [ -L "${t}" ] && continue
+    [ -e "${t}" ] && continue                      # a real file of the user's, left alone
+    ln -s -- "${want[${n}]}" "${t}"
+  done
+  unset want
+done
+exit 0

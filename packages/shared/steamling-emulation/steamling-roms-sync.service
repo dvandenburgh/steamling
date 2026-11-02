@@ -1,0 +1,8 @@
+[Unit]
+Description=steamling: refresh the ES-DE games list from the handheld and microSD cards
+# Started by the card automount on insert and removal (sdcard-mount.sh). Collapses repeats: a
+# second start while one runs just waits for it.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/steamling-roms-sync
