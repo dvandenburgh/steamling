@@ -43,14 +43,14 @@ for d in "${CARDS}"/*/; do
 done
 
 for src in "${sources[@]}"; do
-  for s in "${SYSTEMS[@]}"; do mkdir -p "${src}/${s}" 2>/dev/null || break; done
+  mkdir -p "${SYSTEMS[@]/#/${src}/}" 2>/dev/null
 done
 
 # Every system folder any source has, ours and any the user made.
 declare -A systems=()
 for s in "${SYSTEMS[@]}"; do systems["${s}"]=1; done
 for src in "${sources[@]}"; do
-  for d in "${src}"/*/; do [ -d "${d}" ] && systems["$(basename "${d}")"]=1; done
+  for d in "${src}"/*/; do [ -d "${d}" ] && { d="${d%/}"; systems["${d##*/}"]=1; }; done
 done
 
 mkdir -p "${LIB}" || exit 1
@@ -60,24 +60,28 @@ for s in "${!systems[@]}"; do
   declare -A want=()
   for src in "${sources[@]}"; do
     for f in "${src}/${s}"/*; do
-      n="$(basename "${f}")"
+      n="${f##*/}"
       case "${n}" in .*) continue ;; esac
       [ -n "${want[${n}]+x}" ] && continue        # the handheld's copy wins
       want["${n}"]="${f}"
     done
   done
-  # Drop links that point nowhere we want any more (a removed card, a deleted game).
-  for l in "${LIB}/${s}"/*; do
-    [ -L "${l}" ] || continue
-    n="$(basename "${l}")"
-    [ "${want[${n}]-}" = "$(readlink "${l}")" ] || rm -f -- "${l}"
-  done
+  # Drop links that point nowhere we want any more (a removed card, a deleted game). One find
+  # per system lists every link with its target: this runs before each ES-DE start, so no
+  # process per game.
+  while IFS=$'\t' read -r -d '' n target; do
+    [ "${want[${n}]-}" = "${target}" ] || rm -f -- "${LIB}/${s}/${n}"
+  done < <(find "${LIB}/${s}" -mindepth 1 -maxdepth 1 -type l -printf '%f\t%l\0')
+  # A link is named after its game, so a whole system's new links are one ln call.
+  new=()
   for n in "${!want[@]}"; do
     t="${LIB}/${s}/${n}"
     [ -L "${t}" ] && continue
     [ -e "${t}" ] && continue                      # a real file of the user's, left alone
-    ln -s -- "${want[${n}]}" "${t}"
+    new+=("${want[${n}]}")
   done
+  # Another sync (a card event while ES-DE starts) may have just made some of them.
+  [ "${#new[@]}" -eq 0 ] || ln -s -t "${LIB}/${s}" -- "${new[@]}" 2>/dev/null || true
   unset want
 done
 exit 0
