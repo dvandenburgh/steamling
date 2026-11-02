@@ -24,6 +24,8 @@ no fan, no fan curve; a gamepad driver that can't be calibrated, no calibration;
 
 ### Game tweaks
 
+![The This Game tab's Game Tweaks: FEX preset, audio buffer, Xalia and the touchscreen](images/governor-games.jpeg)
+
 Tweaks can be set globally (the **Default** entry in the **Game** dropdown) or per game.
 Every installed Steam game is listed, and so are non-Steam shortcuts (marked `· non-Steam`).
 If you open the menu while a game is running, that game is preselected. To override the
@@ -124,7 +126,7 @@ draw) or **Everything**. It's the same overlay as Steam's own **Performance Over
 the quick access menu, so changing either one changes it. The level you pick here stays from
 game to game (Steam's own setting resets with every game it starts).
 
-![The performance overlay set to Detailed, with the system monitor below it](images/governor-overlay.jpeg)
+![The Performance tab: the overlay on the Compact bar, then the CPU scheduler and fan curve](images/governor-overlay.jpeg)
 
 ### CPU scheduler and fan curve
 
@@ -171,15 +173,17 @@ For numbers on top of the game itself, use the performance overlay above.
   sticks one colour, **Side Lights** to match the side lighting to the sticks, then colour and
   brightness per stick.
 
-  ![Rumble on at 50% strength, and the stick lights switched off](images/governor-rumble.jpeg)
+  ![Rumble on at 50% strength, and the stick lights switched on](images/governor-rumble.jpeg)
 
-  ![Stick lights on, with the left stick's hue and saturation](images/governor-stick-lights.jpeg)
+  ![The left stick's hue, saturation and brightness](images/governor-stick-lights.jpeg)
+
+  ![Link Left & Right on: one set of sliders for both sticks](images/governor-stick-lights-linked.jpeg)
 
 ## Files
 
 ### Adding non-Steam games
 
-![Add Non-Steam Game, then File Sharing](images/governor-add-game.jpeg)
+![The Files tab: Add Non-Steam Game, then File Sharing](images/governor-add-game.jpeg)
 
 Steam's own **Add a Non-Steam Game** dialog does not work on Steamling, so add them here:
 
@@ -224,6 +228,8 @@ current filesystem before you wipe it.
 The section shows the detected card (label, size, current filesystem); set a label if you like
 and press **Format SD Card**.
 
+![USB file transfer, then the SD Card section showing a mounted 500 GB card](images/governor-sd-card.jpeg)
+
 > **Formatting erases everything on the card.** The confirmation dialog makes you type
 > `format` before it will run, so you cannot trigger it by accident.
 
@@ -233,7 +239,7 @@ target right away, and cards formatted here also work in a real Steam Deck (and 
 
 ## System
 
-![Check for Updates, and the last snapshot under Rollback](images/governor-updater.jpeg)
+![The System tab: Check for Updates, and the last snapshot under Rollback](images/governor-updater.jpeg)
 
 System updates, without leaving game mode:
 
@@ -261,8 +267,6 @@ saves and settings are untouched. To go back further, or when game mode itself i
 
 **Allow SSH logins** lets you log in from another computer's terminal, and shows the exact
 `ssh deck@...` line to type once it's on. It's the same switch as in **Steamling Tools**.
-
-![USB file transfer switched off, then Remote Access with SSH logins allowed](images/governor-remote-access.jpeg)
 
 > Every Steamling image ships with the same default password. Change yours first: open Konsole
 > in desktop mode and run `passwd`.
