@@ -276,16 +276,17 @@ function Icon({ path }) {
     return (SP_JSX.jsx("svg", { style: { display: "block" }, width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: path }));
 }
 const tabIcons = {
-    // Performance: a gauge with its needle swung toward high, for the fan curve, CPU scheduler,
-    // overlay and system monitor that live under this tab.
-    Games: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("path", { d: "M3.34 19a10 10 0 1 1 17.32 0" }), SP_JSX.jsx("path", { d: "M6 14h1.5" }), SP_JSX.jsx("path", { d: "M12 6.5V8" }), SP_JSX.jsx("path", { d: "M16.5 14H18" }), SP_JSX.jsx("path", { d: "m12 14 4.5-4.5" }), SP_JSX.jsx("circle", { cx: "12", cy: "14", r: "1.5", fill: "currentColor" })] }) })),
-    // Display: a screen with a pulse line on it, for the overlay, the live readings and the panel
-    // settings under this tab.
-    Display: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("rect", { width: "20", height: "14", x: "2", y: "3", rx: "2" }), SP_JSX.jsx("path", { d: "M8 21h8" }), SP_JSX.jsx("path", { d: "M12 17v4" }), SP_JSX.jsx("path", { d: "M6 11h2.5l1.5-3 3 6 1.5-3H18" })] }) })),
-    Library: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("rect", { width: "18", height: "18", x: "3", y: "3", rx: "2" }), SP_JSX.jsx("path", { d: "M8 12h8" }), SP_JSX.jsx("path", { d: "M12 8v8" })] }) })),
-    Updater: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }), SP_JSX.jsx("polyline", { points: "7 10 12 15 17 10" }), SP_JSX.jsx("line", { x1: "12", x2: "12", y1: "15", y2: "3" })] }) })),
+    // This Game: a game cartridge, for one game's settings and tweaks.
+    ThisGame: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("path", { d: "M6 3h12a1 1 0 0 1 1 1v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z" }), SP_JSX.jsx("rect", { width: "8", height: "6", x: "8", y: "6", rx: "1" }), SP_JSX.jsx("path", { d: "M9 17v1" }), SP_JSX.jsx("path", { d: "M12 17v1" }), SP_JSX.jsx("path", { d: "M15 17v1" })] }) })),
+    // Performance: a gauge with its needle swung toward high, for the overlay, CPU scheduler, fan
+    // curve and system monitor that live under this tab.
+    Performance: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("path", { d: "M3.34 19a10 10 0 1 1 17.32 0" }), SP_JSX.jsx("path", { d: "M6 14h1.5" }), SP_JSX.jsx("path", { d: "M12 6.5V8" }), SP_JSX.jsx("path", { d: "M16.5 14H18" }), SP_JSX.jsx("path", { d: "m12 14 4.5-4.5" }), SP_JSX.jsx("circle", { cx: "12", cy: "14", r: "1.5", fill: "currentColor" })] }) })),
     // The gamepad: calibration, stick response, paddles and rumble all live under this tab.
     Controller: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("line", { x1: "6", x2: "10", y1: "11", y2: "11" }), SP_JSX.jsx("line", { x1: "8", x2: "8", y1: "9", y2: "13" }), SP_JSX.jsx("line", { x1: "15", x2: "15.01", y1: "12", y2: "12" }), SP_JSX.jsx("line", { x1: "18", x2: "18.01", y1: "10", y2: "10" }), SP_JSX.jsx("path", { d: "M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" })] }) })),
+    // Files: a folder, for adding games and moving files on and off the handheld.
+    Files: (SP_JSX.jsx(Icon, { path: SP_JSX.jsx("path", { d: "M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" }) })),
+    // System: a gear, for updates, remote access, the set-once screen settings and versions.
+    System: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("path", { d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" }), SP_JSX.jsx("circle", { cx: "12", cy: "12", r: "3" })] }) })),
 };
 /** Governor's own icon: a flyball governor, the spinning regulator that holds a steam engine's speed. */
 const pluginIcon = (SP_JSX.jsxs("svg", { width: "1em", height: "1em", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [SP_JSX.jsx("line", { x1: "12", x2: "12", y1: "2", y2: "21" }), SP_JSX.jsx("path", { d: "M12 4 7.6 9.4M12 4l4.4 5.4" }), SP_JSX.jsx("circle", { cx: "6.5", cy: "11", r: "1.9", fill: "currentColor" }), SP_JSX.jsx("circle", { cx: "17.5", cy: "11", r: "1.9", fill: "currentColor" }), SP_JSX.jsx("path", { d: "M7.6 12.6 10.5 15.5M16.4 12.6 13.5 15.5" }), SP_JSX.jsx("rect", { x: "10", y: "15", width: "4", height: "2.5", rx: "0.5" }), SP_JSX.jsx("line", { x1: "7", x2: "17", y1: "21", y2: "21" })] }));
@@ -810,54 +811,644 @@ function StickLights({ config, setConfig, reload }) {
                                 .catch(() => reload()) }) }))] }), led.enabled && (led.linked ? (SP_JSX.jsx(DFL.PanelSection, { title: t("BOTH STICKS"), children: SP_JSX.jsx(ColorControls, { zone: "both", hsv: leftHsv, brightness: led.left.brightness, onCommit: commitBoth }) })) : (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.PanelSection, { title: t("LEFT STICK"), children: SP_JSX.jsx(ColorControls, { zone: "left", hsv: leftHsv, brightness: led.left.brightness, onCommit: commitLeft }) }), SP_JSX.jsx(DFL.PanelSection, { title: t("RIGHT STICK"), children: SP_JSX.jsx(ColorControls, { zone: "right", hsv: rightHsv, brightness: led.right.brightness, onCommit: commitRight }) })] })))] }));
 }
 
-// Panels leave the factory a touch fast or slow, and emulators that pace to the display drift
-// against their audio. steamling-panel-calibration measures the running refresh rate and trims the
-// panel's frame length until it sits on the nominal rate; the result is kept across reboots.
-function PanelModal({ initial, onChange, closeModal }) {
-    const [status, setStatus] = SP_REACT.useState(initial);
-    const [busy, setBusy] = SP_REACT.useState(initial.running);
-    const [error, setError] = SP_REACT.useState("");
-    const busyRef = SP_REACT.useRef(busy);
+// Every Steam game and every non-Steam shortcut (emulator tiles, ROM managers, a Windows .exe on
+// Proton) launches through steamling-game-launch, which applies the per-game tweaks at launch
+// time, so a settings change never has to touch launch options.
+// Bare name: Steam runs launch options through a shell with the system PATH (/usr/bin).
+const LAUNCHER = "steamling-game-launch";
+const COMMAND = "%command%";
+// Written by this plugin before the launcher existed; the launcher exports it itself now.
+const FEX_TOKEN = /STEAM_COMPAT_FEX_CONFIG=("[^"]*"|\S*)\s*/g;
+function getLaunchOptions(appid) {
+    return new Promise((resolve) => {
+        const apps = window.SteamClient?.Apps;
+        if (!apps?.RegisterForAppDetails)
+            return resolve(null);
+        let registration;
+        let timer;
+        let done = false;
+        const finish = (value) => {
+            if (done)
+                return;
+            done = true;
+            if (timer !== undefined)
+                window.clearTimeout(timer);
+            // Steam may call back before RegisterForAppDetails returns; unregister on a microtask.
+            Promise.resolve().then(() => registration?.unregister?.());
+            resolve(value);
+        };
+        timer = window.setTimeout(() => finish(null), 3000);
+        try {
+            registration = apps.RegisterForAppDetails(Number(appid), (details) => {
+                finish(String(details?.strLaunchOptions ?? ""));
+            });
+        }
+        catch (error) {
+            finish(null);
+        }
+    });
+}
+/** null = already wrapped. Keeps the user's own options around %command%. */
+function wrapLaunchOptions(current) {
+    const stripped = current.replace(FEX_TOKEN, "").trim();
+    if (stripped.includes(LAUNCHER))
+        return stripped === current.trim() ? null : stripped;
+    if (stripped.includes(COMMAND))
+        return stripped.replace(COMMAND, `${LAUNCHER} ${COMMAND}`);
+    // Without %command% Steam appends bare options as arguments, so they stay after it.
+    return [`${LAUNCHER} ${COMMAND}`, stripped].filter(Boolean).join(" ");
+}
+/** Bails rather than clobber when the current value can't be read. */
+async function ensureLaunchWrapper(appid) {
+    const apps = window.SteamClient?.Apps;
+    if (!apps?.SetAppLaunchOptions)
+        return false;
+    const current = await getLaunchOptions(appid);
+    if (current === null)
+        return false;
+    const next = wrapLaunchOptions(current);
+    if (next !== null)
+        apps.SetAppLaunchOptions(Number(appid), next);
+    return true;
+}
+async function wrapShortcuts(appids) {
+    for (const appid of appids)
+        await ensureLaunchWrapper(appid);
+}
+async function wrapAllGames(appids) {
+    let next = 0;
+    const worker = async () => {
+        while (next < appids.length)
+            await ensureLaunchWrapper(appids[next++]);
+    };
+    await Promise.all(Array.from({ length: Math.min(8, appids.length) }, worker));
+}
+/** New installs get wrapped once their download queues; returns the unregister. */
+function registerDownloadWrapper(isGame) {
+    const downloads = window.SteamClient?.Downloads;
+    if (!downloads?.RegisterForDownloadItems)
+        return () => { };
+    const pending = new Set();
+    let timer;
+    const flush = () => {
+        timer = undefined;
+        const ids = Array.from(pending);
+        pending.clear();
+        wrapAllGames(ids.filter(isGame));
+    };
+    // Each queue item is { item_data: [{ appid, ... }] }: the appids live in item_data.
+    const handle = downloads.RegisterForDownloadItems((_paused, items) => {
+        if (!Array.isArray(items))
+            return;
+        for (const item of items) {
+            for (const entry of Object.values(item?.item_data || {})) {
+                const appid = String(entry?.appid ?? "");
+                if (appid && appid !== "0")
+                    pending.add(appid);
+            }
+        }
+        if (timer === undefined)
+            timer = window.setTimeout(flush, 1500);
+    });
+    return () => {
+        if (timer !== undefined)
+            window.clearTimeout(timer);
+        try {
+            handle?.unregister?.();
+        }
+        catch (error) {
+        }
+    };
+}
+
+// Replaces the stock "Add a Non-Steam Game" flow: Steam's file browser cannot open a new
+// window under the Plasma Mobile X11 session, so Decky's in-UI picker feeds this instead.
+const WINDOWS_EXE = /\.(exe|bat|msi)$/i;
+// Constant internal name from proton-cachyos' compatibilitytool.vdf; survives version bumps.
+const PROTON_TOOL = "proton-cachyos";
+function isWindowsExe(path) {
+    return WINDOWS_EXE.test(path);
+}
+function defaultShortcutName(path) {
+    const base = path.split("/").pop() || path;
+    const cleaned = base.replace(/\.[^.]+$/, "").replace(/_+/g, " ").trim();
+    return cleaned || base;
+}
+const quote = (value) => `"${value.replace(/"/g, '\\"')}"`;
+async function addShortcut(name, path, useProton) {
+    const apps = window.SteamClient?.Apps;
+    if (!apps?.AddShortcut)
+        throw new Error("Steam shortcut API unavailable");
+    const dir = path.slice(0, path.lastIndexOf("/") + 1) || "/";
+    const appId = await apps.AddShortcut(name, path, "", "");
+    if (typeof appId !== "number" || !appId)
+        throw new Error("Steam refused to create the shortcut");
+    apps.SetShortcutName?.(appId, name);
+    apps.SetShortcutExe?.(appId, quote(path));
+    apps.SetShortcutStartDir?.(appId, quote(dir));
+    if (useProton)
+        apps.SpecifyCompatTool?.(appId, PROTON_TOOL);
+    ensureLaunchWrapper(String(appId >>> 0));
+    return appId;
+}
+
+function AddGameModal({ path, closeModal }) {
+    const [name, setName] = SP_REACT.useState(defaultShortcutName(path));
+    const [proton, setProton] = SP_REACT.useState(isWindowsExe(path));
+    const [busy, setBusy] = SP_REACT.useState(false);
+    const submit = async () => {
+        if (busy || !name.trim())
+            return;
+        setBusy(true);
+        try {
+            await addShortcut(name.trim(), path, proton);
+            toaster.toast({ title: t("Added to library"), body: name.trim() });
+            closeModal?.();
+        }
+        catch (error) {
+            toaster.toast({ title: t("Could not add game"), body: String(error) });
+            setBusy(false);
+        }
+    };
+    return (SP_JSX.jsxs(DFL.ConfirmModal, { strTitle: t("Add Non-Steam Game"), strDescription: path, strOKButtonText: busy ? "Adding…" : "Add to Library", bOKDisabled: busy || !name.trim(), onCancel: () => closeModal?.(), onOK: submit, children: [SP_JSX.jsx(DFL.TextField, { label: t("Name"), value: name, disabled: busy, onChange: (event) => setName(event.target.value) }), SP_JSX.jsx(DFL.ToggleField, { label: t("Launch with Proton"), description: t("Needed for Windows games (.exe)"), checked: proton, disabled: busy, onChange: setProton })] }));
+}
+function AddGameSection() {
+    const pick = async () => {
+        try {
+            // 0 = FileSelectionType.FILE (const enum in @decky/api typings, no runtime export).
+            const result = await openFilePicker(0, "/home/deck", true, true);
+            if (result?.path)
+                DFL.showModal(SP_JSX.jsx(AddGameModal, { path: result.path }));
+        }
+        catch (error) {
+            // Picker closed without a selection.
+        }
+    };
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("LIBRARY"), children: [SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: pick, children: t("Add Non-Steam Game") }) }), SP_JSX.jsx("div", { className: "steamling-note", children: t("Pick an executable to add it to your Steam library") })] }));
+}
+
+// The share is guest-writable and covers the whole home folder, so the trade is spelled out
+// rather than buried: same warning the Steamling Tools menu shows before it flips the switch.
+function ShareConfirmModal({ onConfirm, closeModal }) {
+    const [running, setRunning] = SP_REACT.useState(false);
+    const runningRef = SP_REACT.useRef(false);
+    runningRef.current = running;
+    const start = async () => {
+        if (runningRef.current)
+            return;
+        setRunning(true);
+        await onConfirm();
+        closeModal?.();
+    };
+    return (SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Share Files Over The Network"), strDescription: running
+            ? "Starting…"
+            : "Anyone on the same network can read and write every file in your home folder - games, saves and emulator settings, but also your Steam login and SSH keys. There is no password. Only turn this on at home.", strOKButtonText: running ? "Starting…" : "Turn On Sharing", bDestructiveWarning: true, bOKDisabled: running, bCancelDisabled: running, bDisableBackgroundDismiss: true, onCancel: () => {
+            if (!runningRef.current)
+                closeModal?.();
+        }, onOK: start }));
+}
+function FileSharing() {
+    const [share, setShareState] = SP_REACT.useState(null);
+    const [busy, setBusy] = SP_REACT.useState(false);
+    const [status, setStatus] = SP_REACT.useState("");
+    const busyRef = SP_REACT.useRef(false);
     busyRef.current = busy;
+    const visible = useQamVisible();
+    // Polled only while the menu is open; reopening refreshes at once.
+    SP_REACT.useEffect(() => {
+        if (!visible)
+            return;
+        let cancelled = false;
+        const refresh = async () => {
+            if (busyRef.current)
+                return;
+            try {
+                const next = await shareStatus();
+                if (!cancelled && !busyRef.current)
+                    setShareState(next);
+            }
+            catch (error) {
+                if (!cancelled)
+                    setStatus(String(error));
+            }
+        };
+        refresh();
+        const timer = window.setInterval(refresh, 5000);
+        return () => {
+            cancelled = true;
+            window.clearInterval(timer);
+        };
+    }, [visible]);
     const run = async (action) => {
         if (busyRef.current)
             return;
         setBusy(true);
-        setError("");
+        setStatus("");
         try {
-            const next = await action();
-            setStatus(next);
-            onChange(next);
+            setShareState(await action());
         }
-        catch (e) {
-            setError(String(e));
+        catch (error) {
+            setStatus(String(error));
         }
         finally {
             setBusy(false);
         }
     };
-    const result = status.result;
-    return (SP_JSX.jsxs(DFL.ModalRoot, { closeModal: busy ? undefined : closeModal, bDisableBackgroundDismiss: busy, children: [SP_JSX.jsx("div", { style: { fontSize: "20px", fontWeight: "bold", marginBottom: "8px" }, children: t("Display Refresh Calibration") }), SP_JSX.jsx("div", { children: busy
-                    ? "Measuring… this takes up to a minute. Leave the device on this screen until it finishes."
-                    : `${status.saved ? "A saved calibration is in use." : "Using the panel's factory timing."} Calibrate measures the refresh rate and trims it to exactly the nominal rate, which keeps emulator audio and video in step.` }), result && !busy ? (SP_JSX.jsx("div", { style: { marginTop: "8px" }, children: `${result.rate} Hz: measured ${result.before.toFixed(2)} Hz, now ${result.after.toFixed(2)} Hz.` })) : null, SP_JSX.jsxs(DFL.Focusable, { style: { display: "flex", gap: "8px", marginTop: "12px" }, children: [SP_JSX.jsx(DFL.DialogButton, { disabled: busy, onClick: () => run(panelCalibrate), children: busy ? "Calibrating…" : "Calibrate" }), SP_JSX.jsx(DFL.DialogButton, { disabled: busy || !status.saved, onClick: () => run(panelReset), children: t("Reset to Factory") }), SP_JSX.jsx(DFL.DialogButton, { disabled: busy, onClick: () => closeModal?.(), children: t("Close") })] }), error ? SP_JSX.jsx("div", { style: { marginTop: "8px", color: "#ff8080" }, children: error }) : null] }));
+    const summary = () => {
+        if (status)
+            return status;
+        if (!share)
+            return "Checking…";
+        if (!share.installed)
+            return "Samba is not installed (7.4 MB download)";
+        if (share.on)
+            return "On - open smb://steamling.local and connect as Guest";
+        return "Off - your home folder is not shared";
+    };
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("FILE SHARING"), children: [SP_JSX.jsx(DFL.Field, { label: t("Network share"), description: summary() }), share && !share.installed ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busy, onClick: () => run(installSamba), children: busy ? "Installing…" : "Install Samba" }) })) : (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Share my home folder"), description: t("Drag files straight onto the device from another computer"), checked: !!share?.on, disabled: busy || !share?.installed, onChange: (on) => {
+                        if (busyRef.current)
+                            return;
+                        if (on)
+                            DFL.showModal(SP_JSX.jsx(ShareConfirmModal, { onConfirm: () => run(() => setShare(true)) }));
+                        else
+                            run(() => setShare(false));
+                    } }) }))] }));
 }
-function PanelCalibration() {
-    const [status, setStatus] = SP_REACT.useState(null);
+
+function cardSummary(card) {
+    if (!card)
+        return "Checking…";
+    if (!card.present)
+        return "No SD card detected";
+    if (card.bootDisk)
+        return "Booted from this card - formatting disabled";
+    const size = card.sizeBytes ? `${(card.sizeBytes / 1e9).toFixed(1)} GB` : "";
+    const state = card.fstype === "ext4" ? (card.mountpoint ? "mounted" : "") : "not formatted for Steam";
+    return [card.label || "unlabeled", size, card.fstype || "no filesystem", state].filter(Boolean).join(" · ");
+}
+// closeModal must not be forwarded to ConfirmModal: its OK handler would close the dialog
+// at once, and it has to stay open until the format finishes.
+function FormatConfirmModal({ summary, onConfirm, closeModal }) {
+    const [text, setText] = SP_REACT.useState("");
+    const [running, setRunning] = SP_REACT.useState(false);
+    const armedRef = SP_REACT.useRef(false);
+    const runningRef = SP_REACT.useRef(false);
+    armedRef.current = text.trim().toLowerCase() === "format";
+    runningRef.current = running;
+    const start = async () => {
+        if (!armedRef.current || runningRef.current)
+            return;
+        setRunning(true);
+        await onConfirm();
+        closeModal?.();
+    };
+    return (SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Format SD Card"), strDescription: running
+            ? "Formatting… This can take a minute. Do not remove the card."
+            : `This erases ALL data on the card (${summary}) and formats it for Steam. Type "format" and press Enter to confirm.`, strOKButtonText: running ? "Formatting…" : "Erase and Format", bDestructiveWarning: true, bOKDisabled: !armedRef.current || running, bCancelDisabled: running, bDisableBackgroundDismiss: true, bHideCloseIcon: true, onCancel: () => {
+            if (!runningRef.current)
+                closeModal?.();
+        }, onOK: start, children: !running ? (SP_JSX.jsx(DFL.TextField, { value: text, focusOnMount: true, onChange: (event) => setText(event.target.value), onKeyDown: (event) => {
+                if (event.key === "Enter")
+                    start();
+            } })) : null }));
+}
+function SdCard() {
+    const [card, setCard] = SP_REACT.useState(null);
+    const [label, setLabel] = SP_REACT.useState("SDCARD");
+    const [busy, setBusy] = SP_REACT.useState(false);
+    const [status, setStatus] = SP_REACT.useState("");
+    const busyRef = SP_REACT.useRef(false);
+    busyRef.current = busy;
     const visible = useQamVisible();
-    // One cheap sysfs read per menu open; panels without the attributes never show the section.
+    // Polled only while the menu is open; reopening refreshes at once.
     SP_REACT.useEffect(() => {
         if (!visible)
             return;
         let cancelled = false;
-        panelStatus()
-            .then((next) => { if (!cancelled)
-            setStatus(next); })
-            .catch(() => { });
-        return () => { cancelled = true; };
+        const refresh = async () => {
+            if (busyRef.current)
+                return;
+            try {
+                const next = await detectSdcard();
+                if (!cancelled && !busyRef.current)
+                    setCard(next);
+            }
+            catch (error) {
+                if (!cancelled)
+                    setStatus(String(error));
+            }
+        };
+        refresh();
+        const timer = window.setInterval(refresh, 5000);
+        return () => {
+            cancelled = true;
+            window.clearInterval(timer);
+        };
     }, [visible]);
-    if (!status?.available)
+    const runFormat = async () => {
+        if (busyRef.current)
+            return;
+        setBusy(true);
+        setStatus("");
+        try {
+            const next = await formatSdcard(label);
+            setCard(next);
+        }
+        catch (error) {
+            setStatus(String(error));
+        }
+        finally {
+            setBusy(false);
+        }
+    };
+    const confirmFormat = () => DFL.showModal(SP_JSX.jsx(FormatConfirmModal, { summary: cardSummary(card), onConfirm: runFormat }));
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("SD CARD"), children: [SP_JSX.jsx(DFL.Field, { label: t("Card"), description: cardSummary(card) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.TextField, { label: t("Label"), value: label, disabled: busy || !!card?.bootDisk, onChange: (event) => setLabel(event.target.value.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 16)) }) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: !card?.present || busy || !!card?.bootDisk, onClick: confirmFormat, children: busy ? "Formatting…" : "Format SD Card" }) }), status ? SP_JSX.jsx(DFL.Field, { label: "", description: status }) : null] }));
+}
+
+function UsbTransfer() {
+    const [usb, setUsb] = SP_REACT.useState(null);
+    const [busy, setBusy] = SP_REACT.useState(false);
+    const [status, setStatus] = SP_REACT.useState("");
+    const busyRef = SP_REACT.useRef(false);
+    busyRef.current = busy;
+    const visible = useQamVisible();
+    SP_REACT.useEffect(() => {
+        if (!visible)
+            return;
+        let cancelled = false;
+        usbTransferStatus()
+            .then((next) => {
+            if (!cancelled && !busyRef.current)
+                setUsb(next);
+        })
+            .catch((error) => {
+            if (!cancelled)
+                setStatus(String(error));
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [visible]);
+    const run = async (on) => {
+        if (busyRef.current)
+            return;
+        setBusy(true);
+        setStatus("");
+        try {
+            setUsb(await setUsbTransfer(on));
+        }
+        catch (error) {
+            setStatus(String(error));
+        }
+        finally {
+            setBusy(false);
+        }
+    };
+    if (usb && !usb.available)
         return null;
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("DISPLAY"), children: [SP_JSX.jsx(DFL.Field, { label: t("Refresh rate"), description: status.saved ? "Calibrated" : "Factory timing" }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: () => DFL.showModal(SP_JSX.jsx(PanelModal, { initial: status, onChange: setStatus })), children: t("Calibrate Display") }) })] }));
+    const summary = () => {
+        if (status)
+            return status;
+        if (!usb)
+            return "Checking…";
+        if (usb.on)
+            return "On - plug into a computer with a USB-C cable and open \"Steamling\" like a phone. Controllers and hubs on the port stop working until you turn this off.";
+        return "Off";
+    };
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("USB FILE TRANSFER"), children: [SP_JSX.jsx(DFL.Field, { label: t("Transfer over USB"), description: summary() }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Show up on a computer"), description: t("Copy files over a cable, no network needed. Stays on until you restart."), checked: !!usb?.on, disabled: busy || !usb, onChange: (on) => run(on) }) })] }));
+}
+
+// Getting games and files onto the handheld. SD card last: formatting is the only destructive
+// action, kept away from the casual toggles.
+function Files() {
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(AddGameSection, {}), SP_JSX.jsx(FileSharing, {}), SP_JSX.jsx(UsbTransfer, {}), SP_JSX.jsx(SdCard, {})] }));
+}
+
+// Drives the same state as Steam's own per-game compatibility dropdown (SpecifyCompatTool +
+// app details), so never store a shadow copy: the two UIs stay in sync by construction.
+
+// Steam's tool list is only reachable through its react-query hook, which throws
+// without Steam's QueryClient in context; a throwaway root under Steam's provider
+// works from any tree (QAM panel, modals, import flow).
+const steam = {
+    hook: null,
+    provider: null,
+    client: null,
+    createRoot: null,
+};
+function findSteam() {
+    steam.hook || (steam.hook = DFL.findModuleExport((e) => typeof e === "function" && e.toString().includes("Failed to fetch available compat tools")));
+    steam.provider || (steam.provider = DFL.findModuleExport((e) => {
+        if (typeof e !== "function")
+            return false;
+        const src = e.toString();
+        return src.length < 400 && /\.mount\(\)/.test(src) && /unmount\(\)/.test(src) && /children/.test(src);
+    }));
+    steam.client || (steam.client = DFL.findModuleExport((e) => e && typeof e === "object" && typeof e.getQueryCache === "function" && typeof e.invalidateQueries === "function"));
+    steam.createRoot || (steam.createRoot = DFL.findModule((m) => typeof m?.createRoot === "function")?.createRoot);
+    return !!(steam.hook && steam.provider && steam.client && steam.createRoot);
+}
+class ProbeBoundary extends SP_REACT.Component {
+    constructor() {
+        super(...arguments);
+        this.state = { failed: false };
+    }
+    static getDerivedStateFromError() {
+        return { failed: true };
+    }
+    componentDidCatch(error) {
+        this.props.onError(error);
+    }
+    render() {
+        return this.state.failed ? null : this.props.children;
+    }
+}
+function steamCompatTools(appid) {
+    return new Promise((resolve) => {
+        let root = null;
+        const finish = (tools) => {
+            clearTimeout(timer);
+            resolve(tools);
+            setTimeout(() => root?.unmount(), 0);
+        };
+        const timer = setTimeout(() => finish([]), 10000);
+        const Probe = () => {
+            const [query] = steam.hook(Number(appid));
+            if (query.status === "success")
+                finish(fromSteam(query.data));
+            else if (query.status === "error")
+                finish([]);
+            return null;
+        };
+        try {
+            root = steam.createRoot(document.createElement("div"));
+            root.render(SP_REACT.createElement(ProbeBoundary, { onError: () => finish([]) }, SP_REACT.createElement(steam.provider, { client: steam.client }, SP_REACT.createElement(Probe))));
+        }
+        catch {
+            finish([]);
+        }
+    });
+}
+function fromSteam(data) {
+    return (data?.tools ?? [])
+        .filter((tool) => !tool.is_incompatible)
+        .map((tool) => ({ name: String(tool.name ?? ""), label: String(tool.display_name || tool.name || "") }))
+        .filter((tool) => tool.name);
+}
+async function availableCompatTools(appid) {
+    const apps = window.SteamClient?.Apps;
+    try {
+        if (apps?.GetAvailableCompatTools) {
+            const tools = await apps.GetAvailableCompatTools(Number(appid));
+            if (!Array.isArray(tools))
+                return [];
+            return tools
+                .map((tool) => ({
+                name: String(tool?.strToolName ?? ""),
+                label: String(tool?.strDisplayName ?? tool?.strToolName ?? ""),
+            }))
+                .filter((tool) => tool.name);
+        }
+        return findSteam() ? await steamCompatTools(appid) : [];
+    }
+    catch {
+        return [];
+    }
+}
+/** Live view of the game's current tool; fires again when it changes anywhere (incl. Steam's UI). */
+function registerForCompatTool(appid, onChange) {
+    const apps = window.SteamClient?.Apps;
+    if (!apps?.RegisterForAppDetails)
+        return () => { };
+    const registration = apps.RegisterForAppDetails(Number(appid), (details) => {
+        onChange(String(details?.strCompatToolName ?? ""));
+    });
+    return () => registration?.unregister?.();
+}
+function setCompatTool(appid, tool) {
+    window.SteamClient?.Apps?.SpecifyCompatTool?.(Number(appid), tool);
+    // A shortcut picked up after the load-time sweep still gets the launcher.
+    if (tool && Number(appid) >= 0x80000000)
+        ensureLaunchWrapper(appid);
+}
+/** Resolve an imported Proton pick against this device's tools. Unknown ARM-named tools
+ *  fall back to the cachy ARM Proton; unknown x86-named ones to a Proton 11. */
+function resolveCompatTool(wanted, tools) {
+    if (!wanted)
+        return { tool: "", fallback: false };
+    if (tools.some((tool) => tool.name === wanted))
+        return { tool: wanted, fallback: false };
+    const haystack = (tool) => `${tool.name} ${tool.label}`;
+    const isArm = /arm/i.test(wanted);
+    const fallback = isArm
+        ? tools.find((tool) => /cachy/i.test(haystack(tool)) && !/x86/i.test(haystack(tool)))
+        : tools.find((tool) => /(^|\D)11(\D|$)/.test(haystack(tool)) && !/arm|cachy/i.test(haystack(tool)));
+    return { tool: fallback?.name || "", fallback: true };
+}
+
+// Audio buffer (PULSE_LATENCY_MSEC): absorbs FEX-mixer overruns (SFX-burst crackle) at the
+// cost of audio latency — keep rhythm games on Game default.
+const audioLatencyOptions = [
+    { data: "", label: t("Game default") },
+    { data: "60", label: t("60 ms") },
+    { data: "90", label: t("90 ms") },
+    { data: "120", label: t("120 ms") },
+];
+const fanOptions = [
+    { data: "quiet", label: t("Quiet") },
+    { data: "moderate", label: t("Moderate") },
+    { data: "performance", label: t("Performance") },
+];
+const lavdOptions = [
+    { data: "autopilot", label: t("Autopilot") },
+    { data: "performance", label: t("Performance") },
+];
+const globalChoice = { data: "", label: t("Use global") };
+function EnvVarsModal({ initial, onSave, closeModal }) {
+    const [value, setValue] = SP_REACT.useState(initial);
+    return (SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Environment Variables"), strDescription: 'Space-separated KEY=VALUE pairs; quote values with spaces, e.g. DXVK_CONFIG="dxgi.customDeviceDesc = GTX 480". Steam launch options win over these.', strOKButtonText: t("Save"), onCancel: () => closeModal?.(), onOK: () => {
+            onSave(value.trim());
+            closeModal?.();
+        }, children: SP_JSX.jsx(DFL.TextField, { label: t("Variables"), value: value, onChange: (event) => setValue(event.target.value) }) }));
+}
+function EnvVarsButton({ value, onSave }) {
+    return (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", description: value ? value : "None set", onClick: () => DFL.showModal(SP_JSX.jsx(EnvVarsModal, { initial: value, onSave: onSave })), children: t("Environment Variables") }) }));
+}
+function XaliaToggle({ values, patch }) {
+    return (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Disable Xalia"), description: t("Proton's controller-navigation helper; costs CPU in every game"), checked: values.disableXalia !== false, onChange: (checked) => patch({ disableXalia: checked }) }) }));
+}
+/** Applies live: the backend re-syncs the running game's touchscreen on every save. */
+function TouchField({ values, patch }) {
+    return (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Disable Touchscreen"), description: t("While the game is running, to stop stray touches"), checked: values.touchDisabled === true, onChange: (on) => patch({ touchDisabled: on }) }) }));
+}
+/** What the handheld has; an older backend that doesn't say counts as having everything. */
+function hw(config) {
+    return { fan: true, scheduler: true, touchscreen: true, padSwitch: true, ...(config.hardware || {}) };
+}
+/** Per-game fan/scheduler overrides ("" = follow the global mode); only the ones this handheld has. */
+function PerfFields({ config, values, patch }) {
+    const has = hw(config);
+    const perGameFan = [globalChoice, ...fanOptions];
+    const perGameLavd = [globalChoice, ...lavdOptions];
+    const fanValue = perGameFan.some((option) => option.data === String(values.fanMode ?? "")) ? String(values.fanMode ?? "") : "";
+    const lavdValue = perGameLavd.some((option) => option.data === String(values.lavdMode ?? "")) ? String(values.lavdMode ?? "") : "";
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [has.scheduler ? SP_JSX.jsx(SelectEdit, { label: t("CPU Scheduler"), value: lavdValue, options: perGameLavd, onChange: (id) => patch({ lavdMode: id }) }) : null, has.fan ? SP_JSX.jsx(SelectEdit, { label: t("Fan Curve"), value: fanValue, options: perGameFan, onChange: (id) => patch({ fanMode: id }) }) : null] }));
+}
+/** Applies live, like the touchscreen: the backend switches the pad when the game starts or stops. */
+function GamepadTypeField({ values, patch }) {
+    const options = [
+        { data: "", label: t("Steam Deck (default)") },
+        { data: "xb360", label: t("Xbox 360") },
+        { data: "xbox-series", label: t("Xbox Series") },
+        { data: "ds5", label: t("DualSense") },
+    ];
+    const stored = String(values.gamepadType ?? "");
+    const value = options.some((option) => option.data === stored) ? stored : "";
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("Controller Type"), value: value, options: options, onChange: (id) => patch({ gamepadType: id }) }), SP_JSX.jsx("div", { className: "steamling-note", children: t("What the game sees while it runs. Only matters with Steam Input turned off for the game.") })] }));
+}
+/** The per-game tweak controls, shared by the Games tab and the library context-menu modal. */
+function TweakFields({ config, appid, values, patch }) {
+    // Proton pick is Steam's own per-game compat setting (see lib/compat.ts) — read live and
+    // written straight back to Steam, so it mirrors the game-properties dropdown both ways.
+    const [compatTools, setCompatTools] = SP_REACT.useState([]);
+    const [currentTool, setCurrentTool] = SP_REACT.useState("");
+    SP_REACT.useEffect(() => {
+        setCompatTools([]);
+        setCurrentTool("");
+        if (!appid)
+            return;
+        let live = true;
+        availableCompatTools(appid).then((tools) => {
+            if (live)
+                setCompatTools(tools);
+        });
+        const unregister = registerForCompatTool(appid, (tool) => {
+            if (live)
+                setCurrentTool(tool);
+        });
+        return () => {
+            live = false;
+            unregister();
+        };
+    }, [appid]);
+    const compatOptions = [
+        { data: "", label: t("Steam default") },
+        ...compatTools.map((tool) => ({ data: tool.name, label: tool.label })),
+    ];
+    const compatValue = compatOptions.some((option) => option.data === currentTool) ? currentTool : "";
+    const presets = config.fexProfiles || {};
+    const storedProfile = values.fexProfile;
+    const fexValue = storedProfile && presets[storedProfile] ? storedProfile : "default";
+    const fexOptions = Object.entries(presets).map(([id, profile]) => ({ data: id, label: profile.label }));
+    const storedLatency = String(values.audioLatency ?? "");
+    const audioValue = audioLatencyOptions.some((option) => option.data === storedLatency) ? storedLatency : "";
+    const mesaOptions = [{ data: "", label: t("System default") }, ...(config.mesaVersions || [])];
+    const storedMesa = String(values.mesaVersion ?? "");
+    const mesaValue = mesaOptions.some((option) => option.data === storedMesa) ? storedMesa : "";
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("Proton Version"), value: compatValue, options: compatOptions, onChange: (name) => {
+                    setCurrentTool(String(name));
+                    setCompatTool(appid, String(name));
+                } }), SP_JSX.jsx(SelectEdit, { label: t("FEX Preset"), value: fexValue, options: fexOptions, onChange: (id) => patch({ fexProfile: id }) }), SP_JSX.jsx(SelectEdit, { label: t("Audio Buffer"), value: audioValue, options: audioLatencyOptions, onChange: (id) => patch({ audioLatency: id }) }), (config.mesaVersions || []).length > 0 ? (SP_JSX.jsx(SelectEdit, { label: t("Mesa Version"), value: mesaValue, options: mesaOptions, onChange: (id) => patch({ mesaVersion: id }) })) : null, SP_JSX.jsx(XaliaToggle, { values: values, patch: patch }), hw(config).touchscreen ? SP_JSX.jsx(TouchField, { values: values, patch: patch }) : null, hw(config).padSwitch ? SP_JSX.jsx(GamepadTypeField, { values: values, patch: patch }) : null, SP_JSX.jsx(EnvVarsButton, { value: String(values.envVars ?? ""), onSave: (next) => patch({ envVars: next }) })] }));
 }
 
 function PerformanceOverlay() {
@@ -989,241 +1580,307 @@ function SystemMonitor() {
                             : dash }), stats.fan ? (SP_JSX.jsx(DFL.Field, { label: t("Fan"), description: stats.fan.rpm !== null ? t("{rpm} RPM", { rpm: stats.fan.rpm }) : t("{n}% speed", { n: stats.fan.percent ?? 0 }) })) : null] })) : null] }));
 }
 
-// What's on the screen: the overlay and live readings first, the panel and menu settings after.
-function Display() {
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(PerformanceOverlay, {}), SP_JSX.jsx(SystemMonitor, {}), SP_JSX.jsx(PanelCalibration, {}), SP_JSX.jsx(MenuWidthSetting, {})] }));
-}
-
-// Every Steam game and every non-Steam shortcut (emulator tiles, ROM managers, a Windows .exe on
-// Proton) launches through steamling-game-launch, which applies the per-game tweaks at launch
-// time, so a settings change never has to touch launch options.
-// Bare name: Steam runs launch options through a shell with the system PATH (/usr/bin).
-const LAUNCHER = "steamling-game-launch";
-const COMMAND = "%command%";
-// Written by this plugin before the launcher existed; the launcher exports it itself now.
-const FEX_TOKEN = /STEAM_COMPAT_FEX_CONFIG=("[^"]*"|\S*)\s*/g;
-function getLaunchOptions(appid) {
-    return new Promise((resolve) => {
-        const apps = window.SteamClient?.Apps;
-        if (!apps?.RegisterForAppDetails)
-            return resolve(null);
-        let registration;
-        let timer;
-        let done = false;
-        const finish = (value) => {
-            if (done)
-                return;
-            done = true;
-            if (timer !== undefined)
-                window.clearTimeout(timer);
-            // Steam may call back before RegisterForAppDetails returns; unregister on a microtask.
-            Promise.resolve().then(() => registration?.unregister?.());
-            resolve(value);
-        };
-        timer = window.setTimeout(() => finish(null), 3000);
+// How hard the handheld runs, and the numbers that show whether a change helped: the overlay
+// first, since it's what people reach for mid-game.
+function Performance({ config, setConfig, reload }) {
+    const has = hw(config);
+    // The live, handheld-wide modes, applied at once through the backend.
+    const applyMode = async (setter, mode) => {
         try {
-            registration = apps.RegisterForAppDetails(Number(appid), (details) => {
-                finish(String(details?.strLaunchOptions ?? ""));
-            });
+            const next = await setter(mode);
+            setConfig((current) => (current ? { ...current, fanMode: next.fanMode, lavdMode: next.lavdMode } : current));
         }
         catch (error) {
-            finish(null);
+            reload();
         }
-    });
-}
-/** null = already wrapped. Keeps the user's own options around %command%. */
-function wrapLaunchOptions(current) {
-    const stripped = current.replace(FEX_TOKEN, "").trim();
-    if (stripped.includes(LAUNCHER))
-        return stripped === current.trim() ? null : stripped;
-    if (stripped.includes(COMMAND))
-        return stripped.replace(COMMAND, `${LAUNCHER} ${COMMAND}`);
-    // Without %command% Steam appends bare options as arguments, so they stay after it.
-    return [`${LAUNCHER} ${COMMAND}`, stripped].filter(Boolean).join(" ");
-}
-/** Bails rather than clobber when the current value can't be read. */
-async function ensureLaunchWrapper(appid) {
-    const apps = window.SteamClient?.Apps;
-    if (!apps?.SetAppLaunchOptions)
-        return false;
-    const current = await getLaunchOptions(appid);
-    if (current === null)
-        return false;
-    const next = wrapLaunchOptions(current);
-    if (next !== null)
-        apps.SetAppLaunchOptions(Number(appid), next);
-    return true;
-}
-async function wrapShortcuts(appids) {
-    for (const appid of appids)
-        await ensureLaunchWrapper(appid);
-}
-async function wrapAllGames(appids) {
-    let next = 0;
-    const worker = async () => {
-        while (next < appids.length)
-            await ensureLaunchWrapper(appids[next++]);
     };
-    await Promise.all(Array.from({ length: Math.min(8, appids.length) }, worker));
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(PerformanceOverlay, {}), has.scheduler || has.fan ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("CPU AND FAN"), children: [has.scheduler ? SP_JSX.jsx(SelectEdit, { label: t("CPU Scheduler"), value: config.lavdMode, options: lavdOptions, onChange: (mode) => applyMode(setLavdMode, mode) }) : null, has.fan ? SP_JSX.jsx(SelectEdit, { label: t("Fan Curve"), value: config.fanMode, options: fanOptions, onChange: (mode) => applyMode(setFanMode, mode) }) : null, SP_JSX.jsx("div", { className: "steamling-note", children: t("A game with its own settings on the This Game tab uses those while it runs") })] })) : null, SP_JSX.jsx(SystemMonitor, {})] }));
 }
-/** New installs get wrapped once their download queues; returns the unregister. */
-function registerDownloadWrapper(isGame) {
-    const downloads = window.SteamClient?.Downloads;
-    if (!downloads?.RegisterForDownloadItems)
-        return () => { };
-    const pending = new Set();
-    let timer;
-    const flush = () => {
-        timer = undefined;
-        const ids = Array.from(pending);
-        pending.clear();
-        wrapAllGames(ids.filter(isGame));
-    };
-    // Each queue item is { item_data: [{ appid, ... }] }: the appids live in item_data.
-    const handle = downloads.RegisterForDownloadItems((_paused, items) => {
-        if (!Array.isArray(items))
+
+function About() {
+    const [info, setInfo] = SP_REACT.useState(null);
+    const [error, setError] = SP_REACT.useState("");
+    const visible = useQamVisible();
+    // Once per open: the bootloader check reads both ABL slots, so it is not polled.
+    SP_REACT.useEffect(() => {
+        if (!visible)
             return;
-        for (const item of items) {
-            for (const entry of Object.values(item?.item_data || {})) {
-                const appid = String(entry?.appid ?? "");
-                if (appid && appid !== "0")
-                    pending.add(appid);
-            }
-        }
-        if (timer === undefined)
-            timer = window.setTimeout(flush, 1500);
-    });
-    return () => {
-        if (timer !== undefined)
-            window.clearTimeout(timer);
+        let cancelled = false;
+        deviceInfo()
+            .then((next) => {
+            if (!cancelled)
+                setInfo(next);
+        })
+            .catch((err) => {
+            if (!cancelled)
+                setError(String(err));
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [visible]);
+    const confirmRestart = () => DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Restart Game Mode"), strDescription: t("Closes Steam and any running game, then brings game mode back up. Unsaved progress in a running game is lost. Useful when Steam or the screen gets stuck."), strOKButtonText: t("Restart"), onOK: () => restartGameMode().catch((err) => setError(String(err))) }));
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("ABOUT"), children: [SP_JSX.jsx(DFL.Field, { label: t("Steamling OS"), description: info?.osVersion ?? "…" }), SP_JSX.jsx(DFL.Field, { label: t("Kernel"), description: info?.kernel ?? "…" }), info?.bootloader ? SP_JSX.jsx(DFL.Field, { label: t("Bootloader"), description: info.bootloader }) : null, SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: confirmRestart, children: t("Restart Game Mode") }) }), error ? SP_JSX.jsx(DFL.Field, { label: t("Error"), description: error }) : null] }));
+}
+
+// Panels leave the factory a touch fast or slow, and emulators that pace to the display drift
+// against their audio. steamling-panel-calibration measures the running refresh rate and trims the
+// panel's frame length until it sits on the nominal rate; the result is kept across reboots.
+function PanelModal({ initial, onChange, closeModal }) {
+    const [status, setStatus] = SP_REACT.useState(initial);
+    const [busy, setBusy] = SP_REACT.useState(initial.running);
+    const [error, setError] = SP_REACT.useState("");
+    const busyRef = SP_REACT.useRef(busy);
+    busyRef.current = busy;
+    const run = async (action) => {
+        if (busyRef.current)
+            return;
+        setBusy(true);
+        setError("");
         try {
-            handle?.unregister?.();
+            const next = await action();
+            setStatus(next);
+            onChange(next);
         }
-        catch (error) {
+        catch (e) {
+            setError(String(e));
+        }
+        finally {
+            setBusy(false);
         }
     };
+    const result = status.result;
+    return (SP_JSX.jsxs(DFL.ModalRoot, { closeModal: busy ? undefined : closeModal, bDisableBackgroundDismiss: busy, children: [SP_JSX.jsx("div", { style: { fontSize: "20px", fontWeight: "bold", marginBottom: "8px" }, children: t("Display Refresh Calibration") }), SP_JSX.jsx("div", { children: busy
+                    ? "Measuring… this takes up to a minute. Leave the device on this screen until it finishes."
+                    : `${status.saved ? "A saved calibration is in use." : "Using the panel's factory timing."} Calibrate measures the refresh rate and trims it to exactly the nominal rate, which keeps emulator audio and video in step.` }), result && !busy ? (SP_JSX.jsx("div", { style: { marginTop: "8px" }, children: `${result.rate} Hz: measured ${result.before.toFixed(2)} Hz, now ${result.after.toFixed(2)} Hz.` })) : null, SP_JSX.jsxs(DFL.Focusable, { style: { display: "flex", gap: "8px", marginTop: "12px" }, children: [SP_JSX.jsx(DFL.DialogButton, { disabled: busy, onClick: () => run(panelCalibrate), children: busy ? "Calibrating…" : "Calibrate" }), SP_JSX.jsx(DFL.DialogButton, { disabled: busy || !status.saved, onClick: () => run(panelReset), children: t("Reset to Factory") }), SP_JSX.jsx(DFL.DialogButton, { disabled: busy, onClick: () => closeModal?.(), children: t("Close") })] }), error ? SP_JSX.jsx("div", { style: { marginTop: "8px", color: "#ff8080" }, children: error }) : null] }));
+}
+function PanelCalibration() {
+    const [status, setStatus] = SP_REACT.useState(null);
+    const visible = useQamVisible();
+    // One cheap sysfs read per menu open; panels without the attributes never show the section.
+    SP_REACT.useEffect(() => {
+        if (!visible)
+            return;
+        let cancelled = false;
+        panelStatus()
+            .then((next) => { if (!cancelled)
+            setStatus(next); })
+            .catch(() => { });
+        return () => { cancelled = true; };
+    }, [visible]);
+    if (!status?.available)
+        return null;
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("DISPLAY"), children: [SP_JSX.jsx(DFL.Field, { label: t("Refresh rate"), description: status.saved ? "Calibrated" : "Factory timing" }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: () => DFL.showModal(SP_JSX.jsx(PanelModal, { initial: status, onChange: setStatus })), children: t("Calibrate Display") }) })] }));
 }
 
-// Drives the same state as Steam's own per-game compatibility dropdown (SpecifyCompatTool +
-// app details), so never store a shadow copy: the two UIs stay in sync by construction.
-
-// Steam's tool list is only reachable through its react-query hook, which throws
-// without Steam's QueryClient in context; a throwaway root under Steam's provider
-// works from any tree (QAM panel, modals, import flow).
-const steam = {
-    hook: null,
-    provider: null,
-    client: null,
-    createRoot: null,
-};
-function findSteam() {
-    steam.hook || (steam.hook = DFL.findModuleExport((e) => typeof e === "function" && e.toString().includes("Failed to fetch available compat tools")));
-    steam.provider || (steam.provider = DFL.findModuleExport((e) => {
-        if (typeof e !== "function")
-            return false;
-        const src = e.toString();
-        return src.length < 400 && /\.mount\(\)/.test(src) && /unmount\(\)/.test(src) && /children/.test(src);
-    }));
-    steam.client || (steam.client = DFL.findModuleExport((e) => e && typeof e === "object" && typeof e.getQueryCache === "function" && typeof e.invalidateQueries === "function"));
-    steam.createRoot || (steam.createRoot = DFL.findModule((m) => typeof m?.createRoot === "function")?.createRoot);
-    return !!(steam.hook && steam.provider && steam.client && steam.createRoot);
+// Same warning the Steamling Tools menu shows: every image ships the same default password.
+function SshConfirmModal({ onConfirm, closeModal }) {
+    const [running, setRunning] = SP_REACT.useState(false);
+    const runningRef = SP_REACT.useRef(false);
+    runningRef.current = running;
+    const start = async () => {
+        if (runningRef.current)
+            return;
+        setRunning(true);
+        await onConfirm();
+        closeModal?.();
+    };
+    return (SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Allow SSH Logins"), strDescription: running
+            ? "Starting…"
+            : "Anyone on the same network can then log in with an account password, and Steamling ships a well-known default one. If you have not changed it yet, do that first: open Konsole in desktop mode and run passwd. It stays on, across reboots, until you turn it off here.", strOKButtonText: running ? "Starting…" : "Turn On SSH", bDestructiveWarning: true, bOKDisabled: running, bCancelDisabled: running, bDisableBackgroundDismiss: true, onCancel: () => {
+            if (!runningRef.current)
+                closeModal?.();
+        }, onOK: start }));
 }
-class ProbeBoundary extends SP_REACT.Component {
-    constructor() {
-        super(...arguments);
-        this.state = { failed: false };
-    }
-    static getDerivedStateFromError() {
-        return { failed: true };
-    }
-    componentDidCatch(error) {
-        this.props.onError(error);
-    }
-    render() {
-        return this.state.failed ? null : this.props.children;
-    }
-}
-function steamCompatTools(appid) {
-    return new Promise((resolve) => {
-        let root = null;
-        const finish = (tools) => {
-            clearTimeout(timer);
-            resolve(tools);
-            setTimeout(() => root?.unmount(), 0);
+function RemoteAccess() {
+    const [ssh, setSshState] = SP_REACT.useState(null);
+    const [busy, setBusy] = SP_REACT.useState(false);
+    const [status, setStatus] = SP_REACT.useState("");
+    const busyRef = SP_REACT.useRef(false);
+    busyRef.current = busy;
+    const visible = useQamVisible();
+    // Read once per open: nothing else flips it while the menu is up, and each read is a transient unit.
+    SP_REACT.useEffect(() => {
+        if (!visible)
+            return;
+        let cancelled = false;
+        sshStatus()
+            .then((next) => {
+            if (!cancelled && !busyRef.current)
+                setSshState(next);
+        })
+            .catch((error) => {
+            if (!cancelled)
+                setStatus(String(error));
+        });
+        return () => {
+            cancelled = true;
         };
-        const timer = setTimeout(() => finish([]), 10000);
-        const Probe = () => {
-            const [query] = steam.hook(Number(appid));
-            if (query.status === "success")
-                finish(fromSteam(query.data));
-            else if (query.status === "error")
-                finish([]);
-            return null;
-        };
+    }, [visible]);
+    const run = async (on) => {
+        if (busyRef.current)
+            return;
+        setBusy(true);
+        setStatus("");
         try {
-            root = steam.createRoot(document.createElement("div"));
-            root.render(SP_REACT.createElement(ProbeBoundary, { onError: () => finish([]) }, SP_REACT.createElement(steam.provider, { client: steam.client }, SP_REACT.createElement(Probe))));
+            setSshState(await setSsh(on));
         }
-        catch {
-            finish([]);
+        catch (error) {
+            setStatus(String(error));
         }
-    });
-}
-function fromSteam(data) {
-    return (data?.tools ?? [])
-        .filter((tool) => !tool.is_incompatible)
-        .map((tool) => ({ name: String(tool.name ?? ""), label: String(tool.display_name || tool.name || "") }))
-        .filter((tool) => tool.name);
-}
-async function availableCompatTools(appid) {
-    const apps = window.SteamClient?.Apps;
-    try {
-        if (apps?.GetAvailableCompatTools) {
-            const tools = await apps.GetAvailableCompatTools(Number(appid));
-            if (!Array.isArray(tools))
-                return [];
-            return tools
-                .map((tool) => ({
-                name: String(tool?.strToolName ?? ""),
-                label: String(tool?.strDisplayName ?? tool?.strToolName ?? ""),
-            }))
-                .filter((tool) => tool.name);
+        finally {
+            setBusy(false);
         }
-        return findSteam() ? await steamCompatTools(appid) : [];
-    }
-    catch {
-        return [];
-    }
+    };
+    if (ssh && !ssh.available)
+        return null;
+    const summary = () => {
+        if (status)
+            return status;
+        if (!ssh)
+            return "Checking…";
+        if (!ssh.on)
+            return "Off - the device does not accept SSH logins";
+        if (ssh.addresses.length === 0)
+            return "On - connect to Wi-Fi to reach it";
+        return `On - ${ssh.addresses.map((a) => `ssh deck@${a}`).join(" or ")}`;
+    };
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("REMOTE ACCESS"), children: [SP_JSX.jsx(DFL.Field, { label: t("SSH"), description: summary() }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Allow SSH logins"), description: t("Log in from another computer's terminal"), checked: !!ssh?.on, disabled: busy || !ssh, onChange: (on) => {
+                        if (busyRef.current)
+                            return;
+                        if (on)
+                            DFL.showModal(SP_JSX.jsx(SshConfirmModal, { onConfirm: () => run(true) }));
+                        else
+                            run(false);
+                    } }) })] }));
 }
-/** Live view of the game's current tool; fires again when it changes anywhere (incl. Steam's UI). */
-function registerForCompatTool(appid, onChange) {
-    const apps = window.SteamClient?.Apps;
-    if (!apps?.RegisterForAppDetails)
-        return () => { };
-    const registration = apps.RegisterForAppDetails(Number(appid), (details) => {
-        onChange(String(details?.strCompatToolName ?? ""));
-    });
-    return () => registration?.unregister?.();
-}
-function setCompatTool(appid, tool) {
-    window.SteamClient?.Apps?.SpecifyCompatTool?.(Number(appid), tool);
-    // A shortcut picked up after the load-time sweep still gets the launcher.
-    if (tool && Number(appid) >= 0x80000000)
-        ensureLaunchWrapper(appid);
-}
-/** Resolve an imported Proton pick against this device's tools. Unknown ARM-named tools
- *  fall back to the cachy ARM Proton; unknown x86-named ones to a Proton 11. */
-function resolveCompatTool(wanted, tools) {
-    if (!wanted)
-        return { tool: "", fallback: false };
-    if (tools.some((tool) => tool.name === wanted))
-        return { tool: wanted, fallback: false };
-    const haystack = (tool) => `${tool.name} ${tool.label}`;
-    const isArm = /arm/i.test(wanted);
-    const fallback = isArm
-        ? tools.find((tool) => /cachy/i.test(haystack(tool)) && !/x86/i.test(haystack(tool)))
-        : tools.find((tool) => /(^|\D)11(\D|$)/.test(haystack(tool)) && !/arm|cachy/i.test(haystack(tool)));
-    return { tool: fallback?.name || "", fallback: true };
+
+const SHOWN_UPDATES = 8;
+const gib = (bytes) => (bytes / 1024 ** 3).toFixed(1);
+// snapshot metadata stores ISO-8601 UTC; show local DD/MM/YYYY HH:MM
+const fmtDate = (iso) => {
+    const d = new Date(iso);
+    if (isNaN(d.getTime()))
+        return iso;
+    const p = (n) => String(n).padStart(2, "0");
+    return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+// Occasional upkeep: updates and rollback, remote access, the set-once screen and menu
+// settings, and what is installed.
+function System() {
+    const [updates, setUpdates] = SP_REACT.useState(null);
+    const [checking, setChecking] = SP_REACT.useState(false);
+    const [status, setStatus] = SP_REACT.useState(null);
+    const [snap, setSnap] = SP_REACT.useState(null);
+    const [rollingBack, setRollingBack] = SP_REACT.useState(false);
+    const [rollbackDone, setRollbackDone] = SP_REACT.useState(false);
+    const [error, setError] = SP_REACT.useState("");
+    const [rollbackError, setRollbackError] = SP_REACT.useState("");
+    const busyRef = SP_REACT.useRef(false);
+    const running = !!status?.running;
+    busyRef.current = checking || running || rollingBack;
+    const visible = useQamVisible();
+    const refreshSnap = () => snapshotStatus().then(setSnap).catch(() => { });
+    // Re-attach to an update that survived a QAM close (or a Steam restart), on every open.
+    SP_REACT.useEffect(() => {
+        if (!visible)
+            return;
+        let cancelled = false;
+        updateStatus()
+            .then((next) => {
+            if (!cancelled && (next.running || next.exitCode !== null))
+                setStatus(next);
+        })
+            .catch(() => { });
+        refreshSnap();
+        return () => {
+            cancelled = true;
+        };
+    }, [visible]);
+    // The update itself runs on regardless; only the progress display stops while hidden.
+    SP_REACT.useEffect(() => {
+        if (!running || !visible)
+            return;
+        const timer = window.setInterval(async () => {
+            try {
+                const next = await updateStatus();
+                setStatus(next);
+                if (!next.running) {
+                    if (next.exitCode === 0)
+                        setUpdates([]);
+                    refreshSnap(); // a finished transaction changes snapshots + reboot-required
+                }
+            }
+            catch (err) {
+                setError(String(err));
+            }
+        }, 2000);
+        return () => window.clearInterval(timer);
+    }, [running, visible]);
+    const check = async () => {
+        if (busyRef.current)
+            return;
+        setChecking(true);
+        setError("");
+        try {
+            setUpdates(await checkUpdates());
+        }
+        catch (err) {
+            setError(String(err));
+        }
+        finally {
+            setChecking(false);
+        }
+    };
+    const start = async () => {
+        if (busyRef.current)
+            return;
+        setError("");
+        try {
+            setStatus(await startUpdate());
+        }
+        catch (err) {
+            setError(String(err));
+        }
+    };
+    const confirmStart = () => DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Install Updates"), strDescription: t("Downloads and installs all available system updates. Keep the device powered; a running game may stutter. Restart after it finishes."), strOKButtonText: t("Install"), onOK: start }));
+    const lastSnapshot = snap?.supported && snap.snapshots.length > 0 ? snap.snapshots[snap.snapshots.length - 1] : null;
+    // Already rolled back onto the latest snapshot: another rollback would be a no-op,
+    // so hide the button until the next update (which clears the marker + snapshots anew).
+    const onLastSnapshot = !!(snap?.rolledBack && lastSnapshot && snap.rolledBack.fromSnapshot === lastSnapshot.id);
+    const rollBack = async () => {
+        if (busyRef.current || !lastSnapshot)
+            return;
+        setRollbackError("");
+        setRollingBack(true);
+        try {
+            setSnap(await startRollback(lastSnapshot.id));
+            setRollbackDone(true);
+        }
+        catch (err) {
+            setRollbackError(String(err));
+        }
+        finally {
+            setRollingBack(false);
+        }
+    };
+    const confirmRollback = () => {
+        if (!lastSnapshot)
+            return;
+        DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Roll Back Last Update"), strDescription: `Restores the system to before the update of ${fmtDate(lastSnapshot.created)}` +
+                (lastSnapshot.targets ? ` (${lastSnapshot.targets})` : "") +
+                `. Games, saves and settings are kept.` +
+                (lastSnapshot.kernel ? " The previous kernel is restored too." : "") +
+                ` Reboot after it completes.`, strOKButtonText: t("Roll Back"), onOK: rollBack }));
+    };
+    const reboot = () => rebootSystem().catch((err) => setError(String(err)));
+    const finished = !running && status?.exitCode !== null && status?.exitCode !== undefined;
+    const summary = updates === null
+        ? "Not checked yet"
+        : updates.length === 0
+            ? "System is up to date"
+            : `${updates.length} update${updates.length === 1 ? "" : "s"} available`;
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsxs(DFL.PanelSection, { title: t("SYSTEM UPDATES"), children: [!running ? SP_JSX.jsx(DFL.Field, { label: t("Status"), description: summary }) : null, !running && updates && updates.length > 0 ? (SP_JSX.jsxs("div", { className: "steamling-note", children: [updates.slice(0, SHOWN_UPDATES).map((update) => (SP_JSX.jsx("div", { children: `${update.name} ${update.current} → ${update.latest}` }, update.name))), updates.length > SHOWN_UPDATES ? SP_JSX.jsx("div", { children: `… and ${updates.length - SHOWN_UPDATES} more` }) : null] })) : null, SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: check, children: checking ? "Checking…" : "Check for Updates" }) }), !running && updates && updates.length > 0 ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: confirmStart, children: t("Install Updates") }) })) : null, running ? SP_JSX.jsx(DFL.Field, { label: t("Updating…"), description: t("Safe to close this menu. Do not power off.") }) : null, finished ? (SP_JSX.jsx(DFL.Field, { label: status.exitCode === 0 ? "Update complete" : `Update failed (code ${status.exitCode})`, description: status.exitCode === 0 ? "Restart to finish applying updates." : "See the log below." })) : null, finished && status.exitCode === 0 ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: reboot, children: t("Restart Now") }) })) : null, (running || (finished && status.exitCode !== 0)) && status?.log ? (SP_JSX.jsx("div", { className: "steamling-note steamling-log", children: status.log })) : null, error ? SP_JSX.jsx(DFL.Field, { label: t("Error"), description: error }) : null] }), snap?.supported ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("ROLLBACK"), children: [snap.rolledBack && !rollbackDone ? (SP_JSX.jsx(DFL.Field, { label: t("System was rolled back"), description: `Restored from snapshot ${snap.rolledBack.fromSnapshot} (${fmtDate(snap.rolledBack.ts)}).${onLastSnapshot ? " Rollback will be available again after the next update." : ""}` })) : null, rollbackDone ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("Rolled back"), description: t("Reboot to finish switching to the restored system.") }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: reboot, children: t("Reboot Now") }) })] })) : onLastSnapshot ? null : lastSnapshot ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("Last snapshot"), description: `${fmtDate(lastSnapshot.created)}${lastSnapshot.targets ? ` — ${lastSnapshot.targets}` : ""}` }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: confirmRollback, children: rollingBack ? "Rolling back…" : "Roll Back Last Update" }) })] })) : (SP_JSX.jsx(DFL.Field, { label: t("No snapshots yet"), description: t("A snapshot is taken automatically before every update.") })), rollbackError ? SP_JSX.jsx(DFL.Field, { label: t("Rollback error"), description: rollbackError }) : null, SP_JSX.jsx(DFL.Field, { label: t("Storage"), description: `${gib(snap.freeBytes)} GB free${snap.lowSpace ? " — LOW: snapshots may be skipped" : ""}` })] })) : null, SP_JSX.jsx(RemoteAccess, {}), SP_JSX.jsx(PanelCalibration, {}), SP_JSX.jsx(MenuWidthSetting, {}), SP_JSX.jsx(About, {})] }));
 }
 
 function ExportNameModal({ game, base, onDone, closeModal }) {
@@ -1385,111 +2042,6 @@ function ShaderCache({ appid, name, running }) {
     return (SP_JSX.jsx(DFL.PanelSection, { title: t("SHADER CACHE"), children: SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", description: description(), disabled: busy || running || !info || info.bytes === 0, onClick: () => DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Clear Shader Cache"), strDescription: t("Delete the {size} of compiled shaders kept for {name}? The game builds them again as it runs.", { size, name }), strOKButtonText: t("Clear"), onOK: clear })), children: busy ? t("Clearing…") : t("Clear Shader Cache ({size})", { size }) }) }) }));
 }
 
-// Audio buffer (PULSE_LATENCY_MSEC): absorbs FEX-mixer overruns (SFX-burst crackle) at the
-// cost of audio latency — keep rhythm games on Game default.
-const audioLatencyOptions = [
-    { data: "", label: t("Game default") },
-    { data: "60", label: t("60 ms") },
-    { data: "90", label: t("90 ms") },
-    { data: "120", label: t("120 ms") },
-];
-const fanOptions = [
-    { data: "quiet", label: t("Quiet") },
-    { data: "moderate", label: t("Moderate") },
-    { data: "performance", label: t("Performance") },
-];
-const lavdOptions = [
-    { data: "autopilot", label: t("Autopilot") },
-    { data: "performance", label: t("Performance") },
-];
-const globalChoice = { data: "", label: t("Use global") };
-function EnvVarsModal({ initial, onSave, closeModal }) {
-    const [value, setValue] = SP_REACT.useState(initial);
-    return (SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Environment Variables"), strDescription: 'Space-separated KEY=VALUE pairs; quote values with spaces, e.g. DXVK_CONFIG="dxgi.customDeviceDesc = GTX 480". Steam launch options win over these.', strOKButtonText: t("Save"), onCancel: () => closeModal?.(), onOK: () => {
-            onSave(value.trim());
-            closeModal?.();
-        }, children: SP_JSX.jsx(DFL.TextField, { label: t("Variables"), value: value, onChange: (event) => setValue(event.target.value) }) }));
-}
-function EnvVarsButton({ value, onSave }) {
-    return (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", description: value ? value : "None set", onClick: () => DFL.showModal(SP_JSX.jsx(EnvVarsModal, { initial: value, onSave: onSave })), children: t("Environment Variables") }) }));
-}
-function XaliaToggle({ values, patch }) {
-    return (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Disable Xalia"), description: t("Proton's controller-navigation helper; costs CPU in every game"), checked: values.disableXalia !== false, onChange: (checked) => patch({ disableXalia: checked }) }) }));
-}
-/** Applies live: the backend re-syncs the running game's touchscreen on every save. */
-function TouchField({ values, patch }) {
-    return (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Disable Touchscreen"), description: t("While the game is running, to stop stray touches"), checked: values.touchDisabled === true, onChange: (on) => patch({ touchDisabled: on }) }) }));
-}
-/** What the handheld has; an older backend that doesn't say counts as having everything. */
-function hw(config) {
-    return { fan: true, scheduler: true, touchscreen: true, padSwitch: true, ...(config.hardware || {}) };
-}
-/** Per-game fan/scheduler overrides ("" = follow the global mode); only the ones this handheld has. */
-function PerfFields({ config, values, patch }) {
-    const has = hw(config);
-    const perGameFan = [globalChoice, ...fanOptions];
-    const perGameLavd = [globalChoice, ...lavdOptions];
-    const fanValue = perGameFan.some((option) => option.data === String(values.fanMode ?? "")) ? String(values.fanMode ?? "") : "";
-    const lavdValue = perGameLavd.some((option) => option.data === String(values.lavdMode ?? "")) ? String(values.lavdMode ?? "") : "";
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [has.scheduler ? SP_JSX.jsx(SelectEdit, { label: t("CPU Scheduler"), value: lavdValue, options: perGameLavd, onChange: (id) => patch({ lavdMode: id }) }) : null, has.fan ? SP_JSX.jsx(SelectEdit, { label: t("Fan Curve"), value: fanValue, options: perGameFan, onChange: (id) => patch({ fanMode: id }) }) : null] }));
-}
-/** Applies live, like the touchscreen: the backend switches the pad when the game starts or stops. */
-function GamepadTypeField({ values, patch }) {
-    const options = [
-        { data: "", label: t("Steam Deck (default)") },
-        { data: "xb360", label: t("Xbox 360") },
-        { data: "xbox-series", label: t("Xbox Series") },
-        { data: "ds5", label: t("DualSense") },
-    ];
-    const stored = String(values.gamepadType ?? "");
-    const value = options.some((option) => option.data === stored) ? stored : "";
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("Controller Type"), value: value, options: options, onChange: (id) => patch({ gamepadType: id }) }), SP_JSX.jsx("div", { className: "steamling-note", children: t("What the game sees while it runs. Only matters with Steam Input turned off for the game.") })] }));
-}
-/** The per-game tweak controls, shared by the Games tab and the library context-menu modal. */
-function TweakFields({ config, appid, values, patch }) {
-    // Proton pick is Steam's own per-game compat setting (see lib/compat.ts) — read live and
-    // written straight back to Steam, so it mirrors the game-properties dropdown both ways.
-    const [compatTools, setCompatTools] = SP_REACT.useState([]);
-    const [currentTool, setCurrentTool] = SP_REACT.useState("");
-    SP_REACT.useEffect(() => {
-        setCompatTools([]);
-        setCurrentTool("");
-        if (!appid)
-            return;
-        let live = true;
-        availableCompatTools(appid).then((tools) => {
-            if (live)
-                setCompatTools(tools);
-        });
-        const unregister = registerForCompatTool(appid, (tool) => {
-            if (live)
-                setCurrentTool(tool);
-        });
-        return () => {
-            live = false;
-            unregister();
-        };
-    }, [appid]);
-    const compatOptions = [
-        { data: "", label: t("Steam default") },
-        ...compatTools.map((tool) => ({ data: tool.name, label: tool.label })),
-    ];
-    const compatValue = compatOptions.some((option) => option.data === currentTool) ? currentTool : "";
-    const presets = config.fexProfiles || {};
-    const storedProfile = values.fexProfile;
-    const fexValue = storedProfile && presets[storedProfile] ? storedProfile : "default";
-    const fexOptions = Object.entries(presets).map(([id, profile]) => ({ data: id, label: profile.label }));
-    const storedLatency = String(values.audioLatency ?? "");
-    const audioValue = audioLatencyOptions.some((option) => option.data === storedLatency) ? storedLatency : "";
-    const mesaOptions = [{ data: "", label: t("System default") }, ...(config.mesaVersions || [])];
-    const storedMesa = String(values.mesaVersion ?? "");
-    const mesaValue = mesaOptions.some((option) => option.data === storedMesa) ? storedMesa : "";
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("Proton Version"), value: compatValue, options: compatOptions, onChange: (name) => {
-                    setCurrentTool(String(name));
-                    setCompatTool(appid, String(name));
-                } }), SP_JSX.jsx(SelectEdit, { label: t("FEX Preset"), value: fexValue, options: fexOptions, onChange: (id) => patch({ fexProfile: id }) }), SP_JSX.jsx(SelectEdit, { label: t("Audio Buffer"), value: audioValue, options: audioLatencyOptions, onChange: (id) => patch({ audioLatency: id }) }), (config.mesaVersions || []).length > 0 ? (SP_JSX.jsx(SelectEdit, { label: t("Mesa Version"), value: mesaValue, options: mesaOptions, onChange: (id) => patch({ mesaVersion: id }) })) : null, SP_JSX.jsx(XaliaToggle, { values: values, patch: patch }), hw(config).touchscreen ? SP_JSX.jsx(TouchField, { values: values, patch: patch }) : null, hw(config).padSwitch ? SP_JSX.jsx(GamepadTypeField, { values: values, patch: patch }) : null, SP_JSX.jsx(EnvVarsButton, { value: String(values.envVars ?? ""), onSave: (next) => patch({ envVars: next }) })] }));
-}
-
 // A suggestion made on another handheld can name a fan or scheduler this one doesn't have.
 function usable(config, settings) {
     const has = hw(config);
@@ -1545,7 +2097,9 @@ function Suggestion({ config, appid, apply }) {
                     }, children: t("Use Suggested Settings") }) })] }));
 }
 
-function Games({ config, setConfig, reload }) {
+// One game's settings, or the Default every game without its own starts from. The handheld-wide
+// scheduler and fan curve are on the Performance tab; a game here can override them.
+function ThisGame({ config, setConfig, reload }) {
     const runtimeGame = config.game;
     // One app-store lookup per game: worth doing once per library change, not on every render.
     const games = SP_REACT.useMemo(() => availableGames(config), [config.installedGames, config.tweaks.games]);
@@ -1614,17 +2168,6 @@ function Games({ config, setConfig, reload }) {
         const saved = games.find((candidate) => candidate.appid === id);
         setConfig((current) => (current ? { ...current, selectedGame: saved || null } : current));
     };
-    // Default target: FEX/audio/env edit tweaks.global; fan + scheduler are the LIVE system
-    // modes, applied immediately through the backend.
-    const applyMode = async (setter, mode) => {
-        try {
-            const next = await setter(mode);
-            setConfig((current) => (current ? { ...current, fanMode: next.fanMode, lavdMode: next.lavdMode } : current));
-        }
-        catch (error) {
-            reload();
-        }
-    };
     const presets = config.fexProfiles || {};
     const storedProfile = values.fexProfile;
     const fexValue = storedProfile && presets[storedProfile] ? storedProfile : "default";
@@ -1633,551 +2176,15 @@ function Games({ config, setConfig, reload }) {
     const audioValue = audioLatencyOptions.some((option) => option.data === storedLatency) ? storedLatency : "";
     const showFields = editingDefault || perGameEnabled;
     const has = hw(config);
-    const showPerf = showFields && (has.fan || has.scheduler);
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsxs(DFL.PanelSection, { title: t("PERFORMANCE & GAME TWEAKS"), children: [SP_JSX.jsx(SelectEdit, { label: t("Game"), value: game?.appid || "", options: targetOptions, onChange: setSelectedGame }), !editingDefault ? SP_JSX.jsx(DFL.ToggleField, { label: t("Use Per-Game Settings"), checked: perGameEnabled, onChange: setPerGameEnabled }) : null] }), !editingDefault ? SP_JSX.jsx(Suggestion, { config: config, appid: game.appid, apply: applySuggestion }) : null, showPerf ? (SP_JSX.jsx(DFL.PanelSection, { title: t("PERFORMANCE"), children: editingDefault ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [has.scheduler ? SP_JSX.jsx(SelectEdit, { label: t("CPU Scheduler"), value: config.lavdMode, options: lavdOptions, onChange: (mode) => applyMode(setLavdMode, mode) }) : null, has.fan ? SP_JSX.jsx(SelectEdit, { label: t("Fan Curve"), value: config.fanMode, options: fanOptions, onChange: (mode) => applyMode(setFanMode, mode) }) : null] })) : (SP_JSX.jsx(PerfFields, { config: config, values: values, patch: patchSettings })) })) : null, showFields ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("GAME TWEAKS"), children: [SP_JSX.jsx("div", { className: "steamling-note", children: t("Changes apply on next game launch") }), editingDefault ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("FEX Preset"), value: fexValue, options: fexOptions, onChange: (id) => patchSettings({ fexProfile: id }) }), SP_JSX.jsx(SelectEdit, { label: t("Audio Buffer"), value: audioValue, options: audioLatencyOptions, onChange: (id) => patchSettings({ audioLatency: id }) }), SP_JSX.jsx(XaliaToggle, { values: values, patch: patchSettings }), has.touchscreen ? SP_JSX.jsx(TouchField, { values: values, patch: patchSettings }) : null, SP_JSX.jsx(EnvVarsButton, { value: String(values.envVars ?? ""), onSave: (next) => patchSettings({ envVars: next }) })] })) : (SP_JSX.jsx(TweakFields, { config: config, appid: game.appid, values: values, patch: patchSettings }))] })) : null, !editingDefault && perGameEnabled ? (SP_JSX.jsx(ConfigSection, { game: { appid: game.appid, name: game.name || "" }, reload: reload })) : null, !editingDefault ? (SP_JSX.jsx(ShaderCache, { appid: game.appid, name: game.name || "", running: runtimeGame?.appid === game.appid })) : null] }));
-}
-
-// Replaces the stock "Add a Non-Steam Game" flow: Steam's file browser cannot open a new
-// window under the Plasma Mobile X11 session, so Decky's in-UI picker feeds this instead.
-const WINDOWS_EXE = /\.(exe|bat|msi)$/i;
-// Constant internal name from proton-cachyos' compatibilitytool.vdf; survives version bumps.
-const PROTON_TOOL = "proton-cachyos";
-function isWindowsExe(path) {
-    return WINDOWS_EXE.test(path);
-}
-function defaultShortcutName(path) {
-    const base = path.split("/").pop() || path;
-    const cleaned = base.replace(/\.[^.]+$/, "").replace(/_+/g, " ").trim();
-    return cleaned || base;
-}
-const quote = (value) => `"${value.replace(/"/g, '\\"')}"`;
-async function addShortcut(name, path, useProton) {
-    const apps = window.SteamClient?.Apps;
-    if (!apps?.AddShortcut)
-        throw new Error("Steam shortcut API unavailable");
-    const dir = path.slice(0, path.lastIndexOf("/") + 1) || "/";
-    const appId = await apps.AddShortcut(name, path, "", "");
-    if (typeof appId !== "number" || !appId)
-        throw new Error("Steam refused to create the shortcut");
-    apps.SetShortcutName?.(appId, name);
-    apps.SetShortcutExe?.(appId, quote(path));
-    apps.SetShortcutStartDir?.(appId, quote(dir));
-    if (useProton)
-        apps.SpecifyCompatTool?.(appId, PROTON_TOOL);
-    ensureLaunchWrapper(String(appId >>> 0));
-    return appId;
-}
-
-function AddGameModal({ path, closeModal }) {
-    const [name, setName] = SP_REACT.useState(defaultShortcutName(path));
-    const [proton, setProton] = SP_REACT.useState(isWindowsExe(path));
-    const [busy, setBusy] = SP_REACT.useState(false);
-    const submit = async () => {
-        if (busy || !name.trim())
-            return;
-        setBusy(true);
-        try {
-            await addShortcut(name.trim(), path, proton);
-            toaster.toast({ title: t("Added to library"), body: name.trim() });
-            closeModal?.();
-        }
-        catch (error) {
-            toaster.toast({ title: t("Could not add game"), body: String(error) });
-            setBusy(false);
-        }
-    };
-    return (SP_JSX.jsxs(DFL.ConfirmModal, { strTitle: t("Add Non-Steam Game"), strDescription: path, strOKButtonText: busy ? "Adding…" : "Add to Library", bOKDisabled: busy || !name.trim(), onCancel: () => closeModal?.(), onOK: submit, children: [SP_JSX.jsx(DFL.TextField, { label: t("Name"), value: name, disabled: busy, onChange: (event) => setName(event.target.value) }), SP_JSX.jsx(DFL.ToggleField, { label: t("Launch with Proton"), description: t("Needed for Windows games (.exe)"), checked: proton, disabled: busy, onChange: setProton })] }));
-}
-function AddGameSection() {
-    const pick = async () => {
-        try {
-            // 0 = FileSelectionType.FILE (const enum in @decky/api typings, no runtime export).
-            const result = await openFilePicker(0, "/home/deck", true, true);
-            if (result?.path)
-                DFL.showModal(SP_JSX.jsx(AddGameModal, { path: result.path }));
-        }
-        catch (error) {
-            // Picker closed without a selection.
-        }
-    };
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("LIBRARY"), children: [SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: pick, children: t("Add Non-Steam Game") }) }), SP_JSX.jsx("div", { className: "steamling-note", children: t("Pick an executable to add it to your Steam library") })] }));
-}
-
-// The share is guest-writable and covers the whole home folder, so the trade is spelled out
-// rather than buried: same warning the Steamling Tools menu shows before it flips the switch.
-function ShareConfirmModal({ onConfirm, closeModal }) {
-    const [running, setRunning] = SP_REACT.useState(false);
-    const runningRef = SP_REACT.useRef(false);
-    runningRef.current = running;
-    const start = async () => {
-        if (runningRef.current)
-            return;
-        setRunning(true);
-        await onConfirm();
-        closeModal?.();
-    };
-    return (SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Share Files Over The Network"), strDescription: running
-            ? "Starting…"
-            : "Anyone on the same network can read and write every file in your home folder - games, saves and emulator settings, but also your Steam login and SSH keys. There is no password. Only turn this on at home.", strOKButtonText: running ? "Starting…" : "Turn On Sharing", bDestructiveWarning: true, bOKDisabled: running, bCancelDisabled: running, bDisableBackgroundDismiss: true, onCancel: () => {
-            if (!runningRef.current)
-                closeModal?.();
-        }, onOK: start }));
-}
-function FileSharing() {
-    const [share, setShareState] = SP_REACT.useState(null);
-    const [busy, setBusy] = SP_REACT.useState(false);
-    const [status, setStatus] = SP_REACT.useState("");
-    const busyRef = SP_REACT.useRef(false);
-    busyRef.current = busy;
-    const visible = useQamVisible();
-    // Polled only while the menu is open; reopening refreshes at once.
-    SP_REACT.useEffect(() => {
-        if (!visible)
-            return;
-        let cancelled = false;
-        const refresh = async () => {
-            if (busyRef.current)
-                return;
-            try {
-                const next = await shareStatus();
-                if (!cancelled && !busyRef.current)
-                    setShareState(next);
-            }
-            catch (error) {
-                if (!cancelled)
-                    setStatus(String(error));
-            }
-        };
-        refresh();
-        const timer = window.setInterval(refresh, 5000);
-        return () => {
-            cancelled = true;
-            window.clearInterval(timer);
-        };
-    }, [visible]);
-    const run = async (action) => {
-        if (busyRef.current)
-            return;
-        setBusy(true);
-        setStatus("");
-        try {
-            setShareState(await action());
-        }
-        catch (error) {
-            setStatus(String(error));
-        }
-        finally {
-            setBusy(false);
-        }
-    };
-    const summary = () => {
-        if (status)
-            return status;
-        if (!share)
-            return "Checking…";
-        if (!share.installed)
-            return "Samba is not installed (7.4 MB download)";
-        if (share.on)
-            return "On - open smb://steamling.local and connect as Guest";
-        return "Off - your home folder is not shared";
-    };
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("FILE SHARING"), children: [SP_JSX.jsx(DFL.Field, { label: t("Network share"), description: summary() }), share && !share.installed ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busy, onClick: () => run(installSamba), children: busy ? "Installing…" : "Install Samba" }) })) : (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Share my home folder"), description: t("Drag files straight onto the device from another computer"), checked: !!share?.on, disabled: busy || !share?.installed, onChange: (on) => {
-                        if (busyRef.current)
-                            return;
-                        if (on)
-                            DFL.showModal(SP_JSX.jsx(ShareConfirmModal, { onConfirm: () => run(() => setShare(true)) }));
-                        else
-                            run(() => setShare(false));
-                    } }) }))] }));
-}
-
-// Same warning the Steamling Tools menu shows: every image ships the same default password.
-function SshConfirmModal({ onConfirm, closeModal }) {
-    const [running, setRunning] = SP_REACT.useState(false);
-    const runningRef = SP_REACT.useRef(false);
-    runningRef.current = running;
-    const start = async () => {
-        if (runningRef.current)
-            return;
-        setRunning(true);
-        await onConfirm();
-        closeModal?.();
-    };
-    return (SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Allow SSH Logins"), strDescription: running
-            ? "Starting…"
-            : "Anyone on the same network can then log in with an account password, and Steamling ships a well-known default one. If you have not changed it yet, do that first: open Konsole in desktop mode and run passwd. It stays on, across reboots, until you turn it off here.", strOKButtonText: running ? "Starting…" : "Turn On SSH", bDestructiveWarning: true, bOKDisabled: running, bCancelDisabled: running, bDisableBackgroundDismiss: true, onCancel: () => {
-            if (!runningRef.current)
-                closeModal?.();
-        }, onOK: start }));
-}
-function RemoteAccess() {
-    const [ssh, setSshState] = SP_REACT.useState(null);
-    const [busy, setBusy] = SP_REACT.useState(false);
-    const [status, setStatus] = SP_REACT.useState("");
-    const busyRef = SP_REACT.useRef(false);
-    busyRef.current = busy;
-    const visible = useQamVisible();
-    // Read once per open: nothing else flips it while the menu is up, and each read is a transient unit.
-    SP_REACT.useEffect(() => {
-        if (!visible)
-            return;
-        let cancelled = false;
-        sshStatus()
-            .then((next) => {
-            if (!cancelled && !busyRef.current)
-                setSshState(next);
-        })
-            .catch((error) => {
-            if (!cancelled)
-                setStatus(String(error));
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, [visible]);
-    const run = async (on) => {
-        if (busyRef.current)
-            return;
-        setBusy(true);
-        setStatus("");
-        try {
-            setSshState(await setSsh(on));
-        }
-        catch (error) {
-            setStatus(String(error));
-        }
-        finally {
-            setBusy(false);
-        }
-    };
-    if (ssh && !ssh.available)
-        return null;
-    const summary = () => {
-        if (status)
-            return status;
-        if (!ssh)
-            return "Checking…";
-        if (!ssh.on)
-            return "Off - the device does not accept SSH logins";
-        if (ssh.addresses.length === 0)
-            return "On - connect to Wi-Fi to reach it";
-        return `On - ${ssh.addresses.map((a) => `ssh deck@${a}`).join(" or ")}`;
-    };
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("REMOTE ACCESS"), children: [SP_JSX.jsx(DFL.Field, { label: t("SSH"), description: summary() }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Allow SSH logins"), description: t("Log in from another computer's terminal"), checked: !!ssh?.on, disabled: busy || !ssh, onChange: (on) => {
-                        if (busyRef.current)
-                            return;
-                        if (on)
-                            DFL.showModal(SP_JSX.jsx(SshConfirmModal, { onConfirm: () => run(true) }));
-                        else
-                            run(false);
-                    } }) })] }));
-}
-
-function cardSummary(card) {
-    if (!card)
-        return "Checking…";
-    if (!card.present)
-        return "No SD card detected";
-    if (card.bootDisk)
-        return "Booted from this card - formatting disabled";
-    const size = card.sizeBytes ? `${(card.sizeBytes / 1e9).toFixed(1)} GB` : "";
-    const state = card.fstype === "ext4" ? (card.mountpoint ? "mounted" : "") : "not formatted for Steam";
-    return [card.label || "unlabeled", size, card.fstype || "no filesystem", state].filter(Boolean).join(" · ");
-}
-// closeModal must not be forwarded to ConfirmModal: its OK handler would close the dialog
-// at once, and it has to stay open until the format finishes.
-function FormatConfirmModal({ summary, onConfirm, closeModal }) {
-    const [text, setText] = SP_REACT.useState("");
-    const [running, setRunning] = SP_REACT.useState(false);
-    const armedRef = SP_REACT.useRef(false);
-    const runningRef = SP_REACT.useRef(false);
-    armedRef.current = text.trim().toLowerCase() === "format";
-    runningRef.current = running;
-    const start = async () => {
-        if (!armedRef.current || runningRef.current)
-            return;
-        setRunning(true);
-        await onConfirm();
-        closeModal?.();
-    };
-    return (SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Format SD Card"), strDescription: running
-            ? "Formatting… This can take a minute. Do not remove the card."
-            : `This erases ALL data on the card (${summary}) and formats it for Steam. Type "format" and press Enter to confirm.`, strOKButtonText: running ? "Formatting…" : "Erase and Format", bDestructiveWarning: true, bOKDisabled: !armedRef.current || running, bCancelDisabled: running, bDisableBackgroundDismiss: true, bHideCloseIcon: true, onCancel: () => {
-            if (!runningRef.current)
-                closeModal?.();
-        }, onOK: start, children: !running ? (SP_JSX.jsx(DFL.TextField, { value: text, focusOnMount: true, onChange: (event) => setText(event.target.value), onKeyDown: (event) => {
-                if (event.key === "Enter")
-                    start();
-            } })) : null }));
-}
-function SdCard() {
-    const [card, setCard] = SP_REACT.useState(null);
-    const [label, setLabel] = SP_REACT.useState("SDCARD");
-    const [busy, setBusy] = SP_REACT.useState(false);
-    const [status, setStatus] = SP_REACT.useState("");
-    const busyRef = SP_REACT.useRef(false);
-    busyRef.current = busy;
-    const visible = useQamVisible();
-    // Polled only while the menu is open; reopening refreshes at once.
-    SP_REACT.useEffect(() => {
-        if (!visible)
-            return;
-        let cancelled = false;
-        const refresh = async () => {
-            if (busyRef.current)
-                return;
-            try {
-                const next = await detectSdcard();
-                if (!cancelled && !busyRef.current)
-                    setCard(next);
-            }
-            catch (error) {
-                if (!cancelled)
-                    setStatus(String(error));
-            }
-        };
-        refresh();
-        const timer = window.setInterval(refresh, 5000);
-        return () => {
-            cancelled = true;
-            window.clearInterval(timer);
-        };
-    }, [visible]);
-    const runFormat = async () => {
-        if (busyRef.current)
-            return;
-        setBusy(true);
-        setStatus("");
-        try {
-            const next = await formatSdcard(label);
-            setCard(next);
-        }
-        catch (error) {
-            setStatus(String(error));
-        }
-        finally {
-            setBusy(false);
-        }
-    };
-    const confirmFormat = () => DFL.showModal(SP_JSX.jsx(FormatConfirmModal, { summary: cardSummary(card), onConfirm: runFormat }));
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("SD CARD"), children: [SP_JSX.jsx(DFL.Field, { label: t("Card"), description: cardSummary(card) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.TextField, { label: t("Label"), value: label, disabled: busy || !!card?.bootDisk, onChange: (event) => setLabel(event.target.value.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 16)) }) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: !card?.present || busy || !!card?.bootDisk, onClick: confirmFormat, children: busy ? "Formatting…" : "Format SD Card" }) }), status ? SP_JSX.jsx(DFL.Field, { label: "", description: status }) : null] }));
-}
-
-function UsbTransfer() {
-    const [usb, setUsb] = SP_REACT.useState(null);
-    const [busy, setBusy] = SP_REACT.useState(false);
-    const [status, setStatus] = SP_REACT.useState("");
-    const busyRef = SP_REACT.useRef(false);
-    busyRef.current = busy;
-    const visible = useQamVisible();
-    SP_REACT.useEffect(() => {
-        if (!visible)
-            return;
-        let cancelled = false;
-        usbTransferStatus()
-            .then((next) => {
-            if (!cancelled && !busyRef.current)
-                setUsb(next);
-        })
-            .catch((error) => {
-            if (!cancelled)
-                setStatus(String(error));
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, [visible]);
-    const run = async (on) => {
-        if (busyRef.current)
-            return;
-        setBusy(true);
-        setStatus("");
-        try {
-            setUsb(await setUsbTransfer(on));
-        }
-        catch (error) {
-            setStatus(String(error));
-        }
-        finally {
-            setBusy(false);
-        }
-    };
-    if (usb && !usb.available)
-        return null;
-    const summary = () => {
-        if (status)
-            return status;
-        if (!usb)
-            return "Checking…";
-        if (usb.on)
-            return "On - plug into a computer with a USB-C cable and open \"Steamling\" like a phone. Controllers and hubs on the port stop working until you turn this off.";
-        return "Off";
-    };
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("USB FILE TRANSFER"), children: [SP_JSX.jsx(DFL.Field, { label: t("Transfer over USB"), description: summary() }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Show up on a computer"), description: t("Copy files over a cable, no network needed. Stays on until you restart."), checked: !!usb?.on, disabled: busy || !usb, onChange: (on) => run(on) }) })] }));
-}
-
-// SD card last: the only destructive action, kept away from the casual toggles
-function Library() {
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(AddGameSection, {}), SP_JSX.jsx(FileSharing, {}), SP_JSX.jsx(UsbTransfer, {}), SP_JSX.jsx(RemoteAccess, {}), SP_JSX.jsx(SdCard, {})] }));
-}
-
-function About() {
-    const [info, setInfo] = SP_REACT.useState(null);
-    const [error, setError] = SP_REACT.useState("");
-    const visible = useQamVisible();
-    // Once per open: the bootloader check reads both ABL slots, so it is not polled.
-    SP_REACT.useEffect(() => {
-        if (!visible)
-            return;
-        let cancelled = false;
-        deviceInfo()
-            .then((next) => {
-            if (!cancelled)
-                setInfo(next);
-        })
-            .catch((err) => {
-            if (!cancelled)
-                setError(String(err));
-        });
-        return () => {
-            cancelled = true;
-        };
-    }, [visible]);
-    const confirmRestart = () => DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Restart Game Mode"), strDescription: t("Closes Steam and any running game, then brings game mode back up. Unsaved progress in a running game is lost. Useful when Steam or the screen gets stuck."), strOKButtonText: t("Restart"), onOK: () => restartGameMode().catch((err) => setError(String(err))) }));
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("ABOUT"), children: [SP_JSX.jsx(DFL.Field, { label: t("Steamling OS"), description: info?.osVersion ?? "…" }), SP_JSX.jsx(DFL.Field, { label: t("Kernel"), description: info?.kernel ?? "…" }), info?.bootloader ? SP_JSX.jsx(DFL.Field, { label: t("Bootloader"), description: info.bootloader }) : null, SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: confirmRestart, children: t("Restart Game Mode") }) }), error ? SP_JSX.jsx(DFL.Field, { label: t("Error"), description: error }) : null] }));
-}
-
-const SHOWN_UPDATES = 8;
-const gib = (bytes) => (bytes / 1024 ** 3).toFixed(1);
-// snapshot metadata stores ISO-8601 UTC; show local DD/MM/YYYY HH:MM
-const fmtDate = (iso) => {
-    const d = new Date(iso);
-    if (isNaN(d.getTime()))
-        return iso;
-    const p = (n) => String(n).padStart(2, "0");
-    return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
-};
-function Updater() {
-    const [updates, setUpdates] = SP_REACT.useState(null);
-    const [checking, setChecking] = SP_REACT.useState(false);
-    const [status, setStatus] = SP_REACT.useState(null);
-    const [snap, setSnap] = SP_REACT.useState(null);
-    const [rollingBack, setRollingBack] = SP_REACT.useState(false);
-    const [rollbackDone, setRollbackDone] = SP_REACT.useState(false);
-    const [error, setError] = SP_REACT.useState("");
-    const [rollbackError, setRollbackError] = SP_REACT.useState("");
-    const busyRef = SP_REACT.useRef(false);
-    const running = !!status?.running;
-    busyRef.current = checking || running || rollingBack;
-    const visible = useQamVisible();
-    const refreshSnap = () => snapshotStatus().then(setSnap).catch(() => { });
-    // Re-attach to an update that survived a QAM close (or a Steam restart), on every open.
-    SP_REACT.useEffect(() => {
-        if (!visible)
-            return;
-        let cancelled = false;
-        updateStatus()
-            .then((next) => {
-            if (!cancelled && (next.running || next.exitCode !== null))
-                setStatus(next);
-        })
-            .catch(() => { });
-        refreshSnap();
-        return () => {
-            cancelled = true;
-        };
-    }, [visible]);
-    // The update itself runs on regardless; only the progress display stops while hidden.
-    SP_REACT.useEffect(() => {
-        if (!running || !visible)
-            return;
-        const timer = window.setInterval(async () => {
-            try {
-                const next = await updateStatus();
-                setStatus(next);
-                if (!next.running) {
-                    if (next.exitCode === 0)
-                        setUpdates([]);
-                    refreshSnap(); // a finished transaction changes snapshots + reboot-required
-                }
-            }
-            catch (err) {
-                setError(String(err));
-            }
-        }, 2000);
-        return () => window.clearInterval(timer);
-    }, [running, visible]);
-    const check = async () => {
-        if (busyRef.current)
-            return;
-        setChecking(true);
-        setError("");
-        try {
-            setUpdates(await checkUpdates());
-        }
-        catch (err) {
-            setError(String(err));
-        }
-        finally {
-            setChecking(false);
-        }
-    };
-    const start = async () => {
-        if (busyRef.current)
-            return;
-        setError("");
-        try {
-            setStatus(await startUpdate());
-        }
-        catch (err) {
-            setError(String(err));
-        }
-    };
-    const confirmStart = () => DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Install Updates"), strDescription: t("Downloads and installs all available system updates. Keep the device powered; a running game may stutter. Restart after it finishes."), strOKButtonText: t("Install"), onOK: start }));
-    const lastSnapshot = snap?.supported && snap.snapshots.length > 0 ? snap.snapshots[snap.snapshots.length - 1] : null;
-    // Already rolled back onto the latest snapshot: another rollback would be a no-op,
-    // so hide the button until the next update (which clears the marker + snapshots anew).
-    const onLastSnapshot = !!(snap?.rolledBack && lastSnapshot && snap.rolledBack.fromSnapshot === lastSnapshot.id);
-    const rollBack = async () => {
-        if (busyRef.current || !lastSnapshot)
-            return;
-        setRollbackError("");
-        setRollingBack(true);
-        try {
-            setSnap(await startRollback(lastSnapshot.id));
-            setRollbackDone(true);
-        }
-        catch (err) {
-            setRollbackError(String(err));
-        }
-        finally {
-            setRollingBack(false);
-        }
-    };
-    const confirmRollback = () => {
-        if (!lastSnapshot)
-            return;
-        DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Roll Back Last Update"), strDescription: `Restores the system to before the update of ${fmtDate(lastSnapshot.created)}` +
-                (lastSnapshot.targets ? ` (${lastSnapshot.targets})` : "") +
-                `. Games, saves and settings are kept.` +
-                (lastSnapshot.kernel ? " The previous kernel is restored too." : "") +
-                ` Reboot after it completes.`, strOKButtonText: t("Roll Back"), onOK: rollBack }));
-    };
-    const reboot = () => rebootSystem().catch((err) => setError(String(err)));
-    const finished = !running && status?.exitCode !== null && status?.exitCode !== undefined;
-    const summary = updates === null
-        ? "Not checked yet"
-        : updates.length === 0
-            ? "System is up to date"
-            : `${updates.length} update${updates.length === 1 ? "" : "s"} available`;
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsxs(DFL.PanelSection, { title: t("SYSTEM UPDATES"), children: [!running ? SP_JSX.jsx(DFL.Field, { label: t("Status"), description: summary }) : null, !running && updates && updates.length > 0 ? (SP_JSX.jsxs("div", { className: "steamling-note", children: [updates.slice(0, SHOWN_UPDATES).map((update) => (SP_JSX.jsx("div", { children: `${update.name} ${update.current} → ${update.latest}` }, update.name))), updates.length > SHOWN_UPDATES ? SP_JSX.jsx("div", { children: `… and ${updates.length - SHOWN_UPDATES} more` }) : null] })) : null, SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: check, children: checking ? "Checking…" : "Check for Updates" }) }), !running && updates && updates.length > 0 ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: confirmStart, children: t("Install Updates") }) })) : null, running ? SP_JSX.jsx(DFL.Field, { label: t("Updating…"), description: t("Safe to close this menu. Do not power off.") }) : null, finished ? (SP_JSX.jsx(DFL.Field, { label: status.exitCode === 0 ? "Update complete" : `Update failed (code ${status.exitCode})`, description: status.exitCode === 0 ? "Restart to finish applying updates." : "See the log below." })) : null, finished && status.exitCode === 0 ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: reboot, children: t("Restart Now") }) })) : null, (running || (finished && status.exitCode !== 0)) && status?.log ? (SP_JSX.jsx("div", { className: "steamling-note steamling-log", children: status.log })) : null, error ? SP_JSX.jsx(DFL.Field, { label: t("Error"), description: error }) : null] }), snap?.supported ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("ROLLBACK"), children: [snap.rolledBack && !rollbackDone ? (SP_JSX.jsx(DFL.Field, { label: t("System was rolled back"), description: `Restored from snapshot ${snap.rolledBack.fromSnapshot} (${fmtDate(snap.rolledBack.ts)}).${onLastSnapshot ? " Rollback will be available again after the next update." : ""}` })) : null, rollbackDone ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("Rolled back"), description: t("Reboot to finish switching to the restored system.") }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: reboot, children: t("Reboot Now") }) })] })) : onLastSnapshot ? null : lastSnapshot ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("Last snapshot"), description: `${fmtDate(lastSnapshot.created)}${lastSnapshot.targets ? ` — ${lastSnapshot.targets}` : ""}` }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: confirmRollback, children: rollingBack ? "Rolling back…" : "Roll Back Last Update" }) })] })) : (SP_JSX.jsx(DFL.Field, { label: t("No snapshots yet"), description: t("A snapshot is taken automatically before every update.") })), rollbackError ? SP_JSX.jsx(DFL.Field, { label: t("Rollback error"), description: rollbackError }) : null, SP_JSX.jsx(DFL.Field, { label: t("Storage"), description: `${gib(snap.freeBytes)} GB free${snap.lowSpace ? " — LOW: snapshots may be skipped" : ""}` })] })) : null, SP_JSX.jsx(About, {})] }));
+    const showPerf = !editingDefault && perGameEnabled && (has.fan || has.scheduler);
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsxs(DFL.PanelSection, { title: t("THIS GAME"), children: [SP_JSX.jsx(SelectEdit, { label: t("Game"), value: game?.appid || "", options: targetOptions, onChange: setSelectedGame }), !editingDefault ? SP_JSX.jsx(DFL.ToggleField, { label: t("Use Per-Game Settings"), checked: perGameEnabled, onChange: setPerGameEnabled }) : null] }), !editingDefault ? SP_JSX.jsx(Suggestion, { config: config, appid: game.appid, apply: applySuggestion }) : null, showPerf ? (SP_JSX.jsx(DFL.PanelSection, { title: t("PERFORMANCE"), children: SP_JSX.jsx(PerfFields, { config: config, values: values, patch: patchSettings }) })) : null, showFields ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("GAME TWEAKS"), children: [SP_JSX.jsx("div", { className: "steamling-note", children: t("Changes apply on next game launch") }), editingDefault ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("FEX Preset"), value: fexValue, options: fexOptions, onChange: (id) => patchSettings({ fexProfile: id }) }), SP_JSX.jsx(SelectEdit, { label: t("Audio Buffer"), value: audioValue, options: audioLatencyOptions, onChange: (id) => patchSettings({ audioLatency: id }) }), SP_JSX.jsx(XaliaToggle, { values: values, patch: patchSettings }), has.touchscreen ? SP_JSX.jsx(TouchField, { values: values, patch: patchSettings }) : null, SP_JSX.jsx(EnvVarsButton, { value: String(values.envVars ?? ""), onSave: (next) => patchSettings({ envVars: next }) })] })) : (SP_JSX.jsx(TweakFields, { config: config, appid: game.appid, values: values, patch: patchSettings }))] })) : null, !editingDefault && perGameEnabled ? (SP_JSX.jsx(ConfigSection, { game: { appid: game.appid, name: game.name || "" }, reload: reload })) : null, !editingDefault ? (SP_JSX.jsx(ShaderCache, { appid: game.appid, name: game.name || "", running: runtimeGame?.appid === game.appid })) : null] }));
 }
 
 // A loader whose API lacks the hook gets the old behaviour (always treated as open) instead of
 // a crash; the choice is fixed per load, so hook order stays stable.
 const useVisible = typeof useQuickAccessVisible === "function" ? useQuickAccessVisible : () => true;
 function Content() {
-    const [tab, setTab] = SP_REACT.useState("Games");
+    const [tab, setTab] = SP_REACT.useState("ThisGame");
     const [config, setConfig] = SP_REACT.useState(null);
     const [message, setMessage] = SP_REACT.useState("Loading");
     const savedTweaksSnapshot = SP_REACT.useRef("");
@@ -2253,11 +2260,11 @@ function Content() {
         return SP_JSX.jsx(DFL.PanelSection, { title: "Governor", children: SP_JSX.jsx(DFL.Field, { label: message }) });
     const tabContent = (content) => (SP_JSX.jsx("div", { className: "steamling-control-tab-content", children: content }));
     const tabs = [
-        { id: "Games", title: tabIcons.Games, content: tabContent(SP_JSX.jsx(Games, { config: config, setConfig: setConfig, reload: load })) },
-        { id: "Display", title: tabIcons.Display, content: tabContent(SP_JSX.jsx(Display, {})) },
-        { id: "Library", title: tabIcons.Library, content: tabContent(SP_JSX.jsx(Library, {})) },
+        { id: "ThisGame", title: tabIcons.ThisGame, content: tabContent(SP_JSX.jsx(ThisGame, { config: config, setConfig: setConfig, reload: load })) },
+        { id: "Performance", title: tabIcons.Performance, content: tabContent(SP_JSX.jsx(Performance, { config: config, setConfig: setConfig, reload: load })) },
         { id: "Controller", title: tabIcons.Controller, content: tabContent(SP_JSX.jsx(Controller, { config: config, setConfig: setConfig, reload: load })) },
-        { id: "Updater", title: tabIcons.Updater, content: tabContent(SP_JSX.jsx(Updater, {})) },
+        { id: "Files", title: tabIcons.Files, content: tabContent(SP_JSX.jsx(Files, {})) },
+        { id: "System", title: tabIcons.System, content: tabContent(SP_JSX.jsx(System, {})) },
     ];
     return (SP_JSX.jsx(QamVisible.Provider, { value: visible, children: SP_JSX.jsxs("div", { className: "steamling-control-tabs", children: [SP_JSX.jsx("style", { children: styles }), SP_JSX.jsx(MenuWidthStyle, {}), SP_JSX.jsx(DFL.Tabs, { activeTab: tab, onShowTab: setTab, tabs: tabs })] }) }));
 }

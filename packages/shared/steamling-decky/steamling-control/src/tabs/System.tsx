@@ -1,6 +1,9 @@
 import { ButtonItem, ConfirmModal, Field, PanelSection, PanelSectionRow, showModal } from "@decky/ui";
 import { useEffect, useRef, useState } from "react";
 import { About } from "../components/About";
+import { MenuWidthSetting } from "../components/MenuWidth";
+import { PanelCalibration } from "../components/PanelCalibration";
+import { RemoteAccess } from "../components/RemoteAccess";
 import { checkUpdates, rebootSystem, snapshotStatus, startRollback, startUpdate, updateStatus } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { SnapshotStatus, UpdateInfo, UpdateStatus } from "../types";
@@ -18,7 +21,9 @@ const fmtDate = (iso: string) => {
   return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
 
-export function Updater() {
+// Occasional upkeep: updates and rollback, remote access, the set-once screen and menu
+// settings, and what is installed.
+export function System() {
   const [updates, setUpdates] = useState<UpdateInfo[] | null>(null);
   const [checking, setChecking] = useState(false);
   const [status, setStatus] = useState<UpdateStatus | null>(null);
@@ -216,6 +221,9 @@ export function Updater() {
           />
         </PanelSection>
       ) : null}
+      <RemoteAccess />
+      <PanelCalibration />
+      <MenuWidthSetting />
       <About />
     </>
   );

@@ -11,10 +11,10 @@ import { currentGame } from "./lib/games";
 import { onGameLifetime } from "./lib/touch";
 import { styles } from "./styles";
 import { Controller } from "./tabs/Controller";
-import { Display } from "./tabs/Display";
-import { Games } from "./tabs/Games";
-import { Library } from "./tabs/Library";
-import { Updater } from "./tabs/Updater";
+import { Files } from "./tabs/Files";
+import { Performance } from "./tabs/Performance";
+import { System } from "./tabs/System";
+import { ThisGame } from "./tabs/ThisGame";
 import type { Config } from "./types";
 
 // A loader whose API lacks the hook gets the old behaviour (always treated as open) instead of
@@ -22,7 +22,7 @@ import type { Config } from "./types";
 const useVisible: () => boolean = typeof useQuickAccessVisible === "function" ? useQuickAccessVisible : () => true;
 
 export function Content() {
-  const [tab, setTab] = useState("Games");
+  const [tab, setTab] = useState("ThisGame");
   const [config, setConfig] = useState<Config | null>(null);
   const [message, setMessage] = useState("Loading");
   const savedTweaksSnapshot = useRef("");
@@ -93,11 +93,11 @@ export function Content() {
     <div className="steamling-control-tab-content">{content}</div>
   );
   const tabs = [
-    { id: "Games", title: tabIcons.Games, content: tabContent(<Games config={config} setConfig={setConfig} reload={load} />) },
-    { id: "Display", title: tabIcons.Display, content: tabContent(<Display />) },
-    { id: "Library", title: tabIcons.Library, content: tabContent(<Library />) },
+    { id: "ThisGame", title: tabIcons.ThisGame, content: tabContent(<ThisGame config={config} setConfig={setConfig} reload={load} />) },
+    { id: "Performance", title: tabIcons.Performance, content: tabContent(<Performance config={config} setConfig={setConfig} reload={load} />) },
     { id: "Controller", title: tabIcons.Controller, content: tabContent(<Controller config={config} setConfig={setConfig} reload={load} />) },
-    { id: "Updater", title: tabIcons.Updater, content: tabContent(<Updater />) },
+    { id: "Files", title: tabIcons.Files, content: tabContent(<Files />) },
+    { id: "System", title: tabIcons.System, content: tabContent(<System />) },
   ];
   return (
     <QamVisible.Provider value={visible}>

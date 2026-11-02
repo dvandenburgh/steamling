@@ -1,19 +1,19 @@
 import { PanelSection, ToggleField } from "@decky/ui";
 import { useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { setFanMode, setLavdMode } from "../backend";
-import type { Modes } from "../backend";
 import { ConfigSection } from "../components/ConfigSection";
 import { ShaderCache } from "../components/ShaderCache";
 import { Suggestion } from "../components/Suggestion";
-import { EnvVarsButton, PerfFields, hw, TouchField, TweakFields, XaliaToggle, audioLatencyOptions, fanOptions, lavdOptions } from "../components/GameFields";
+import { EnvVarsButton, PerfFields, hw, TouchField, TweakFields, XaliaToggle, audioLatencyOptions } from "../components/GameFields";
 import { SelectEdit } from "../components/widgets";
 import { availableGames, editTargetOptions } from "../lib/games";
 import { clone } from "../lib/util";
 import type { Config } from "../types";
 import { t } from "../i18n";
 
-export function Games({ config, setConfig, reload }: {
+// One game's settings, or the Default every game without its own starts from. The handheld-wide
+// scheduler and fan curve are on the Performance tab; a game here can override them.
+export function ThisGame({ config, setConfig, reload }: {
   config: Config;
   setConfig: Dispatch<SetStateAction<Config | null>>;
   reload: () => void;
@@ -81,16 +81,6 @@ export function Games({ config, setConfig, reload }: {
     setConfig((current) => (current ? { ...current, selectedGame: saved || null } : current));
   };
 
-  // Default target: FEX/audio/env edit tweaks.global; fan + scheduler are the LIVE system
-  // modes, applied immediately through the backend.
-  const applyMode = async (setter: (mode: string) => Promise<Modes>, mode: string) => {
-    try {
-      const next = await setter(mode);
-      setConfig((current) => (current ? { ...current, fanMode: next.fanMode, lavdMode: next.lavdMode } : current));
-    } catch (error) {
-      reload();
-    }
-  };
   const presets = config.fexProfiles || {};
   const storedProfile = values.fexProfile as string | undefined;
   const fexValue = storedProfile && presets[storedProfile] ? storedProfile : "default";
@@ -100,24 +90,17 @@ export function Games({ config, setConfig, reload }: {
 
   const showFields = editingDefault || perGameEnabled;
   const has = hw(config);
-  const showPerf = showFields && (has.fan || has.scheduler);
+  const showPerf = !editingDefault && perGameEnabled && (has.fan || has.scheduler);
   return (
     <>
-      <PanelSection title={t("PERFORMANCE & GAME TWEAKS")}>
+      <PanelSection title={t("THIS GAME")}>
         <SelectEdit label={t("Game")} value={game?.appid || ""} options={targetOptions} onChange={setSelectedGame} />
         {!editingDefault ? <ToggleField label={t("Use Per-Game Settings")} checked={perGameEnabled} onChange={setPerGameEnabled} /> : null}
       </PanelSection>
       {!editingDefault ? <Suggestion config={config} appid={game!.appid} apply={applySuggestion} /> : null}
       {showPerf ? (
         <PanelSection title={t("PERFORMANCE")}>
-          {editingDefault ? (
-            <>
-              {has.scheduler ? <SelectEdit label={t("CPU Scheduler")} value={config.lavdMode} options={lavdOptions} onChange={(mode) => applyMode(setLavdMode, mode)} /> : null}
-              {has.fan ? <SelectEdit label={t("Fan Curve")} value={config.fanMode} options={fanOptions} onChange={(mode) => applyMode(setFanMode, mode)} /> : null}
-            </>
-          ) : (
-            <PerfFields config={config} values={values} patch={patchSettings} />
-          )}
+          <PerfFields config={config} values={values} patch={patchSettings} />
         </PanelSection>
       ) : null}
       {showFields ? (
