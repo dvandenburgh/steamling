@@ -58,6 +58,13 @@ notify_steam()
 sync_roms()
 {
     [[ -x /usr/bin/steamling-roms-sync ]] || return 0
+    # The ROM folders are made by the deck user, which can't write to a card whose top folder
+    # belongs to root (formatted on another computer, say). Make the top two here, as root and
+    # owned by deck; the per-system folders under them the sync makes itself.
+    if [[ -n ${MOUNT_POINT} && ! -d ${MOUNT_POINT}/Emulation/ROMs ]] && /usr/bin/mountpoint -q -- "${MOUNT_POINT}"; then
+        /usr/bin/install -d -o "${STEAM_UID}" -g "${STEAM_UID}" -- \
+            "${MOUNT_POINT}/Emulation" "${MOUNT_POINT}/Emulation/ROMs" 2>/dev/null || true
+    fi
     systemctl -M ${STEAM_UID}@ --user start --no-block steamling-roms-sync.service 2>/dev/null || true
 }
 
