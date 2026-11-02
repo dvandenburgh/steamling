@@ -276,10 +276,16 @@ function Icon({ path }) {
     return (SP_JSX.jsx("svg", { style: { display: "block" }, width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: path }));
 }
 const tabIcons = {
-    Games: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("line", { x1: "6", x2: "10", y1: "11", y2: "11" }), SP_JSX.jsx("line", { x1: "8", x2: "8", y1: "9", y2: "13" }), SP_JSX.jsx("line", { x1: "15", x2: "15.01", y1: "12", y2: "12" }), SP_JSX.jsx("line", { x1: "18", x2: "18.01", y1: "10", y2: "10" }), SP_JSX.jsx("path", { d: "M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" })] }) })),
+    // Performance: a gauge with its needle swung toward high, for the fan curve, CPU scheduler,
+    // overlay and system monitor that live under this tab.
+    Games: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("path", { d: "M3.34 19a10 10 0 1 1 17.32 0" }), SP_JSX.jsx("path", { d: "M6 14h1.5" }), SP_JSX.jsx("path", { d: "M12 6.5V8" }), SP_JSX.jsx("path", { d: "M16.5 14H18" }), SP_JSX.jsx("path", { d: "m12 14 4.5-4.5" }), SP_JSX.jsx("circle", { cx: "12", cy: "14", r: "1.5", fill: "currentColor" })] }) })),
+    // Display: a screen with a pulse line on it, for the overlay, the live readings and the panel
+    // settings under this tab.
+    Display: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("rect", { width: "20", height: "14", x: "2", y: "3", rx: "2" }), SP_JSX.jsx("path", { d: "M8 21h8" }), SP_JSX.jsx("path", { d: "M12 17v4" }), SP_JSX.jsx("path", { d: "M6 11h2.5l1.5-3 3 6 1.5-3H18" })] }) })),
     Library: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("rect", { width: "18", height: "18", x: "3", y: "3", rx: "2" }), SP_JSX.jsx("path", { d: "M8 12h8" }), SP_JSX.jsx("path", { d: "M12 8v8" })] }) })),
     Updater: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }), SP_JSX.jsx("polyline", { points: "7 10 12 15 17 10" }), SP_JSX.jsx("line", { x1: "12", x2: "12", y1: "15", y2: "3" })] }) })),
-    Controller: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("path", { d: "M21 17a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2Z" }), SP_JSX.jsx("path", { d: "M6 15v-2" }), SP_JSX.jsx("path", { d: "M12 15V9" }), SP_JSX.jsx("circle", { cx: "12", cy: "6", r: "3" })] }) })),
+    // The gamepad: calibration, stick response, paddles and rumble all live under this tab.
+    Controller: (SP_JSX.jsx(Icon, { path: SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx("line", { x1: "6", x2: "10", y1: "11", y2: "11" }), SP_JSX.jsx("line", { x1: "8", x2: "8", y1: "9", y2: "13" }), SP_JSX.jsx("line", { x1: "15", x2: "15.01", y1: "12", y2: "12" }), SP_JSX.jsx("line", { x1: "18", x2: "18.01", y1: "10", y2: "10" }), SP_JSX.jsx("path", { d: "M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" })] }) })),
 };
 /** Governor's own icon: a flyball governor, the spinning regulator that holds a steam engine's speed. */
 const pluginIcon = (SP_JSX.jsxs("svg", { width: "1em", height: "1em", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [SP_JSX.jsx("line", { x1: "12", x2: "12", y1: "2", y2: "21" }), SP_JSX.jsx("path", { d: "M12 4 7.6 9.4M12 4l4.4 5.4" }), SP_JSX.jsx("circle", { cx: "6.5", cy: "11", r: "1.9", fill: "currentColor" }), SP_JSX.jsx("circle", { cx: "17.5", cy: "11", r: "1.9", fill: "currentColor" }), SP_JSX.jsx("path", { d: "M7.6 12.6 10.5 15.5M16.4 12.6 13.5 15.5" }), SP_JSX.jsx("rect", { x: "10", y: "15", width: "4", height: "2.5", rx: "0.5" }), SP_JSX.jsx("line", { x1: "7", x2: "17", y1: "21", y2: "21" })] }));
@@ -671,56 +677,6 @@ function ColorControls({ zone, hsv, brightness, onCommit }) {
       ` })] }));
 }
 
-// Panels leave the factory a touch fast or slow, and emulators that pace to the display drift
-// against their audio. steamling-panel-calibration measures the running refresh rate and trims the
-// panel's frame length until it sits on the nominal rate; the result is kept across reboots.
-function PanelModal({ initial, onChange, closeModal }) {
-    const [status, setStatus] = SP_REACT.useState(initial);
-    const [busy, setBusy] = SP_REACT.useState(initial.running);
-    const [error, setError] = SP_REACT.useState("");
-    const busyRef = SP_REACT.useRef(busy);
-    busyRef.current = busy;
-    const run = async (action) => {
-        if (busyRef.current)
-            return;
-        setBusy(true);
-        setError("");
-        try {
-            const next = await action();
-            setStatus(next);
-            onChange(next);
-        }
-        catch (e) {
-            setError(String(e));
-        }
-        finally {
-            setBusy(false);
-        }
-    };
-    const result = status.result;
-    return (SP_JSX.jsxs(DFL.ModalRoot, { closeModal: busy ? undefined : closeModal, bDisableBackgroundDismiss: busy, children: [SP_JSX.jsx("div", { style: { fontSize: "20px", fontWeight: "bold", marginBottom: "8px" }, children: t("Display Refresh Calibration") }), SP_JSX.jsx("div", { children: busy
-                    ? "Measuring… this takes up to a minute. Leave the device on this screen until it finishes."
-                    : `${status.saved ? "A saved calibration is in use." : "Using the panel's factory timing."} Calibrate measures the refresh rate and trims it to exactly the nominal rate, which keeps emulator audio and video in step.` }), result && !busy ? (SP_JSX.jsx("div", { style: { marginTop: "8px" }, children: `${result.rate} Hz: measured ${result.before.toFixed(2)} Hz, now ${result.after.toFixed(2)} Hz.` })) : null, SP_JSX.jsxs(DFL.Focusable, { style: { display: "flex", gap: "8px", marginTop: "12px" }, children: [SP_JSX.jsx(DFL.DialogButton, { disabled: busy, onClick: () => run(panelCalibrate), children: busy ? "Calibrating…" : "Calibrate" }), SP_JSX.jsx(DFL.DialogButton, { disabled: busy || !status.saved, onClick: () => run(panelReset), children: t("Reset to Factory") }), SP_JSX.jsx(DFL.DialogButton, { disabled: busy, onClick: () => closeModal?.(), children: t("Close") })] }), error ? SP_JSX.jsx("div", { style: { marginTop: "8px", color: "#ff8080" }, children: error }) : null] }));
-}
-function PanelCalibration() {
-    const [status, setStatus] = SP_REACT.useState(null);
-    const visible = useQamVisible();
-    // One cheap sysfs read per menu open; panels without the attributes never show the section.
-    SP_REACT.useEffect(() => {
-        if (!visible)
-            return;
-        let cancelled = false;
-        panelStatus()
-            .then((next) => { if (!cancelled)
-            setStatus(next); })
-            .catch(() => { });
-        return () => { cancelled = true; };
-    }, [visible]);
-    if (!status?.available)
-        return null;
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("DISPLAY"), children: [SP_JSX.jsx(DFL.Field, { label: t("Refresh rate"), description: status.saved ? "Calibrated" : "Factory timing" }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: () => DFL.showModal(SP_JSX.jsx(PanelModal, { initial: status, onChange: setStatus })), children: t("Calibrate Display") }) })] }));
-}
-
 const STRENGTHS = [25, 50, 75, 100];
 function Rumble() {
     const [rumble, setRumbleState] = SP_REACT.useState(null);
@@ -836,7 +792,7 @@ function sideHsv(side) {
     return rgbToHsv(side.r, side.g, side.b);
 }
 function Controller(props) {
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(Calibration, {}), SP_JSX.jsx(StickResponse, {}), SP_JSX.jsx(BackPaddles, {}), SP_JSX.jsx(Rumble, {}), props.config.led.available && SP_JSX.jsx(StickLights, { ...props }), SP_JSX.jsx(PanelCalibration, {}), SP_JSX.jsx(MenuWidthSetting, {})] }));
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(Calibration, {}), SP_JSX.jsx(StickResponse, {}), SP_JSX.jsx(BackPaddles, {}), SP_JSX.jsx(Rumble, {}), props.config.led.available && SP_JSX.jsx(StickLights, { ...props })] }));
 }
 function StickLights({ config, setConfig, reload }) {
     const led = config.led;
@@ -852,6 +808,190 @@ function StickLights({ config, setConfig, reload }) {
                                 .catch(() => reload()) }) }), led.sidesAvailable && (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Side Lights"), description: t("Match the side lighting to the sticks."), checked: led.sides, disabled: !led.enabled, onChange: (value) => setLedSides(value)
                                 .then((next) => setConfig((cur) => (cur ? { ...cur, led: next } : cur)))
                                 .catch(() => reload()) }) }))] }), led.enabled && (led.linked ? (SP_JSX.jsx(DFL.PanelSection, { title: t("BOTH STICKS"), children: SP_JSX.jsx(ColorControls, { zone: "both", hsv: leftHsv, brightness: led.left.brightness, onCommit: commitBoth }) })) : (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.PanelSection, { title: t("LEFT STICK"), children: SP_JSX.jsx(ColorControls, { zone: "left", hsv: leftHsv, brightness: led.left.brightness, onCommit: commitLeft }) }), SP_JSX.jsx(DFL.PanelSection, { title: t("RIGHT STICK"), children: SP_JSX.jsx(ColorControls, { zone: "right", hsv: rightHsv, brightness: led.right.brightness, onCommit: commitRight }) })] })))] }));
+}
+
+// Panels leave the factory a touch fast or slow, and emulators that pace to the display drift
+// against their audio. steamling-panel-calibration measures the running refresh rate and trims the
+// panel's frame length until it sits on the nominal rate; the result is kept across reboots.
+function PanelModal({ initial, onChange, closeModal }) {
+    const [status, setStatus] = SP_REACT.useState(initial);
+    const [busy, setBusy] = SP_REACT.useState(initial.running);
+    const [error, setError] = SP_REACT.useState("");
+    const busyRef = SP_REACT.useRef(busy);
+    busyRef.current = busy;
+    const run = async (action) => {
+        if (busyRef.current)
+            return;
+        setBusy(true);
+        setError("");
+        try {
+            const next = await action();
+            setStatus(next);
+            onChange(next);
+        }
+        catch (e) {
+            setError(String(e));
+        }
+        finally {
+            setBusy(false);
+        }
+    };
+    const result = status.result;
+    return (SP_JSX.jsxs(DFL.ModalRoot, { closeModal: busy ? undefined : closeModal, bDisableBackgroundDismiss: busy, children: [SP_JSX.jsx("div", { style: { fontSize: "20px", fontWeight: "bold", marginBottom: "8px" }, children: t("Display Refresh Calibration") }), SP_JSX.jsx("div", { children: busy
+                    ? "Measuring… this takes up to a minute. Leave the device on this screen until it finishes."
+                    : `${status.saved ? "A saved calibration is in use." : "Using the panel's factory timing."} Calibrate measures the refresh rate and trims it to exactly the nominal rate, which keeps emulator audio and video in step.` }), result && !busy ? (SP_JSX.jsx("div", { style: { marginTop: "8px" }, children: `${result.rate} Hz: measured ${result.before.toFixed(2)} Hz, now ${result.after.toFixed(2)} Hz.` })) : null, SP_JSX.jsxs(DFL.Focusable, { style: { display: "flex", gap: "8px", marginTop: "12px" }, children: [SP_JSX.jsx(DFL.DialogButton, { disabled: busy, onClick: () => run(panelCalibrate), children: busy ? "Calibrating…" : "Calibrate" }), SP_JSX.jsx(DFL.DialogButton, { disabled: busy || !status.saved, onClick: () => run(panelReset), children: t("Reset to Factory") }), SP_JSX.jsx(DFL.DialogButton, { disabled: busy, onClick: () => closeModal?.(), children: t("Close") })] }), error ? SP_JSX.jsx("div", { style: { marginTop: "8px", color: "#ff8080" }, children: error }) : null] }));
+}
+function PanelCalibration() {
+    const [status, setStatus] = SP_REACT.useState(null);
+    const visible = useQamVisible();
+    // One cheap sysfs read per menu open; panels without the attributes never show the section.
+    SP_REACT.useEffect(() => {
+        if (!visible)
+            return;
+        let cancelled = false;
+        panelStatus()
+            .then((next) => { if (!cancelled)
+            setStatus(next); })
+            .catch(() => { });
+        return () => { cancelled = true; };
+    }, [visible]);
+    if (!status?.available)
+        return null;
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("DISPLAY"), children: [SP_JSX.jsx(DFL.Field, { label: t("Refresh rate"), description: status.saved ? "Calibrated" : "Factory timing" }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: () => DFL.showModal(SP_JSX.jsx(PanelModal, { initial: status, onChange: setStatus })), children: t("Calibrate Display") }) })] }));
+}
+
+function PerformanceOverlay() {
+    const [overlay, setOverlayState] = SP_REACT.useState(null);
+    const [error, setError] = SP_REACT.useState("");
+    const busy = SP_REACT.useRef(false);
+    const visible = useQamVisible();
+    // Re-read on every open: Steam's own Performance Overlay setting writes the same file.
+    SP_REACT.useEffect(() => {
+        if (!visible)
+            return;
+        let cancelled = false;
+        overlayStatus()
+            .then((next) => {
+            if (!cancelled && !busy.current)
+                setOverlayState(next);
+        })
+            .catch(() => { });
+        return () => {
+            cancelled = true;
+        };
+    }, [visible]);
+    if (!overlay?.available)
+        return null;
+    const options = [
+        { data: "off", label: t("Off") },
+        { data: "fps", label: t("FPS only") },
+        { data: "compact", label: t("Compact bar: FPS, CPU, GPU, RAM, battery") },
+        { data: "detailed", label: t("Detailed: adds clocks, temperatures, power") },
+        { data: "full", label: t("Everything") },
+    ];
+    if (overlay.level === "custom")
+        options.push({ data: "custom", label: t("Set from Steam") });
+    const change = async (level) => {
+        if (busy.current || level === "custom")
+            return;
+        busy.current = true;
+        setError("");
+        try {
+            setOverlayState(await setOverlay(level));
+        }
+        catch (err) {
+            setError(String(err));
+        }
+        finally {
+            busy.current = false;
+        }
+    };
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("PERFORMANCE OVERLAY"), children: [SP_JSX.jsx(SelectEdit, { label: t("Show on screen"), value: overlay.level, options: options, onChange: change }), SP_JSX.jsx("div", { className: "steamling-note", children: error || t("Stays from game to game. Steam's own Performance Overlay setting changes it too, until the next game starts.") })] }));
+}
+
+const REFRESH_MS = 2000;
+const SHOW_KEY = "steamling-control.monitor";
+function remembered() {
+    try {
+        return window.localStorage.getItem(SHOW_KEY) === "1";
+    }
+    catch (error) {
+        return false;
+    }
+}
+function remember(on) {
+    try {
+        window.localStorage.setItem(SHOW_KEY, on ? "1" : "0");
+    }
+    catch (error) {
+    }
+}
+const dash = "–";
+function cpuText(stats) {
+    const clocks = stats.cpu.clusters.map((c) => `${(c.mhz / 1000).toFixed(1)}`).join(" / ");
+    const load = stats.cpu.load === null ? dash : `${stats.cpu.load}%`;
+    return t("{load} busy · {clocks} GHz", { load, clocks: clocks || dash });
+}
+function tempText(stats) {
+    const parts = [];
+    if (stats.temps.cpu !== undefined)
+        parts.push(t("CPU {n}°C", { n: stats.temps.cpu }));
+    if (stats.temps.gpu !== undefined)
+        parts.push(t("GPU {n}°C", { n: stats.temps.gpu }));
+    if (stats.battery?.tempC != null)
+        parts.push(t("Battery {n}°C", { n: stats.battery.tempC }));
+    return parts.join(" · ") || dash;
+}
+function batteryText(stats) {
+    const b = stats.battery;
+    if (!b)
+        return dash;
+    const pct = b.percent === null ? dash : `${b.percent}%`;
+    // Not charging (bypass charging, a charge limit) and Full both mean the charger runs the
+    // handheld: the battery isn't the one being drawn from.
+    if (b.status === "Not charging" || b.status === "Full")
+        return `${pct} · ${t("on external power")}`;
+    if (b.watts === null)
+        return pct;
+    const flow = b.status === "Charging" ? t("charging at {w} W", { w: b.watts }) : t("drawing {w} W", { w: b.watts });
+    return `${pct} · ${flow}`;
+}
+function SystemMonitor() {
+    const [show, setShow] = SP_REACT.useState(remembered);
+    const [stats, setStats] = SP_REACT.useState(null);
+    const visible = useQamVisible();
+    // Only while it is switched on and the menu is open: nothing reads these numbers otherwise.
+    SP_REACT.useEffect(() => {
+        if (!show || !visible)
+            return;
+        let cancelled = false;
+        const tick = () => systemStats()
+            .then((next) => {
+            if (!cancelled)
+                setStats(next);
+        })
+            .catch(() => { });
+        tick();
+        const timer = window.setInterval(tick, REFRESH_MS);
+        return () => {
+            cancelled = true;
+            window.clearInterval(timer);
+        };
+    }, [show, visible]);
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("SYSTEM MONITOR"), children: [SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Show live readings"), description: t("Updates every 2 seconds while this menu is open"), checked: show, onChange: (on) => {
+                        setShow(on);
+                        remember(on);
+                    } }) }), show && stats ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("CPU"), description: cpuText(stats) }), SP_JSX.jsx(DFL.Field, { label: t("GPU"), description: stats.gpu ? t("{mhz} of {max} MHz", { mhz: stats.gpu.mhz, max: stats.gpu.maxMhz }) : dash }), SP_JSX.jsx(DFL.Field, { label: t("Temperature"), description: tempText(stats) }), SP_JSX.jsx(DFL.Field, { label: t("Battery"), description: batteryText(stats) }), SP_JSX.jsx(DFL.Field, { label: t("Memory"), description: stats.memory
+                            ? t("{used} of {total} GB", {
+                                used: (stats.memory.usedMb / 1024).toFixed(1),
+                                total: (stats.memory.totalMb / 1024).toFixed(1),
+                            })
+                            : dash }), stats.fan ? (SP_JSX.jsx(DFL.Field, { label: t("Fan"), description: stats.fan.rpm !== null ? t("{rpm} RPM", { rpm: stats.fan.rpm }) : t("{n}% speed", { n: stats.fan.percent ?? 0 }) })) : null] })) : null] }));
+}
+
+// What's on the screen: the overlay and live readings first, the panel and menu settings after.
+function Display() {
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(PerformanceOverlay, {}), SP_JSX.jsx(SystemMonitor, {}), SP_JSX.jsx(PanelCalibration, {}), SP_JSX.jsx(MenuWidthSetting, {})] }));
 }
 
 // Every Steam game and every non-Steam shortcut (emulator tiles, ROM managers, a Windows .exe on
@@ -1179,55 +1319,6 @@ function ConfigSection({ game, reload }) {
     return (SP_JSX.jsxs(DFL.PanelSection, { title: t("CONFIG"), children: [SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: doExport, children: t("Export Game Config") }) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: doImport, children: t("Import Game Config") }) }), SP_JSX.jsx("div", { className: "steamling-note", children: t("Per-game tweaks and Proton pick; fan settings and defaults stay local") })] }));
 }
 
-function PerformanceOverlay() {
-    const [overlay, setOverlayState] = SP_REACT.useState(null);
-    const [error, setError] = SP_REACT.useState("");
-    const busy = SP_REACT.useRef(false);
-    const visible = useQamVisible();
-    // Re-read on every open: Steam's own Performance Overlay setting writes the same file.
-    SP_REACT.useEffect(() => {
-        if (!visible)
-            return;
-        let cancelled = false;
-        overlayStatus()
-            .then((next) => {
-            if (!cancelled && !busy.current)
-                setOverlayState(next);
-        })
-            .catch(() => { });
-        return () => {
-            cancelled = true;
-        };
-    }, [visible]);
-    if (!overlay?.available)
-        return null;
-    const options = [
-        { data: "off", label: t("Off") },
-        { data: "fps", label: t("FPS only") },
-        { data: "compact", label: t("Compact bar: FPS, CPU, GPU, RAM, battery") },
-        { data: "detailed", label: t("Detailed: adds clocks, temperatures, power") },
-        { data: "full", label: t("Everything") },
-    ];
-    if (overlay.level === "custom")
-        options.push({ data: "custom", label: t("Set from Steam") });
-    const change = async (level) => {
-        if (busy.current || level === "custom")
-            return;
-        busy.current = true;
-        setError("");
-        try {
-            setOverlayState(await setOverlay(level));
-        }
-        catch (err) {
-            setError(String(err));
-        }
-        finally {
-            busy.current = false;
-        }
-    };
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("PERFORMANCE OVERLAY"), children: [SP_JSX.jsx(SelectEdit, { label: t("Show on screen"), value: overlay.level, options: options, onChange: change }), SP_JSX.jsx("div", { className: "steamling-note", children: error || t("Stays from game to game. Steam's own Performance Overlay setting changes it too, until the next game starts.") })] }));
-}
-
 function clone(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
@@ -1454,86 +1545,6 @@ function Suggestion({ config, appid, apply }) {
                     }, children: t("Use Suggested Settings") }) })] }));
 }
 
-const REFRESH_MS = 2000;
-const SHOW_KEY = "steamling-control.monitor";
-function remembered() {
-    try {
-        return window.localStorage.getItem(SHOW_KEY) === "1";
-    }
-    catch (error) {
-        return false;
-    }
-}
-function remember(on) {
-    try {
-        window.localStorage.setItem(SHOW_KEY, on ? "1" : "0");
-    }
-    catch (error) {
-    }
-}
-const dash = "–";
-function cpuText(stats) {
-    const clocks = stats.cpu.clusters.map((c) => `${(c.mhz / 1000).toFixed(1)}`).join(" / ");
-    const load = stats.cpu.load === null ? dash : `${stats.cpu.load}%`;
-    return t("{load} busy · {clocks} GHz", { load, clocks: clocks || dash });
-}
-function tempText(stats) {
-    const parts = [];
-    if (stats.temps.cpu !== undefined)
-        parts.push(t("CPU {n}°C", { n: stats.temps.cpu }));
-    if (stats.temps.gpu !== undefined)
-        parts.push(t("GPU {n}°C", { n: stats.temps.gpu }));
-    if (stats.battery?.tempC != null)
-        parts.push(t("Battery {n}°C", { n: stats.battery.tempC }));
-    return parts.join(" · ") || dash;
-}
-function batteryText(stats) {
-    const b = stats.battery;
-    if (!b)
-        return dash;
-    const pct = b.percent === null ? dash : `${b.percent}%`;
-    // Not charging (bypass charging, a charge limit) and Full both mean the charger runs the
-    // handheld: the battery isn't the one being drawn from.
-    if (b.status === "Not charging" || b.status === "Full")
-        return `${pct} · ${t("on external power")}`;
-    if (b.watts === null)
-        return pct;
-    const flow = b.status === "Charging" ? t("charging at {w} W", { w: b.watts }) : t("drawing {w} W", { w: b.watts });
-    return `${pct} · ${flow}`;
-}
-function SystemMonitor() {
-    const [show, setShow] = SP_REACT.useState(remembered);
-    const [stats, setStats] = SP_REACT.useState(null);
-    const visible = useQamVisible();
-    // Only while it is switched on and the menu is open: nothing reads these numbers otherwise.
-    SP_REACT.useEffect(() => {
-        if (!show || !visible)
-            return;
-        let cancelled = false;
-        const tick = () => systemStats()
-            .then((next) => {
-            if (!cancelled)
-                setStats(next);
-        })
-            .catch(() => { });
-        tick();
-        const timer = window.setInterval(tick, REFRESH_MS);
-        return () => {
-            cancelled = true;
-            window.clearInterval(timer);
-        };
-    }, [show, visible]);
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("SYSTEM MONITOR"), children: [SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Show live readings"), description: t("Updates every 2 seconds while this menu is open"), checked: show, onChange: (on) => {
-                        setShow(on);
-                        remember(on);
-                    } }) }), show && stats ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("CPU"), description: cpuText(stats) }), SP_JSX.jsx(DFL.Field, { label: t("GPU"), description: stats.gpu ? t("{mhz} of {max} MHz", { mhz: stats.gpu.mhz, max: stats.gpu.maxMhz }) : dash }), SP_JSX.jsx(DFL.Field, { label: t("Temperature"), description: tempText(stats) }), SP_JSX.jsx(DFL.Field, { label: t("Battery"), description: batteryText(stats) }), SP_JSX.jsx(DFL.Field, { label: t("Memory"), description: stats.memory
-                            ? t("{used} of {total} GB", {
-                                used: (stats.memory.usedMb / 1024).toFixed(1),
-                                total: (stats.memory.totalMb / 1024).toFixed(1),
-                            })
-                            : dash }), stats.fan ? (SP_JSX.jsx(DFL.Field, { label: t("Fan"), description: stats.fan.rpm !== null ? t("{rpm} RPM", { rpm: stats.fan.rpm }) : t("{n}% speed", { n: stats.fan.percent ?? 0 }) })) : null] })) : null] }));
-}
-
 function Games({ config, setConfig, reload }) {
     const runtimeGame = config.game;
     // One app-store lookup per game: worth doing once per library change, not on every render.
@@ -1623,7 +1634,7 @@ function Games({ config, setConfig, reload }) {
     const showFields = editingDefault || perGameEnabled;
     const has = hw(config);
     const showPerf = showFields && (has.fan || has.scheduler);
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsxs(DFL.PanelSection, { title: t("PERFORMANCE & GAME TWEAKS"), children: [SP_JSX.jsx(SelectEdit, { label: t("Game"), value: game?.appid || "", options: targetOptions, onChange: setSelectedGame }), !editingDefault ? SP_JSX.jsx(DFL.ToggleField, { label: t("Use Per-Game Settings"), checked: perGameEnabled, onChange: setPerGameEnabled }) : null] }), !editingDefault ? SP_JSX.jsx(Suggestion, { config: config, appid: game.appid, apply: applySuggestion }) : null, showPerf ? (SP_JSX.jsx(DFL.PanelSection, { title: t("PERFORMANCE"), children: editingDefault ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [has.scheduler ? SP_JSX.jsx(SelectEdit, { label: t("CPU Scheduler"), value: config.lavdMode, options: lavdOptions, onChange: (mode) => applyMode(setLavdMode, mode) }) : null, has.fan ? SP_JSX.jsx(SelectEdit, { label: t("Fan Curve"), value: config.fanMode, options: fanOptions, onChange: (mode) => applyMode(setFanMode, mode) }) : null] })) : (SP_JSX.jsx(PerfFields, { config: config, values: values, patch: patchSettings })) })) : null, showFields ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("GAME TWEAKS"), children: [SP_JSX.jsx("div", { className: "steamling-note", children: t("Changes apply on next game launch") }), editingDefault ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("FEX Preset"), value: fexValue, options: fexOptions, onChange: (id) => patchSettings({ fexProfile: id }) }), SP_JSX.jsx(SelectEdit, { label: t("Audio Buffer"), value: audioValue, options: audioLatencyOptions, onChange: (id) => patchSettings({ audioLatency: id }) }), SP_JSX.jsx(XaliaToggle, { values: values, patch: patchSettings }), has.touchscreen ? SP_JSX.jsx(TouchField, { values: values, patch: patchSettings }) : null, SP_JSX.jsx(EnvVarsButton, { value: String(values.envVars ?? ""), onSave: (next) => patchSettings({ envVars: next }) })] })) : (SP_JSX.jsx(TweakFields, { config: config, appid: game.appid, values: values, patch: patchSettings }))] })) : null, !editingDefault && perGameEnabled ? (SP_JSX.jsx(ConfigSection, { game: { appid: game.appid, name: game.name || "" }, reload: reload })) : null, !editingDefault ? (SP_JSX.jsx(ShaderCache, { appid: game.appid, name: game.name || "", running: runtimeGame?.appid === game.appid })) : null, SP_JSX.jsx(PerformanceOverlay, {}), SP_JSX.jsx(SystemMonitor, {})] }));
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsxs(DFL.PanelSection, { title: t("PERFORMANCE & GAME TWEAKS"), children: [SP_JSX.jsx(SelectEdit, { label: t("Game"), value: game?.appid || "", options: targetOptions, onChange: setSelectedGame }), !editingDefault ? SP_JSX.jsx(DFL.ToggleField, { label: t("Use Per-Game Settings"), checked: perGameEnabled, onChange: setPerGameEnabled }) : null] }), !editingDefault ? SP_JSX.jsx(Suggestion, { config: config, appid: game.appid, apply: applySuggestion }) : null, showPerf ? (SP_JSX.jsx(DFL.PanelSection, { title: t("PERFORMANCE"), children: editingDefault ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [has.scheduler ? SP_JSX.jsx(SelectEdit, { label: t("CPU Scheduler"), value: config.lavdMode, options: lavdOptions, onChange: (mode) => applyMode(setLavdMode, mode) }) : null, has.fan ? SP_JSX.jsx(SelectEdit, { label: t("Fan Curve"), value: config.fanMode, options: fanOptions, onChange: (mode) => applyMode(setFanMode, mode) }) : null] })) : (SP_JSX.jsx(PerfFields, { config: config, values: values, patch: patchSettings })) })) : null, showFields ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("GAME TWEAKS"), children: [SP_JSX.jsx("div", { className: "steamling-note", children: t("Changes apply on next game launch") }), editingDefault ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("FEX Preset"), value: fexValue, options: fexOptions, onChange: (id) => patchSettings({ fexProfile: id }) }), SP_JSX.jsx(SelectEdit, { label: t("Audio Buffer"), value: audioValue, options: audioLatencyOptions, onChange: (id) => patchSettings({ audioLatency: id }) }), SP_JSX.jsx(XaliaToggle, { values: values, patch: patchSettings }), has.touchscreen ? SP_JSX.jsx(TouchField, { values: values, patch: patchSettings }) : null, SP_JSX.jsx(EnvVarsButton, { value: String(values.envVars ?? ""), onSave: (next) => patchSettings({ envVars: next }) })] })) : (SP_JSX.jsx(TweakFields, { config: config, appid: game.appid, values: values, patch: patchSettings }))] })) : null, !editingDefault && perGameEnabled ? (SP_JSX.jsx(ConfigSection, { game: { appid: game.appid, name: game.name || "" }, reload: reload })) : null, !editingDefault ? (SP_JSX.jsx(ShaderCache, { appid: game.appid, name: game.name || "", running: runtimeGame?.appid === game.appid })) : null] }));
 }
 
 // Replaces the stock "Add a Non-Steam Game" flow: Steam's file browser cannot open a new
@@ -2243,6 +2254,7 @@ function Content() {
     const tabContent = (content) => (SP_JSX.jsx("div", { className: "steamling-control-tab-content", children: content }));
     const tabs = [
         { id: "Games", title: tabIcons.Games, content: tabContent(SP_JSX.jsx(Games, { config: config, setConfig: setConfig, reload: load })) },
+        { id: "Display", title: tabIcons.Display, content: tabContent(SP_JSX.jsx(Display, {})) },
         { id: "Library", title: tabIcons.Library, content: tabContent(SP_JSX.jsx(Library, {})) },
         { id: "Controller", title: tabIcons.Controller, content: tabContent(SP_JSX.jsx(Controller, { config: config, setConfig: setConfig, reload: load })) },
         { id: "Updater", title: tabIcons.Updater, content: tabContent(SP_JSX.jsx(Updater, {})) },

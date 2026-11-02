@@ -11,6 +11,7 @@ import { currentGame } from "./lib/games";
 import { onGameLifetime } from "./lib/touch";
 import { styles } from "./styles";
 import { Controller } from "./tabs/Controller";
+import { Display } from "./tabs/Display";
 import { Games } from "./tabs/Games";
 import { Library } from "./tabs/Library";
 import { Updater } from "./tabs/Updater";
@@ -93,6 +94,7 @@ export function Content() {
   );
   const tabs = [
     { id: "Games", title: tabIcons.Games, content: tabContent(<Games config={config} setConfig={setConfig} reload={load} />) },
+    { id: "Display", title: tabIcons.Display, content: tabContent(<Display />) },
     { id: "Library", title: tabIcons.Library, content: tabContent(<Library />) },
     { id: "Controller", title: tabIcons.Controller, content: tabContent(<Controller config={config} setConfig={setConfig} reload={load} />) },
     { id: "Updater", title: tabIcons.Updater, content: tabContent(<Updater />) },
