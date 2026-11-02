@@ -144,9 +144,6 @@ class LineDoc:
         vals = [self.match(self.lines[i]).group(4) for i in idx]
         return vals if len(vals) > 1 else vals[0]
 
-    def is_list(self, key):
-        return len(self.keys.get(key, [])) > 1
-
     def _with_value(self, line, value):
         m = self.match(line)
         return m.group(1) + m.group(2) + m.group(3) + value + m.group(5)
@@ -229,10 +226,6 @@ class XmlDoc:
             return elem.get(extra)
         return [(k.text or "").strip() for k in elem]
 
-    def is_list(self, key):
-        item = self.items.get(key)
-        return item is not None and item[0] == "list"
-
     def set(self, key, value):
         kind, elem, extra = self.items[key]
         if kind == "leaf":
@@ -311,10 +304,6 @@ class JsonDoc:
             return [json.dumps(x, sort_keys=True) for x in v]
         return json.dumps(v, sort_keys=True)
 
-    def is_list(self, key):
-        item = self.items.get(key)
-        return item is not None and isinstance(item[0][item[1]], list)
-
     def _decode(self, value):
         if isinstance(value, list):
             return [json.loads(x) for x in value]
@@ -348,13 +337,12 @@ def parse(fmt, data):
 
 
 class Policy:
-    """never = keys we add if absent but never modify; list = keys whose value is a list even
-    with one entry (a parent the user may extend, e.g. GamePaths); was = the value(s) a key
-    held before we seeded it (the app's own default), so a device that still has it counts as
-    untouched even though no baseline recorded it."""
+    """never = keys we add if absent but never modify; was = the value(s) a key held before we
+    seeded it (the app's own default), so a device that still has it counts as untouched even
+    though no baseline recorded it."""
 
     def __init__(self, path):
-        self.never_glob, self.never_re, self.lists, self.was = [], [], set(), {}
+        self.never_glob, self.never_re, self.was = [], [], {}
         if not path:
             return
         with open(path) as f:
@@ -368,8 +356,6 @@ class Policy:
                     self.never_re.append(re.compile(arg[1:]))
                 elif verb == "never":
                     self.never_glob.append(arg)
-                elif verb == "list":
-                    self.lists.add(arg)
                 elif verb == "was":
                     key, _, val = arg.partition(" ")
                     self.was.setdefault(key, []).append(val.strip())

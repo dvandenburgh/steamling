@@ -9,4 +9,3 @@ never SPU2/Output/DriverName
 never SPU2/Output/DeviceName
 never Hotkeys/*
 never ~^Folders/(?!Bios$)
-list GameList/RecursivePaths

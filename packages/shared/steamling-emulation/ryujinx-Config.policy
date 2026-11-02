@@ -21,5 +21,3 @@ never application_sort
 never is_ascending_order
 never enable_file_log
 never logging_*
-list game_dirs
-list autoload_dirs
