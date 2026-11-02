@@ -43,4 +43,8 @@ package() {
   # On-device /flash/KERNEL rebuild path; the cmdline it reads comes from the device's BSP.
   [ -d "${out}/mkbootimg" ] || { echo "${pkgname}: ${out}/mkbootimg missing, re-run 'make kernel DEVICE=${STEAMLING_SOC}'" >&2; return 1; }
   cp -r "${out}/mkbootimg" "${pkgdir}/usr/lib/steamling/mkbootimg"
+  # The build runs mkbootimg once, which leaves Python bytecode behind. Don't ship it: the
+  # handheld writes its own copy the first time it runs mkbootimg, and pacman refuses to
+  # upgrade over a file it didn't install.
+  find "${pkgdir}/usr/lib/steamling/mkbootimg" -name __pycache__ -prune -exec rm -rf {} +
 }
