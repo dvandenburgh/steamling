@@ -112,3 +112,13 @@
 
 	status = "okay";
 };
+
+/*
+ * Both 3.5mm jack switches are normally closed, as in AYANEO's own device tree
+ * (msm-mbhc-hphl-swh = msm-mbhc-gnd-swh = 0). Without this MBHC reads the plug with the wrong
+ * polarity and never finishes detecting headphones.
+ */
+&wcd939x {
+	qcom,hphl-jack-type-normally-closed;
+	qcom,ground-jack-type-normally-closed;
+};
