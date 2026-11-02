@@ -494,3 +494,12 @@
 	firmware-name = "qcom/sm8550/retroidpocket/rp6/aw883xx_acf.bin";
 	awinic,audio-channel = <0>;
 };
+
+/*
+ * The 3.5mm jack's ground switch is normally closed. Without saying so, MBHC assumes the other
+ * polarity and never reports a plug. Only the ground switch: marking the HPHL switch too makes
+ * the plug state read backwards. The Nova and the top d-pad RP6 include this file.
+ */
+&wcd938x {
+	qcom,ground-jack-type-normally-closed;
+};
