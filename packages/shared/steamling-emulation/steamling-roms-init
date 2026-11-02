@@ -20,31 +20,29 @@ case "${STEAMLING_PANEL_ORIENT:-left}" in
   left|right) LOGICAL_H="${STEAMLING_PANEL_W:-1080}" ;;
   *)          LOGICAL_H="${STEAMLING_PANEL_H:-1920}" ;;
 esac
-# ES-DE's ROMDirectory setting is the single source of truth for where ROMs live (the user can
-# repoint it at an SD card); this skeleton and steamling-steam-sync both follow it. Empty/absent
-# means ES-DE's own default ~/ROMs. The settings file is a rootless XML fragment, hence sed.
+# ES-DE's ROMDirectory setting is the single source of truth for where ROMs live; this skeleton
+# and steamling-steam-sync both follow it. Ours is ~/Emulation/Library, which steamling-roms-sync
+# fills with links to the games in ~/Emulation/ROMs and on any microSD card. Empty/absent means
+# ES-DE's own default ~/ROMs. The settings file is a rootless XML fragment, hence sed.
 ESDE_SETTINGS="${HOME}/ES-DE/settings/es_settings.xml"
 ESDE_CUSTOM="${HOME}/ES-DE/custom_systems"
 _roms_setting="$(sed -n 's/.*name="ROMDirectory" value="\([^"]*\)".*/\1/p' "${ESDE_SETTINGS}" 2>/dev/null | head -1)"
 case "${_roms_setting}" in "~"*) _roms_setting="${HOME}${_roms_setting#\~}" ;; esac
+LIBRARY="${EMU}/Library"
+# ~/Emulation/ROMs was the default before the handheld and the card were combined: move it to
+# Library, where those games still show. A folder the user picked is left alone. ES-DE writes its
+# settings when it closes, so this waits for a login where it isn't running.
+if [ "${_roms_setting}" = "${EMU}/ROMs" ] && ! pgrep -x es-de >/dev/null; then
+  sed -i "s|<string name=\"ROMDirectory\" value=\"[^\"]*\" */>|<string name=\"ROMDirectory\" value=\"${LIBRARY}\" />|" "${ESDE_SETTINGS}" \
+    && _roms_setting="${LIBRARY}"
+fi
 if [ -n "${_roms_setting}" ]; then
   ROMS="${_roms_setting}"
 elif [ -f "${ESDE_SETTINGS}" ]; then
   ROMS="${HOME}/ROMs"          # settings exist but no/empty ROMDirectory = ES-DE default
 else
-  ROMS="${EMU}/ROMs"           # fresh install: the seed below points ES-DE here
+  ROMS="${LIBRARY}"            # fresh install: the seed below points ES-DE here
 fi
-
-# ES-DE's own default folder names - creating one only gives the user a labelled drop point;
-# ES-DE still shows a system only once it is populated.
-SYSTEMS=(
-  nes snes n64 gb gbc gba nds n3ds
-  genesis megadrive mastersystem gamegear segacd saturn dreamcast
-  tg16 pcengine neogeo cps1 cps2 cps3 arcade mame
-  atari2600 atari7800 atarilynx atarijaguar wonderswan
-  psx ps2 ps3 psp psvita
-  gc wii wiiu switch xbox
-)
 
 have_esde()      { command -v es-de >/dev/null 2>&1; }
 have_retroarch() { command -v retroarch >/dev/null 2>&1; }
@@ -217,13 +215,17 @@ esac
 [ "${#present[@]}" -gt 0 ] || exit 0
 
 mkdir -p "${EMU}/BIOS" "${EMU}/Saves" "${EMU}/States"
-# A ROM folder on a microSD card only gets its system folders while the card is mounted: an
-# empty mount point is not the card.
-_roms_here=1
-case "${ROMS}" in
-  /run/media/*/*) mountpoint -q "$(printf '%s\n' "${ROMS}" | cut -d/ -f1-5)" || _roms_here=0 ;;
-esac
-[ "${_roms_here}" = 0 ] || for s in "${SYSTEMS[@]}"; do mkdir -p "${ROMS}/${s}"; done
+# The per-system folders, on the handheld and on any mounted card, and the links in Library.
+steamling-roms-sync
+# A ROM folder the user pointed ES-DE at themselves gets the folders too, except on a card that
+# isn't mounted: an empty mount point is not the card.
+if [ "${ROMS}" != "${LIBRARY}" ]; then
+  _roms_here=1
+  case "${ROMS}" in
+    /run/media/*/*) mountpoint -q "$(printf '%s\n' "${ROMS}" | cut -d/ -f1-5)" || _roms_here=0 ;;
+  esac
+  [ "${_roms_here}" = 0 ] || while read -r s; do mkdir -p "${ROMS}/${s}"; done < <(steamling-roms-sync --systems)
+fi
 for e in ${EMU_NAMES}; do mkdir -p "${EMU_DROP}/${e}"; done
 # Eden is not shipped any more: hand a device that has it its own copy (cruft.md)
 if [ -x /opt/steamling/emulators/eden/Eden.AppImage ] && [ -z "$(ls -A "${EMU_DROP}/eden" 2>/dev/null)" ]; then
