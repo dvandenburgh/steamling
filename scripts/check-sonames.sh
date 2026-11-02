@@ -3,8 +3,8 @@
 # have. The case it exists for: a repo rebuilds a library with a new soname (libPlasma.so.7 ->
 # .so.8) but not everything linked to it, so the stale package installs fine and only fails when
 # something loads it. A needed soname that is missing while another version of the same library is
-# installed fails the build; one with no version installed at all (an optional dependency left
-# out) is only reported.
+# installed fails the build. One with no version installed at all fails it too when one of our
+# own packages needs it, and is only reported for anyone else's (an optional dependency left out).
 set -euo pipefail
 root="${1:?usage: check-sonames.sh <rootfs>}"
 command -v readelf >/dev/null || { echo "check-sonames: readelf not found (binutils)" >&2; exit 2; }
@@ -71,9 +71,30 @@ while IFS= read -r line; do
 done < <(printf '%s\0' "${files[@]}" | xargs -0 -r readelf -h -d -W 2>/dev/null | sed -n 's/^File: /File: /p;/Machine:/p;/(NEEDED)/p;/(RUNPATH)/p;/(RPATH)/p')
 flush
 
+# A library missing altogether is usually an optional extra of an Arch package (iproute2's arpd
+# wants libdb). In a package we build it's a bug: the build linked something left in the chroot
+# by another package (Dolphin and libLLVM) without depending on it, and it won't start.
+ours=() optional=()
 if [ "${#absent[@]}" -gt 0 ]; then
-  echo "check-sonames: ${#absent[@]} optional-looking libraries are not installed at all (not an error):" >&2
-  printf '  %s\n' "${absent[@]:0:15}" | tr '|' ' ' >&2
+  declare -A mine=()
+  while IFS= read -r p; do mine["${p}"]=1; done \
+    < <(chroot "${root}" pacman -Slq steamling steamling-shared 2>/dev/null)
+  for a in "${absent[@]}"; do
+    o="$(chroot "${root}" pacman -Qqo "${a%%|*}" 2>/dev/null || true)"
+    if [ -n "${o}" ] && [ -n "${mine[${o}]:-}" ]; then ours+=("${o}|${a}"); else optional+=("${a}"); fi
+  done
+fi
+if [ "${#optional[@]}" -gt 0 ]; then
+  echo "check-sonames: ${#optional[@]} optional-looking libraries are not installed at all (not an error):" >&2
+  printf '  %s\n' "${optional[@]:0:15}" | tr '|' ' ' >&2
+fi
+if [ "${#ours[@]}" -gt 0 ]; then
+  echo "check-sonames: one of our packages needs a library nothing in the image provides:" >&2
+  for s in "${ours[@]}"; do
+    IFS='|' read -r o f n <<< "${s}"
+    echo "  ${o}: ${f} needs ${n}"
+  done | sort -u >&2
+  echo "check-sonames: add the library's package to depends=, or build without that feature" >&2
 fi
 if [ "${#stale[@]}" -gt 0 ]; then
   echo "check-sonames: built against a library version this image doesn't have:" >&2
@@ -82,6 +103,6 @@ if [ "${#stale[@]}" -gt 0 ]; then
     echo "  $(chroot "${root}" pacman -Qqo "${f}" 2>/dev/null || echo '?'): ${f} needs ${n}, the image has ${c}"
   done | sort -u >&2
   echo "check-sonames: those packages need a rebuild against what the image ships (or our own build of them)" >&2
-  exit 1
 fi
+[ "${#stale[@]}" -eq 0 ] && [ "${#ours[@]}" -eq 0 ] || exit 1
 echo "check-sonames: ${#files[@]} files, every needed library resolves"
