@@ -1,8 +1,8 @@
 # Board support for the SM8650 family: device.conf picks a boards/ file by devicetree model
 # and the input maps are model-gated, so one package serves every board.
 pkgname=steamling-bsp-sm8650
-pkgver=0.1.0
-pkgrel=3
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="steamling board support: SM8650 family (AYANEO Pocket S2, KONKR Pocket FIT) - board dispatch, input maps, audio UCM"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

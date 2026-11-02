@@ -2,7 +2,7 @@
 # SM8250/ tree. Pinned by commit + sha256, nothing
 # in git; installed under /usr/lib/firmware/updates/, which wins the kernel's search.
 pkgname=steamling-firmware-sm8250
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="SM8250 handheld vendor firmware (AYN Thor Lite ADSP and amp tuning, MANGMI Pocket Max MCU)"
 arch=('any')

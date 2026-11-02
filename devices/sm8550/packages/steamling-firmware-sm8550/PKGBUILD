@@ -5,8 +5,8 @@
 # qcom/sm8550/retroidpocket/rp6/. /usr/lib/firmware/updates/ wins the kernel's search and no ALARM
 # package writes there, so linux-firmware updates never revert the ath12k board file wifi needs.
 pkgname=steamling-firmware-sm8550
-pkgver=0.1.0
-pkgrel=5
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="SM8550 handheld vendor firmware (wifi, ADSP/CDSP, audio, VPU), immune to linux-firmware updates"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

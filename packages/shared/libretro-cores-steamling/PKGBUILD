@@ -4,8 +4,8 @@
 # image time cannot be fetched on device. They install to /usr/lib/libretro, the same path
 # ALARM's libretro-* packages use, so a vendored core can be replaced transparently.
 pkgname=libretro-cores-steamling
-pkgver=0.1.0
-pkgrel=3.1
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="Curated prebuilt aarch64 libretro cores for the RP6 (vendored, ArkOS/TheRA set)"
 arch=('aarch64')
 url="https://github.com/christianhaitian/retroarch-cores"

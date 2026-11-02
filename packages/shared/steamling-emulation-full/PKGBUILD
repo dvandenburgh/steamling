@@ -2,8 +2,8 @@
 # `pacman -Rs steamling-emulation-full` removes exactly this layer; the source-built emulators
 # are optdepends instead, so a failed optional build cannot block the layer.
 pkgname=steamling-emulation-full
-pkgver=0.1.0
-pkgrel=3.1
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="steamling optional layer: ES-DE frontend, RetroArch cores, standalone emulators (Switch: bring your own)"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

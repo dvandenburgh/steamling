@@ -1,7 +1,7 @@
 # Build with ./nodeps: makepkg -s would drag all of KDE/Qt into the chroot for a data package.
 pkgname=steamling-desktop-plasma
-pkgver=0.1.0
-pkgrel=1.1
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="steamling desktop flavour: Plasma (desktop shell)"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

@@ -2,8 +2,8 @@
 # at build time (STEAMLING_BASE_URL from build-packages.sh) and is stable across snapshots,
 # so a bumped base never has to repoint devices.
 pkgname=steamling-lock-migrate
-pkgver=0.1.0
-pkgrel=4
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="One-shot migration of a rolling steamling device onto the locked base snapshot"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

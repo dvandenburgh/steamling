@@ -2,8 +2,8 @@
 # our video_driver), vendored because our seeded presets reference these files by relative path
 # and must resolve at first boot with no Online Updater step.
 pkgname=retroarch-shaders-steamling
-pkgver=0.1.0
-pkgrel=3
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="libretro slang shader set for RetroArch (vendored; replaces the Online Updater step)"
 arch=('any')
 url="https://github.com/libretro/slang-shaders"

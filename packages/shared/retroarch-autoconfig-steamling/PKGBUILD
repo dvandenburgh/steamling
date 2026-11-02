@@ -2,8 +2,8 @@
 # because ALARM's retroarch ships none and RetroArch with no profile for the pad in play has
 # entirely dead controls. The WHOLE set is vendored so Bluetooth pads work untouched too.
 pkgname=retroarch-autoconfig-steamling
-pkgver=0.1.0
-pkgrel=3
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="libretro joypad autoconfig profiles (udev) — controller bindings for RetroArch"
 arch=('any')
 url="https://github.com/libretro/retroarch-joypad-autoconfig"

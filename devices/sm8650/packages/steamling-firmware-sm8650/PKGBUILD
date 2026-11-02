@@ -2,7 +2,7 @@
 # SM8650/ tree. Pinned by commit + sha256, nothing
 # in git; installed under /usr/lib/firmware/updates/, which wins the kernel's search.
 pkgname=steamling-firmware-sm8650
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="SM8650 handheld vendor firmware (wifi, ADSP/CDSP, GPU zap, audio)"
 arch=('any')

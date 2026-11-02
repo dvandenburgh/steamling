@@ -1,7 +1,7 @@
 # steamling-device-sm8250 - metapackage: the per-SoC members of an SM8250 system (BSP, kernel,
 # bootloader, the proton choice). Shared members live on steamling-core / the steamling-*-full layers.
 pkgname=steamling-device-sm8250
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="steamling device metapackage: SM8250 family"
 arch=('any')

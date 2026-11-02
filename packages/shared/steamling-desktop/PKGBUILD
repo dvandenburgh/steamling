@@ -1,8 +1,8 @@
 # DE-neutral half of the desktop layer; the DE itself comes from a steamling-desktop-flavour
 # provider. Build with ./nodeps: the flavour dep would drag a whole DE into the chroot.
 pkgname=steamling-desktop
-pkgver=0.1.0
-pkgrel=31.4
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="steamling desktop session launcher, Flathub seeding, flatpak fixes and Waydroid helpers"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

@@ -5,8 +5,8 @@
 # field, as on the SteamOS boot (game mode boots like a Deck); the Plasma splash keeps the
 # #202126 desktop field. Everything is drawn from SVG at build time: no rendered PNG is committed.
 pkgname=steamling-branding
-pkgver=0.1.0
-pkgrel=2.10
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="Steamling branding: plymouth boot theme, Plasma splash, wallpaper"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

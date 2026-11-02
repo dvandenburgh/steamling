@@ -1,8 +1,8 @@
 # steamling-steam — native ARM64 Steam (Big Picture under gamescope): the client installer, the
 # gamescope launcher, and the ARM-Proton compat-tool plumbing.
 pkgname=steamling-steam
-pkgver=0.1.0
-pkgrel=73
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="Native ARM64 Steam Big Picture (gamescope) for the RP6 — installer + launcher"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

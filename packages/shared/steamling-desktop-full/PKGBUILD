@@ -2,8 +2,8 @@
 # `pacman -Rs steamling-desktop-full` removes exactly this layer and nothing else.
 # Build with ./nodeps: makepkg -s would drag the whole KDE/Qt stack in to lay out nothing.
 pkgname=steamling-desktop-full
-pkgver=0.1.0
-pkgrel=3
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="steamling optional layer: Plasma Mobile desktop session, KDE apps, Waydroid, Flatpak"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

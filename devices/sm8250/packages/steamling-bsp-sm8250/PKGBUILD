@@ -1,8 +1,8 @@
 # Board support for the SM8250 family: device.conf picks a boards/ file by devicetree model
 # and the input maps are model-gated, so one package serves every board.
 pkgname=steamling-bsp-sm8250
-pkgver=0.1.0
-pkgrel=5
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="steamling board support: SM8250 family (Retroid Pocket 5, Retroid Pocket Flip2, Retroid Pocket Mini, Retroid Pocket Mini V2, AYN Thor Lite, MANGMI Air Y Pro, MANGMI Pocket Max, AYANEO Pocket MICRO 2) - board dispatch, input maps, audio UCM"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

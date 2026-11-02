@@ -1,8 +1,8 @@
 # depends= IS the manifest: pacman never installs a new name on its own (#49). Optional
 # layers stay out, or `pacman -Rs <layer>` becomes impossible.
 pkgname=steamling-core
-pkgver=0.1.0
-pkgrel=6
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="steamling mandatory layer: GPU stack, input, storage, base/update tooling"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

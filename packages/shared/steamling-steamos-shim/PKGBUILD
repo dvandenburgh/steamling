@@ -1,8 +1,8 @@
 # steamling-steamos-shim — stubs for the SteamOS update/branch/BIOS helpers the Deck UI
 # (-steamos3 -steamdeck) shells out to; without them the OOBE "required update" step dead-ends.
 pkgname=steamling-steamos-shim
-pkgver=0.1.0
-pkgrel=8
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="SteamOS update/branch/timezone/format/brightness helpers for the Steam Deck UI on a non-SteamOS base (until real OTA)"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

@@ -2,8 +2,8 @@
 # `pacman -Rs steamling-steam-full` removes exactly this layer. Per-SoC members (the proton
 # compat tools) hang off the steamling-device-<soc> metapackages instead.
 pkgname=steamling-steam-full
-pkgver=0.1.0
-pkgrel=4
+pkgver=0.1.1
+pkgrel=1
 pkgdesc="steamling optional layer: Steam gamescope session, FEX x86 runtime, Decky, Heroic"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

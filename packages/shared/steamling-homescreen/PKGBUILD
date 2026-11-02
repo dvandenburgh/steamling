@@ -1,7 +1,7 @@
 # Plasma Mobile boots to an empty, user-immutable homescreen. On the first Plasma Mobile login
 # this puts the default apps on the dock and unlocks it; after that the layout is the user's.
 pkgname=steamling-homescreen
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="Plasma Mobile homescreen defaults: dock apps, unlocked, set once"
 arch=('any')
