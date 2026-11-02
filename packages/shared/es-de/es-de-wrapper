@@ -5,4 +5,7 @@ if [ -z "${GAMESCOPE_WAYLAND_DISPLAY:-}" ]; then
   export SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS=1
 fi
 
+# Games list from the handheld and any microSD card, as they are right now (emulation layer).
+[ -x /usr/bin/steamling-roms-sync ] && /usr/bin/steamling-roms-sync
+
 exec /opt/steamling/es-de/ES-DE.AppImage "$@"
