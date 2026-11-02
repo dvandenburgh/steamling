@@ -6,15 +6,16 @@ a terminal). It's named after the spinning regulator that keeps a steam engine a
 speed, and it used to be called Steamling Control.
 
 Open the **Quick Access menu** in the Steam session, then pick **Governor** under the
-plug icon. The plugin is split into four tabs - switch between them with **L1/R1** or by
+plug icon. The plugin is split into five tabs - switch between them with **L1/R1** or by
 tapping the icons:
 
-| Tab | What it does |
+| Tab (icon) | What it does |
 |---|---|
-| 🎮 Games | Fan curve, CPU scheduler and game tweaks, globally or per game; suggested settings, shader cache, the performance overlay and a live system monitor |
-| 📚 Library | Add non-Steam games, share your files over the network or a USB cable, turn SSH on or off, format a microSD card for Steam |
-| 🕹️ Controller | Stick and trigger calibration, stick dead zone and full tilt, back paddles, rumble, stick lights, display refresh calibration, menu width |
-| 🔄 Updater | Check for and install system updates, roll back the last update, see your versions, restart game mode |
+| Games (a gauge) | Fan curve, CPU scheduler and game tweaks, globally or per game; suggested settings and the shader cache |
+| Display (a screen) | The performance overlay, a live system monitor, display refresh calibration and the menu width |
+| Library (a plus in a box) | Add non-Steam games, share your files over the network or a USB cable, turn SSH on or off, format a microSD card for Steam |
+| Controller (a gamepad) | Stick and trigger calibration, stick dead zone and full tilt, back paddles, rumble, stick lights |
+| Updater (a download arrow) | Check for and install system updates, roll back the last update, see your versions, restart game mode |
 
 Settings save automatically as you change them. The panel only shows what your handheld has:
 no fan, no fan curve; a gamepad driver that can't be calibrated, no calibration; and so on.
@@ -117,6 +118,8 @@ and throws it away. That fixes some graphics glitches and odd stutter after a dr
 update. The game builds its shaders again as it runs, so expect a little stutter the first time
 through. It's greyed out while the game is running.
 
+## Display
+
 ### Performance overlay
 
 Shows live numbers on top of the game: **FPS only**, a **Compact bar** (FPS, CPU, GPU, RAM and
@@ -134,6 +137,23 @@ the CPU is and each core cluster's clock, the GPU clock, CPU, GPU and battery te
 battery level and how much power it's drawing or taking in, memory use and the fan. It reads
 every 2 seconds and only while switched on and the menu is open, so it costs nothing otherwise.
 For numbers on top of the game itself, use the performance overlay above.
+
+### Display refresh rate
+
+Only on screens with adjustable timing, which so far means the RP6. **Calibrate Display**, then
+**Calibrate**, measures the screen's refresh rate for up to a minute and trims it onto the
+nominal rate (panels ship slightly fast or slow, which drifts emulator audio against video).
+The result is kept across reboots; **Reset to Factory** puts the panel's own timing back.
+
+![The Display section showing Factory timing, with the Calibrate Display button](images/governor-display.jpeg)
+
+### Quick Access Menu width
+
+**Standard** is Steam's own width; **Wide** (the default) and **Wider** make the whole quick
+access menu 100 or 200 pixels wider, Steam's own pages and other plugins included, so text wraps
+less on these small screens.
+
+![The quick access menu widened: Governor's pages get the extra room](images/governor-wide-menu.jpeg)
 
 ## Library
 
@@ -228,19 +248,6 @@ target right away, and cards formatted here also work in a real Steam Deck (and 
   brightness per stick.
 
   ![Rumble on at 50% strength, and the stick lights switched off](images/governor-rumble.jpeg)
-
-- **Quick Access Menu width**: **Standard** is Steam's own width; **Wide** (the default) and
-  **Wider** make the whole quick access menu 100 or 200 pixels wider, Steam's own pages and other
-  plugins included, so text wraps less on these small screens.
-
-  ![The quick access menu widened: Governor's pages get the extra room](images/governor-wide-menu.jpeg)
-
-- **Display** (only on screens with adjustable timing, which so far means the RP6): **Calibrate Display**, then
-  **Calibrate**, measures the screen's refresh rate for up to a minute and trims it onto the
-  nominal rate (panels ship slightly fast or slow, which drifts emulator audio against video).
-  The result is kept across reboots; **Reset to Factory** puts the panel's own timing back.
-
-  ![The Display section showing Factory timing, with the Calibrate Display button](images/governor-display.jpeg)
 
 ## Updater
 
