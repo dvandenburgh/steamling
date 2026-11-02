@@ -119,7 +119,11 @@ def favorites() -> list[dict]:
                 continue
             if path.startswith("./"):
                 path = os.path.join(ROMS, system, path[2:])
-            if not os.path.exists(path):
+            # A game on a microSD card that isn't in right now (its link in ~/Emulation/Library
+            # points at the card) keeps its Steam entry: dropping it would take the shortcut, its
+            # artwork and its place in the library away until a later login with the card in.
+            on_card = os.path.islink(path) and os.readlink(path).startswith("/run/media/")
+            if not os.path.exists(path) and not on_card and not path.startswith("/run/media/"):
                 print(f"[steamling-steam-sync] favorite missing on disk, skipped: {path}", file=sys.stderr)
                 continue
             name = (game.findtext("name") or "").strip() or os.path.splitext(os.path.basename(path))[0]
