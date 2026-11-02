@@ -13,6 +13,13 @@ matching subfolder and they are picked up automatically the next time ES-DE star
    (One subfolder per system was created for you. Empty systems stay hidden in the
    menu until you add a game.)
 
+   MORE ROOM ON A MICROSD CARD -> <card>/Emulation/ROMs/<system>/
+   Put a microSD card in and the same folders appear on it. Games on the card
+   and games here show up together in ES-DE. Take the card out and its games
+   just drop off the list until it's back.
+   (ES-DE reads ~/Emulation/Library, which holds links to both. Don't put games
+   there: use ROMs/ here or the card's Emulation/ROMs/.)
+
 2. BIOS FILES -> ~/Emulation/BIOS/
    Some systems need original BIOS/firmware files. Every emulator looks here.
    Exact filenames matter:

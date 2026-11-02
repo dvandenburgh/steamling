@@ -61,19 +61,36 @@ Everything lives under `~/Emulation` (created for you on first login):
   BIOS/              BIOS / firmware / key files (see below)
   Saves/             in-game saves
   States/            save states
+  Library/           what ES-DE reads: links to your games here and on a microSD card
 ```
 
 Drop each game into the folder for its system (`~/Emulation/ROMs/gba/`, `~/Emulation/ROMs/snes/`,
 and so on), then rescan in ES-DE. A single copy of `~/Emulation` is self-contained: ROMs, BIOS,
 and saves all travel together.
 
-### Putting ROMs on an SD card
+### More room: games on a microSD card
 
-Your ROMs folder can live anywhere, as long as ES-DE knows where. Everything else (Steam
-favorites included) asks ES-DE. Go to **ES-DE Menu → Other Settings → ROM directory** and point it
-at the new location (for example
-`/run/media/deck/<card label>/ROMs`). Move your files there, then rescan. `BIOS/`, `Saves/`, and `States/`
-stay in `~/Emulation`.
+You can keep games on the handheld and on a microSD card at the same time, and ES-DE shows them
+all together. Put a card in and Steamling makes an `Emulation/ROMs/` folder on it, with the same
+folder per system as `~/Emulation/ROMs`. Copy games into either one (from your PC, over the
+network share, or with the card in a card reader) and they're in ES-DE the next time it starts.
+
+```
+~/Emulation/ROMs/snes/            games on the handheld
+<card>/Emulation/ROMs/snes/       games on the card
+~/Emulation/Library/snes/         both together: this is what ES-DE reads
+```
+
+- Take the card out and its games just drop off the list; put it back and they return. Your
+  saves are on the handheld either way.
+- If the same game is in both places, ES-DE lists it once and plays the handheld's copy.
+- `Library` only holds links, rebuilt whenever a card goes in or out and every time ES-DE
+  starts. Don't copy games into it: use `ROMs` on either side.
+- The card can be formatted by Steam (ext4) or exFAT; both work.
+
+Installs from before this change move ES-DE over to `Library` by themselves at the next login.
+If you had pointed ES-DE's ROM directory somewhere else yourself, it's left as you set it:
+**ES-DE Menu → Other Settings → ROM directory** and choose `~/Emulation/Library` to switch.
 
 ## BIOS and firmware
 
