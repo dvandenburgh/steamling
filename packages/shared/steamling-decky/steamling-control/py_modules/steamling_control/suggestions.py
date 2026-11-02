@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-# Known-good settings per game, shown as a one-tap suggestion in the Games tab. The shipped list
+# Known-good settings per game, shown as a one-tap suggestion on the This Game tab. The shipped list
 # sits next to this module; /etc/steamling/game-suggestions.json adds to it or overrides it, so an
 # owner can keep their own without rebuilding. Each entry:
 #   "<appid>": {"name": "...", "settings": {<game tweak keys>}, "proton": "<compat tool>",

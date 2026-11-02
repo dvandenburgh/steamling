@@ -1406,7 +1406,7 @@ function GamepadTypeField({ values, patch }) {
     const value = options.some((option) => option.data === stored) ? stored : "";
     return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(SelectEdit, { label: t("Controller Type"), value: value, options: options, onChange: (id) => patch({ gamepadType: id }) }), SP_JSX.jsx("div", { className: "steamling-note", children: t("What the game sees while it runs. Only matters with Steam Input turned off for the game.") })] }));
 }
-/** The per-game tweak controls, shared by the Games tab and the library context-menu modal. */
+/** The per-game tweak controls, shared by the This Game tab and the library context-menu modal. */
 function TweakFields({ config, appid, values, patch }) {
     // Proton pick is Steam's own per-game compat setting (see lib/compat.ts) — read live and
     // written straight back to Steam, so it mirrors the game-properties dropdown both ways.

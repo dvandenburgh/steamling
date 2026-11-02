@@ -132,7 +132,7 @@ function GamepadTypeField({ values, patch }: { values: Record<string, any>; patc
   );
 }
 
-/** The per-game tweak controls, shared by the Games tab and the library context-menu modal. */
+/** The per-game tweak controls, shared by the This Game tab and the library context-menu modal. */
 export function TweakFields({ config, appid, values, patch }: {
   config: Config;
   appid: string;
