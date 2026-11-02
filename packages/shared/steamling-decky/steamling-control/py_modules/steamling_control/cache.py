@@ -1,6 +1,5 @@
 import os
 import shutil
-from pathlib import Path
 
 from .steam import STEAM_APPS_DIR, STEAM_ROOT, _steamapps_dirs
 
