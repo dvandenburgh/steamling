@@ -22,7 +22,7 @@ no fan, no fan curve; a gamepad driver that can't be calibrated, no calibration;
 
 ## Games
 
-![The Games tab: the Game picker, then Performance (CPU scheduler, fan curve) and Game Tweaks](images/governor-games.jpeg)
+![The Games tab: CPU scheduler and fan curve, then Game Tweaks](images/governor-games.jpeg)
 
 ### Game tweaks
 
@@ -128,7 +128,7 @@ draw) or **Everything**. It's the same overlay as Steam's own **Performance Over
 the quick access menu, so changing either one changes it. The level you pick here stays from
 game to game (Steam's own setting resets with every game it starts).
 
-![The performance overlay set to the Compact bar, with the system monitor below it](images/governor-overlay.jpeg)
+![The Display tab: the performance overlay set to Detailed, with the system monitor below it](images/governor-overlay.jpeg)
 
 ### System monitor
 
@@ -145,15 +145,13 @@ Only on screens with adjustable timing, which so far means the RP6. **Calibrate 
 nominal rate (panels ship slightly fast or slow, which drifts emulator audio against video).
 The result is kept across reboots; **Reset to Factory** puts the panel's own timing back.
 
-![The Display section showing Factory timing, with the Calibrate Display button](images/governor-display.jpeg)
-
 ### Quick Access Menu width
 
 **Standard** is Steam's own width; **Wide** (the default) and **Wider** make the whole quick
 access menu 100 or 200 pixels wider, Steam's own pages and other plugins included, so text wraps
 less on these small screens.
 
-![The quick access menu widened: Governor's pages get the extra room](images/governor-wide-menu.jpeg)
+![Refresh rate on Factory timing with the Calibrate Display button, then the menu width set to Wide](images/governor-display.jpeg)
 
 ## Library
 
@@ -197,6 +195,8 @@ devices plugged into that port won't work.
 
 **Allow SSH logins** lets you log in from another computer's terminal, and shows the exact
 `ssh deck@...` line to type once it's on. It's the same switch as in **Steamling Tools**.
+
+![USB file transfer switched off, then Remote Access with SSH logins allowed](images/governor-remote-access.jpeg)
 
 > Every Steamling image ships with the same default password. Change yours first: open Konsole
 > in desktop mode and run `passwd`.
@@ -248,6 +248,8 @@ target right away, and cards formatted here also work in a real Steam Deck (and 
   brightness per stick.
 
   ![Rumble on at 50% strength, and the stick lights switched off](images/governor-rumble.jpeg)
+
+  ![Stick lights on, with the left stick's hue and saturation](images/governor-stick-lights.jpeg)
 
 ## Updater
 
