@@ -96,6 +96,8 @@ case "${1:-status}" in
     if sd_source="$(mounted_sd)" && ln -sfn -- "${sd_source}" "${sd_link}"; then
       sd_storage=1
     fi
+    # The USB buffers: uMTP is built to move 8 KiB per read or write, one system call each, which
+    # holds a copy well under what USB 2.0 can carry. 128 KiB at a time is far fewer calls.
     {
       printf '%s\n' \
         'loop_on_disconnect 1' \
@@ -122,7 +124,9 @@ case "${1:-status}" in
         "usb_epin_path \"${ffs}/ep1\"" \
         "usb_epout_path \"${ffs}/ep2\"" \
         "usb_epint_path \"${ffs}/ep3\"" \
-        'usb_max_packet_size 0x200'
+        'usb_max_packet_size 0x200' \
+        'usb_max_rd_buffer_size 0x20000' \
+        'usb_max_wr_buffer_size 0x20000'
     } > "${runtime}/umtprd.conf"
     ;;
   bind)
