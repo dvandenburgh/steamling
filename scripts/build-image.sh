@@ -375,7 +375,13 @@ main() {
   # packages that install fine and crash on load (Plasma Mobile on libPlasma.so.7 vs .so.8: a
   # black desktop). Fail here instead of on the device.
   progress_detail "checking every program finds its libraries"
-  "${STEAMLING_ROOT}/scripts/check-sonames.sh" "${ROOTFS_DIR}" \
+  # Package names from file names: <name>-<pkgver>-<pkgrel>-<arch>.pkg.tar.*
+  local f b ours=""
+  for f in "${LOCAL_REPO_DIR}"/*.pkg.tar.* "${LOCAL_REPO_SHARED_DIR}"/*.pkg.tar.*; do
+    b="${f##*/}"; case "${b}" in *.sig|'*.pkg.tar.*') continue ;; esac
+    b="${b%%.pkg.tar.*}"; b="${b%-*}"; b="${b%-*}"; ours+="${b%-*}"$'\n'
+  done
+  STEAMLING_OUR_PACKAGES="${ours}" "${STEAMLING_ROOT}/scripts/check-sonames.sh" "${ROOTFS_DIR}" \
     || die "a package in the image needs a library version the image doesn't have (listed above)"
   strip_docs "${ROOTFS_DIR}"
 

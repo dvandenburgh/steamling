@@ -76,9 +76,12 @@ flush
 # by another package (Dolphin and libLLVM) without depending on it, and it won't start.
 ours=() optional=()
 if [ "${#absent[@]}" -gt 0 ]; then
+  # Our package names: build-image.sh passes them from the local repos, since by now the image's
+  # pacman.conf may no longer list [steamling]; the sync databases are the fallback.
   declare -A mine=()
-  while IFS= read -r p; do mine["${p}"]=1; done \
-    < <(chroot "${root}" pacman -Slq steamling steamling-shared 2>/dev/null)
+  while IFS= read -r p; do [ -n "${p}" ] && mine["${p}"]=1; done \
+    < <(if [ -n "${STEAMLING_OUR_PACKAGES:-}" ]; then printf '%s\n' "${STEAMLING_OUR_PACKAGES}"
+        else chroot "${root}" pacman -Slq steamling steamling-shared 2>/dev/null; fi)
   for a in "${absent[@]}"; do
     o="$(chroot "${root}" pacman -Qqo "${a%%|*}" 2>/dev/null || true)"
     if [ -n "${o}" ] && [ -n "${mine[${o}]:-}" ]; then ours+=("${o}|${a}"); else optional+=("${a}"); fi
