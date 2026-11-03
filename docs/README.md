@@ -23,6 +23,8 @@ User guides for Steamling. New here? Start with the [project README](../README.m
   restoring the factory bootloader
 - [snapshots.md](snapshots.md) - automatic pre-update snapshots, one-button rollback, and
   manual recovery when an update goes wrong
+- [benchmarking.md](benchmarking.md) - measuring boot time, battery drain asleep, clocks and
+  temperatures, controller reports and frame times before and after a change
 - [licensing.md](licensing.md) - the project license and the third-party components it ships
 - [about.md](about.md) - where Steamling came from, the projects and people it's built on, and
   who makes it
