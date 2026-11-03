@@ -8,3 +8,5 @@ DRM_MSM_DSI
 SCSI_UFS_QCOM
 PHY_QCOM_QMP_UFS
 MMC_SDHCI_MSM
+# steamling-bench and the preemption A/B in docs/benchmarking.md rely on it.
+PREEMPT_DYNAMIC

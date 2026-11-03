@@ -27,3 +27,8 @@
 --disable CLK_NORD_DISPCC --disable CLK_NORD_GCC --disable CLK_NORD_GPUCC
 --disable CLK_SHIKRA_AUDIOCORECC --disable CLK_SHIKRA_GCC
 --disable INTERCONNECT_QCOM_MAILI --disable PINCTRL_MAILI
+
+# The preemption model picked at boot instead of build time, so it can be measured without a
+# rebuild: preempt=lazy (or full, voluntary, none) on the kernel command line, or at runtime
+# `echo lazy > /sys/kernel/debug/sched/preempt`. Full stays the default.
+--enable PREEMPT_DYNAMIC
