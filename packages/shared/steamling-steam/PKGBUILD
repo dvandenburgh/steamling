@@ -2,7 +2,7 @@
 # gamescope launcher, and the ARM-Proton compat-tool plumbing.
 pkgname=steamling-steam
 pkgver=0.1.1
-pkgrel=1.1
+pkgrel=1.2
 pkgdesc="Native ARM64 Steam Big Picture (gamescope) for the RP6 — installer + launcher"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -22,13 +22,13 @@ install=steamling-steam.install
 source=('steamling-steam-install' 'steamling-steam' 'steamling-steam-splash' 'steamling-steam-sync' 'steam' 'steam.desktop'
         'steam-256.png' 'steam-512.png'
         'steamling-proton-prep' 'steamling-proton-prep.service'
-        'steamling-game-launch' 'steamling-steam-env' 'steamling-proton-wrapper' 'fex-profiles.json'
+        'steamling-game-launch' 'steamling-steam-env' 'steamling-steam-channel' 'steamling-proton-wrapper' 'fex-profiles.json'
         'steamling-guestos-mount' 'steamling-guestos.service' 'graphics_provider.json'
         'steamling-powerbuttond'
         'steamling-fex-binfmt' 'steamling-fex-binfmt.service' '90-steamling-fex-binfmt.hook'
         'steamling-oobe-marker' 'steamling-oobe-marker.service')
 sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
-            'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+            'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   install -Dm755 "${srcdir}/steamling-steam-install" "${pkgdir}/usr/bin/steamling-steam-install"
@@ -48,6 +48,7 @@ package() {
   # this name: never move or rename it.
   install -Dm755 "${srcdir}/steamling-game-launch"           "${pkgdir}/usr/bin/steamling-game-launch"
   install -Dm644 "${srcdir}/steamling-steam-env"             "${pkgdir}/usr/lib/steamling/steamling-steam-env"
+  install -Dm755 "${srcdir}/steamling-steam-channel"         "${pkgdir}/usr/lib/steamling/steamling-steam-channel"
   install -Dm755 "${srcdir}/steamling-proton-wrapper"        "${pkgdir}/usr/lib/steamling/steamling-proton-wrapper"
   install -Dm644 "${srcdir}/fex-profiles.json"             "${pkgdir}/usr/share/steamling/fex-profiles.json"
   install -Dm755 "${srcdir}/steamling-guestos-mount"         "${pkgdir}/usr/lib/steamling/steamling-guestos-mount"

@@ -34,8 +34,7 @@ if [ -z "${DISPLAY:-}" ]; then
 fi
 
 # Re-pin here too, so desktop mode and game mode always agree on the channel. See steamling-steam.
-mkdir -p "${STEAM}/package"
-echo steamdeck_stable > "${STEAM}/package/beta"
+/usr/lib/steamling/steamling-steam-channel "${STEAM}"
 
 # Same game-launch pin + CPU topology as game mode.
 . /usr/lib/steamling/steamling-steam-env
