@@ -2,13 +2,14 @@
 # which live here rather than in the image overlay so fixes reach fielded SDs on -Syu (#34).
 pkgname=steamling-tools
 pkgver=0.1.1
-pkgrel=1.1
+pkgrel=1.2
 pkgdesc="Steamling maintenance app: snapshot rollback, base mode switch, internal install, SSH, file sharing and USB file transfer toggles, emulation layer, desktop picker, first-boot diagnostics and root expansion"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
 license=('GPL-2.0-or-later')
 depends=('steamling-snapshots' 'steamling-base' 'kdialog' 'cloud-guest-utils'  # growpart: steamling-expand-root
-         'umtp-responder')  # steamling-mtp
+         'umtp-responder'  # steamling-mtp
+         'python')  # steamling-bench
 install=steamling-tools.install
 source=('steamling-tools' 'steamling-tools.desktop' 'steamling-installer-gui'
         'steamling-install-internal' 'steamling-uninstall-internal' '54-steamling-installer.rules'
@@ -17,9 +18,10 @@ source=('steamling-tools' 'steamling-tools.desktop' 'steamling-installer-gui'
         'steamling-share' '55-steamling-share.rules' 'smb.conf' 'steamling-smb.service'
         'steamling-layer' '56-steamling-layer.rules'
         'steamling-diag' 'steamling-diag.service' 'steamling-expand-root' 'steamling-expand-root.service'
-        'steamling-mtp' 'steamling-mtp.service')
+        'steamling-mtp' 'steamling-mtp.service' 'steamling-bench')
 sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
-            'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+            'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
+            'SKIP')
 backup=('etc/ssh/sshd_config.d/10-steamling-no-root-login.conf'
         'etc/samba/smb.conf')
 
@@ -52,6 +54,9 @@ package() {
   install -Dm644 "${srcdir}/smb.conf" "${pkgdir}/etc/samba/smb.conf"
   install -Dm644 "${srcdir}/steamling-smb.service" \
     "${pkgdir}/etc/avahi/services/steamling-smb.service"
+
+  # Before-and-after measurements for system changes (docs/benchmarking.md).
+  install -Dm755 "${srcdir}/steamling-bench" "${pkgdir}/usr/bin/steamling-bench"
 
   # Started on request only (Governor), never enabled: see the unit.
   install -Dm755 "${srcdir}/steamling-mtp" "${pkgdir}/usr/bin/steamling-mtp"

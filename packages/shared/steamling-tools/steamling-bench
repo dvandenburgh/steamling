@@ -1,0 +1,527 @@
+#!/usr/bin/env python3
+# steamling-bench - the same few measurements before and after a kernel (or any system) change, so
+# a change is judged on numbers from this handheld rather than by feel. Each run writes one plain
+# "key: value" file under ~/steamling-bench, headed by what was running (Steamling, kernel, Mesa,
+# preemption model), and `compare` lines two runs up. docs/benchmarking.md walks through each test.
+import glob
+import gzip
+import json
+import os
+import pwd
+import statistics
+import struct
+import subprocess
+import sys
+import time
+
+USAGE = """usage: steamling-bench <test> [options]
+
+  info                      what is running (also the header of every result)
+  boot                      how long the last boot took, to game mode
+  sleep [MINUTES]           battery drain asleep and what woke the handheld (sudo; default 30)
+  load [MINUTES]            clocks, temperatures, power and fan while you play (default 10)
+  input [SECONDS] [DEVICE]  how often the controller reports and how evenly (sudo; default 10)
+  frames [CSV]              frame times from a MangoHud log (default: the newest one)
+  compare A B               two results side by side
+  list                      saved results
+"""
+
+
+# --- where results go ------------------------------------------------------------------------
+
+def user_home():
+    # Run with sudo, results still belong to the person who ran it.
+    name = os.environ.get("SUDO_USER") or pwd.getpwuid(os.getuid()).pw_name
+    try:
+        entry = pwd.getpwnam(name)
+        return entry.pw_dir, entry.pw_uid, entry.pw_gid
+    except KeyError:
+        return os.path.expanduser("~"), os.getuid(), os.getgid()
+
+
+HOME, UID, GID = user_home()
+RESULTS = os.path.join(HOME, "steamling-bench")
+
+
+def die(msg):
+    print(f"steamling-bench: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def need_root(test):
+    if os.geteuid() != 0:
+        die(f"'{test}' needs root: sudo steamling-bench {test} ...")
+
+
+def read(path, default=""):
+    try:
+        with open(path) as f:
+            return f.read().strip()
+    except OSError:
+        return default
+
+
+def run(cmd):
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=30).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def save(test, lines):
+    os.makedirs(RESULTS, exist_ok=True)
+    path = os.path.join(RESULTS, f"{time.strftime('%Y%m%d-%H%M%S')}-{test}.txt")
+    with open(path, "w") as f:
+        f.write("\n".join(lines) + "\n")
+    for p in (RESULTS, path):
+        try:
+            os.chown(p, UID, GID)
+        except OSError:
+            pass
+    print("\n".join(lines))
+    print(f"\nsaved: {path}")
+    return path
+
+
+def fmt(value, digits=1):
+    return f"{value:.{digits}f}"
+
+
+# --- info --------------------------------------------------------------------------------------
+
+def kernel_config(symbol):
+    try:
+        with gzip.open("/proc/config.gz", "rt") as f:
+            for line in f:
+                if line.startswith(f"CONFIG_{symbol}="):
+                    return line.split("=", 1)[1].strip()
+    except OSError:
+        pass
+    return "n"
+
+
+def preempt_model():
+    # Root can read the live model; "(lazy)" marks the active one.
+    live = read("/sys/kernel/debug/sched/preempt")
+    if "(" in live:
+        return live[live.index("(") + 1:live.index(")")]
+    for arg in read("/proc/cmdline").split():
+        if arg.startswith("preempt="):
+            return arg.split("=", 1)[1] + " (boot option)"
+    if kernel_config("PREEMPT_DYNAMIC") == "y":
+        return "full (default; run as root to read the live model)"
+    for model in ("PREEMPT_LAZY", "PREEMPT_RT", "PREEMPT", "PREEMPT_VOLUNTARY"):
+        if kernel_config(model) == "y":
+            return model.lower().replace("preempt_", "").replace("preempt", "full")
+    return "unknown"
+
+
+def os_release(key):
+    for line in read("/usr/lib/os-release").splitlines():
+        if line.startswith(f"{key}="):
+            return line.split("=", 1)[1].strip('"')
+    return "?"
+
+
+def pkg_version(*names):
+    for name in names:
+        out = run(["pacman", "-Q", name])
+        if out:
+            return out.split()[-1]
+    return "?"
+
+
+def info_lines():
+    kernel_pkg = "?"
+    for d in glob.glob("/var/lib/pacman/local/linux-steamling-sm*-[0-9]*"):
+        kernel_pkg = os.path.basename(d).replace("linux-steamling-", "")
+    governors = sorted({read(p) for p in glob.glob("/sys/devices/system/cpu/cpufreq/policy*/scaling_governor")})
+    return [
+        f"test: {sys.argv[1] if len(sys.argv) > 1 else 'info'}",
+        f"date: {time.strftime('%Y-%m-%d %H:%M:%S %Z')}",
+        f"device: {read('/sys/firmware/devicetree/base/model').rstrip(chr(0)) or '?'}",
+        f"steamling: {os_release('VERSION_ID')}",
+        f"kernel: {os.uname().release}",
+        f"kernel package: {kernel_pkg}",
+        f"preemption: {preempt_model()}",
+        f"mesa: {pkg_version('mesa')}",
+        f"cpu governor: {', '.join(governors) or '?'}",
+        f"cpu scheduler: {'sched_ext ' + read('/sys/kernel/sched_ext/root/ops') if read('/sys/kernel/sched_ext/state') == 'enabled' else 'kernel default'}",
+    ]
+
+
+def cmd_info(_args):
+    print("\n".join(info_lines()))
+
+
+# --- boot --------------------------------------------------------------------------------------
+
+def first_monotonic(field_match):
+    # The first entry of this boot that matches, in seconds since the kernel started.
+    out = run(["journalctl", "-b", "-o", "json", "--no-pager", field_match])
+    for line in out.splitlines():
+        try:
+            return int(json.loads(line)["__MONOTONIC_TIMESTAMP"]) / 1e6
+        except (ValueError, KeyError):
+            continue
+    return None
+
+
+def cmd_boot(_args):
+    lines = info_lines()
+    analyze = run(["systemd-analyze"])
+    for part in analyze.splitlines():
+        if part.startswith("Startup finished"):
+            lines.append(f"systemd: {part.replace('Startup finished in ', '')}")
+        elif "reached after" in part:
+            lines.append(f"systemd target: {part.strip()}")
+    # Seconds since the kernel started, as the journal counts them.
+    for label, match in (("gamescope started", "_COMM=gamescope"),
+                         ("steam started", "_COMM=steam"),
+                         ("es-de started", "_COMM=es-de")):
+        t = first_monotonic(match)
+        if t is not None:
+            lines.append(f"{label} (s): {fmt(t)}")
+    if not any(line.startswith("gamescope started") for line in lines):
+        lines.append("note: no gamescope in this boot's journal (desktop mode, or run with sudo)")
+    save("boot", lines)
+
+
+# --- sleep -------------------------------------------------------------------------------------
+
+def battery():
+    for d in glob.glob("/sys/class/power_supply/*"):
+        if read(f"{d}/type") == "Battery":
+            return d
+    return None
+
+
+def battery_state(bat):
+    s = {"capacity": float(read(f"{bat}/capacity", "nan")), "status": read(f"{bat}/status", "?")}
+    energy = read(f"{bat}/energy_now")
+    charge, volt = read(f"{bat}/charge_now"), read(f"{bat}/voltage_now")
+    if energy:
+        s["energy_uwh"] = float(energy)
+    elif charge and volt:
+        s["energy_uwh"] = float(charge) * float(volt) / 1e6
+    return s
+
+
+def wakeup_sources():
+    # name, active_count, event_count, ...: event_count is how often each one fired.
+    out = {}
+    for line in read("/sys/kernel/debug/wakeup_sources").splitlines()[1:]:
+        f = line.split()
+        if len(f) >= 3 and f[2].isdigit():
+            out[f[0]] = int(f[2])
+    return out
+
+
+def clocks():
+    return time.clock_gettime(time.CLOCK_BOOTTIME), time.clock_gettime(time.CLOCK_MONOTONIC)
+
+
+def cmd_sleep(args):
+    need_root("sleep")
+    minutes = float(args[0]) if args else 30
+    manual = "--manual" in args
+    bat = battery()
+    if not bat:
+        die("no battery found")
+    before = battery_state(bat)
+    if before["status"] not in ("Discharging", "Not charging"):
+        print(f"warning: battery is {before['status']}: unplug the charger for a real drain figure")
+    src0 = wakeup_sources()
+    ok0 = int(read("/sys/power/suspend_stats/success", "0"))
+    boot0, mono0 = clocks()
+    if not manual and os.path.exists("/sys/class/rtc/rtc0/wakealarm"):
+        print(f"sleeping for {minutes:g} minutes; the handheld wakes itself up")
+        subprocess.run(["rtcwake", "-m", "mem", "-s", str(int(minutes * 60))], capture_output=True)
+    else:
+        print("press the power button to sleep, wake it whenever you like; waiting for the resume...")
+        while int(read("/sys/power/suspend_stats/success", "0")) == ok0:
+            time.sleep(2)
+    time.sleep(3)  # let the battery reading settle after resume
+    boot1, mono1 = clocks()
+    after = battery_state(bat)
+    src1 = wakeup_sources()
+    asleep = (boot1 - boot0) - (mono1 - mono0)
+    total = boot1 - boot0
+    lines = info_lines()
+    lines += [f"time away (min): {fmt(total / 60)}",
+              f"time asleep (min): {fmt(asleep / 60)}",
+              f"asleep share (%): {fmt(100 * asleep / total if total else 0)}",
+              f"suspends: {int(read('/sys/power/suspend_stats/success', '0')) - ok0}",
+              f"battery before (%): {before['capacity']:g}",
+              f"battery after (%): {after['capacity']:g}"]
+    hours = total / 3600
+    if hours > 0:
+        lines.append(f"drain (%/hour): {fmt((before['capacity'] - after['capacity']) / hours, 2)}")
+        if "energy_uwh" in before and "energy_uwh" in after:
+            mwh = (before["energy_uwh"] - after["energy_uwh"]) / 1000
+            lines.append(f"drain (mWh/hour): {fmt(mwh / hours)}")
+            lines.append(f"average power (mW): {fmt(mwh / hours)}")
+    irq = read("/sys/power/pm_wakeup_irq")
+    if irq:
+        lines.append(f"last wakeup irq: {irq} {read(f'/proc/irq/{irq}/actions') if irq.isdigit() else ''}".rstrip())
+    fired = sorted(((src1.get(n, 0) - src0.get(n, 0), n) for n in src1), reverse=True)
+    for count, name in [x for x in fired if x[0] > 0][:10]:
+        lines.append(f"woke: {name}: {count}")
+    if hours > 0 and before["capacity"] == after["capacity"]:
+        lines.append("note: the percentage didn't move; sleep longer for a usable %/hour figure")
+    save("sleep", lines)
+
+
+# --- load --------------------------------------------------------------------------------------
+
+def gpu_devfreq():
+    for d in sorted(glob.glob("/sys/class/devfreq/*")):
+        name = os.path.basename(d) + read(f"{d}/device/of_node/name") + read(f"{d}/name")
+        if "gpu" in name or "kgsl" in name:
+            return d
+    return None
+
+
+def thermal_zones():
+    zones = {}
+    for d in sorted(glob.glob("/sys/class/thermal/thermal_zone*")):
+        kind = read(f"{d}/type")
+        if any(k in kind for k in ("cpu", "gpu", "batt", "skin", "ddr", "nsp")):
+            zones[kind] = f"{d}/temp"
+    return zones
+
+
+def fan_input():
+    for f in glob.glob("/sys/class/hwmon/hwmon*/fan1_input"):
+        return f
+    return None
+
+
+def power_mw(bat):
+    p = read(f"{bat}/power_now") if bat else ""
+    if p:
+        return abs(float(p)) / 1000
+    i, v = read(f"{bat}/current_now") if bat else "", read(f"{bat}/voltage_now") if bat else ""
+    if i and v:
+        return abs(float(i) * float(v)) / 1e9
+    return None
+
+
+def summarize(name, values, unit, digits=0):
+    values = [v for v in values if v is not None]
+    if not values:
+        return []
+    return [f"{name} avg ({unit}): {fmt(statistics.mean(values), digits)}",
+            f"{name} max ({unit}): {fmt(max(values), digits)}"]
+
+
+def cmd_load(args):
+    minutes = float(args[0]) if args else 10
+    policies = sorted(glob.glob("/sys/devices/system/cpu/cpufreq/policy*"))
+    gpu, zones, fan, bat = gpu_devfreq(), thermal_zones(), fan_input(), battery()
+    gpu_max = max((int(x) for x in read(f"{gpu}/available_frequencies").split()), default=0) if gpu else 0
+    series = {p: [] for p in policies}
+    gpu_s, temps, fans, power = [], {k: [] for k in zones}, [], []
+    end = time.time() + minutes * 60
+    csv = [["time"] + [os.path.basename(p) + "_mhz" for p in policies] + ["gpu_mhz"] + list(zones) + ["fan_rpm", "power_mw"]]
+    print(f"recording for {minutes:g} minutes: start your game now (Ctrl-C ends early)")
+    try:
+        while time.time() < end:
+            row = [time.strftime("%H:%M:%S")]
+            for p in policies:
+                v = read(f"{p}/scaling_cur_freq")
+                series[p].append(int(v) / 1000 if v.isdigit() else None)
+                row.append(series[p][-1])
+            g = read(f"{gpu}/cur_freq") if gpu else ""
+            gpu_s.append(int(g) / 1e6 if g.isdigit() else None)
+            row.append(gpu_s[-1])
+            for k, path in zones.items():
+                t = read(path)
+                temps[k].append(int(t) / 1000 if t.lstrip("-").isdigit() else None)
+                row.append(temps[k][-1])
+            f = read(fan) if fan else ""
+            fans.append(int(f) if f.isdigit() else None)
+            power.append(power_mw(bat))
+            row += [fans[-1], power[-1]]
+            csv.append(row)
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
+    lines = info_lines() + [f"samples: {len(csv) - 1}"]
+    for p in policies:
+        lines += summarize(f"{os.path.basename(p)} clock", series[p], "MHz")
+    lines += summarize("gpu clock", gpu_s, "MHz")
+    if gpu_max:
+        top = [v for v in gpu_s if v is not None]
+        if top:
+            lines.append(f"gpu at its top clock (%): {fmt(100 * sum(1 for v in top if v >= gpu_max / 1e6 - 1) / len(top))}")
+    for k in zones:
+        lines += summarize(f"{k} temp", temps[k], "C", 1)
+    lines += summarize("fan", fans, "rpm")
+    lines += summarize("battery power", power, "mW")
+    path = save("load", lines)
+    with open(path.replace(".txt", ".csv"), "w") as f:
+        f.write("\n".join(",".join("" if c is None else str(c) for c in r) for r in csv) + "\n")
+    try:
+        os.chown(path.replace(".txt", ".csv"), UID, GID)
+    except OSError:
+        pass
+
+
+# --- input -------------------------------------------------------------------------------------
+
+EVENT = struct.Struct("llHHi")  # struct input_event on 64-bit: timeval, type, code, value
+EV_SYN, SYN_REPORT = 0, 0
+
+
+def input_devices():
+    devs, cur = [], {}
+    for line in read("/proc/bus/input/devices").splitlines() + [""]:
+        if line.startswith("N: Name="):
+            cur["name"] = line.split("=", 1)[1].strip('"')
+        elif line.startswith("H: Handlers="):
+            ev = [h for h in line.split("=", 1)[1].split() if h.startswith("event")]
+            cur["event"] = ev[0] if ev else None
+        elif line.startswith("B: ABS="):
+            cur["abs"] = True
+        elif not line and cur:
+            if cur.get("event") and cur.get("abs"):
+                devs.append(cur)
+            cur = {}
+    return devs
+
+
+def cmd_input(args):
+    need_root("input")
+    seconds = float(args[0]) if args and args[0].replace(".", "").isdigit() else 10
+    want = next((a for a in args if not a.replace(".", "").isdigit()), "")
+    devs = input_devices()
+    pick = None
+    for d in devs:
+        if (want and want.lower() in d["name"].lower()) or (not want and "gamepad" in d["name"].lower()):
+            pick = d
+            break
+    if not pick:
+        die("no matching controller; pick one by name:\n  " + "\n  ".join(d["name"] for d in devs))
+    print(f"reading '{pick['name']}' for {seconds:g} s: move both sticks in circles the whole time")
+    stamps = []
+    fd = os.open(f"/dev/input/{pick['event']}", os.O_RDONLY | os.O_NONBLOCK)
+    end = time.time() + seconds
+    buf = b""
+    while time.time() < end:
+        try:
+            buf += os.read(fd, EVENT.size * 64)
+        except BlockingIOError:
+            time.sleep(0.001)
+            continue
+        while len(buf) >= EVENT.size:
+            sec, usec, typ, code, _ = EVENT.unpack_from(buf)
+            buf = buf[EVENT.size:]
+            if typ == EV_SYN and code == SYN_REPORT:
+                stamps.append(sec + usec / 1e6)
+    os.close(fd)
+    lines = info_lines() + [f"device: {pick['name']}", f"reports: {len(stamps)}"]
+    if len(stamps) < 10:
+        lines.append("note: almost no reports: something holds this device exclusively "
+                     "(InputPlumber or Steam); try another one from the list")
+    else:
+        gaps = sorted((b - a) * 1000 for a, b in zip(stamps, stamps[1:]) if b > a)
+        span = stamps[-1] - stamps[0]
+        lines += [f"report rate (Hz): {fmt(len(stamps) / span if span else 0)}",
+                  f"interval median (ms): {fmt(statistics.median(gaps), 2)}",
+                  f"interval p99 (ms): {fmt(gaps[int(len(gaps) * 0.99) - 1], 2)}",
+                  f"interval max (ms): {fmt(gaps[-1], 2)}",
+                  f"interval spread (ms): {fmt(statistics.pstdev(gaps), 2)}"]
+    save("input", lines)
+
+
+# --- frames ------------------------------------------------------------------------------------
+
+def cmd_frames(args):
+    path = args[0] if args else None
+    if not path:
+        logs = sorted(glob.glob(os.path.join(RESULTS, "mangohud", "*.csv")), key=os.path.getmtime)
+        logs = [p for p in logs if not p.endswith("_summary.csv")]
+        if not logs:
+            die(f"no MangoHud log in {RESULTS}/mangohud (docs/benchmarking.md shows how to record one)")
+        path = logs[-1]
+    frametimes, col = [], None
+    with open(path, errors="replace") as f:
+        for line in f:
+            cells = [c.strip() for c in line.split(",")]
+            if col is None:
+                if "frametime" in cells:
+                    col = cells.index("frametime")
+                continue
+            try:
+                frametimes.append(float(cells[col]))
+            except (ValueError, IndexError):
+                continue
+    if len(frametimes) < 100:
+        die(f"{path}: not enough frames to measure")
+    ft = sorted(frametimes)
+    worst = lambda share: ft[-max(1, int(len(ft) * share)):]
+    median = statistics.median(ft)
+    lines = info_lines() + [
+        f"log: {os.path.basename(path)}",
+        f"frames: {len(ft)}",
+        f"average fps: {fmt(1000 / statistics.mean(ft))}",
+        f"1% low fps: {fmt(1000 / statistics.mean(worst(0.01)))}",
+        f"0.1% low fps: {fmt(1000 / statistics.mean(worst(0.001)))}",
+        f"frame time median (ms): {fmt(median, 2)}",
+        f"frame time spread (ms): {fmt(statistics.pstdev(ft), 2)}",
+        f"stutters (frames over twice the median): {sum(1 for x in ft if x > 2 * median)}",
+    ]
+    save("frames", lines)
+
+
+# --- compare / list ----------------------------------------------------------------------------
+
+def load_result(path):
+    if not os.path.exists(path):
+        path = os.path.join(RESULTS, path)
+    out = {}
+    with open(path) as f:
+        for line in f:
+            if ": " in line:
+                k, v = line.rstrip("\n").split(": ", 1)
+                out.setdefault(k, v)
+    return out
+
+
+def number(v):
+    try:
+        return float(v.split()[0])
+    except (ValueError, IndexError):
+        return None
+
+
+def cmd_compare(args):
+    if len(args) != 2:
+        die("compare needs two results (steamling-bench list shows them)")
+    a, b = load_result(args[0]), load_result(args[1])
+    keys = list(a) + [k for k in b if k not in a]
+    width = max(len(k) for k in keys)
+    for k in keys:
+        va, vb = a.get(k, "-"), b.get(k, "-")
+        na, nb = number(va), number(vb)
+        change = f"  ({(nb - na) / na * 100:+.1f}%)" if na and nb is not None and na != nb else ""
+        print(f"{k:<{width}}  {va:<32}  {vb}{change}")
+
+
+def cmd_list(_args):
+    for p in sorted(glob.glob(os.path.join(RESULTS, "*.txt"))):
+        print(os.path.basename(p))
+
+
+def main():
+    tests = {"info": cmd_info, "boot": cmd_boot, "sleep": cmd_sleep, "load": cmd_load,
+             "input": cmd_input, "frames": cmd_frames, "compare": cmd_compare, "list": cmd_list}
+    if len(sys.argv) < 2 or sys.argv[1] not in tests:
+        print(USAGE, end="")
+        sys.exit(0 if len(sys.argv) < 2 else 2)
+    tests[sys.argv[1]](sys.argv[2:])
+
+
+if __name__ == "__main__":
+    main()
