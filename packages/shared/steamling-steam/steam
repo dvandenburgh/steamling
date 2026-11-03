@@ -33,10 +33,9 @@ if [ -z "${DISPLAY:-}" ]; then
   [ -n "${DISPLAY:-}" ] || echo "steam: WARNING no XWayland socket in /tmp/.X11-unix — is the Plasma session up + kwin's XWayland running?" >&2
 fi
 
-# Re-pin here too: a desktop-mode `steam` otherwise flips package/beta to steamdeck_stable and
-# breaks the next game-mode launch. See steamling-steam.
+# Re-pin here too, so desktop mode and game mode always agree on the channel. See steamling-steam.
 mkdir -p "${STEAM}/package"
-echo steamdeck_publicbeta > "${STEAM}/package/beta"
+echo steamdeck_stable > "${STEAM}/package/beta"
 
 # Same game-launch pin + CPU topology as game mode.
 . /usr/lib/steamling/steamling-steam-env

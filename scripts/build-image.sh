@@ -269,12 +269,17 @@ install_packages() {
 # hard-fails. Runs the on-device installer in the rootfs chroot under a STAGING HOME, verifies the
 # tree is complete (steamui.so + the channel .installed manifest, else the seed would re-install
 # online), strips per-session cruft and tars the HOME-agnostic tree (relative .steam symlinks) into
-# ${CACHE_DIR}/steam-seed.tar.zst. The tar is a BUILD-TIME INTERMEDIATE, unpacked into the rootfs
+# ${CACHE_DIR}/steam-seed-<channel>.tar.zst. The tar is a BUILD-TIME INTERMEDIATE, unpacked into the rootfs
 # at the end of this function and never shipped. The cache makes repeat builds offline;
 # STEAMLING_REBOOTSTRAP_STEAM=1 forces a rebake.
 bootstrap_steam_seed() {
   local root="$1"
-  local seed="${CACHE_DIR}/steam-seed.tar.zst"
+  # The channel comes from the installer, and names the seed, so moving channels rebakes it.
+  local channel
+  channel="$(sed -n 's/^STEAM_ARM_CHANNEL="\(.*\)"$/\1/p' \
+    "${STEAMLING_ROOT}/packages/shared/steamling-steam/steamling-steam-install")"
+  [ -n "${channel}" ] || die "no STEAM_ARM_CHANNEL in steamling-steam-install"
+  local seed="${CACHE_DIR}/steam-seed-${channel}.tar.zst"
   local home="/var/lib/steamling/steam-seed-home"
   local steam="${home}/.local/share/Steam"
 
@@ -292,7 +297,7 @@ bootstrap_steam_seed() {
       die "steam bake failed (steamling-steam-install in chroot). Check network + retry (the bake is cached, so a retry resumes)."
     fi
     if ! chroot "${root}" test -f "${steam}/steamrtarm64/steamui.so" \
-       || ! chroot "${root}" test -f "${steam}/package/steam_client_steamdeck_publicbeta_linuxarm64.installed"; then
+       || ! chroot "${root}" test -f "${steam}/package/steam_client_${channel}_linuxarm64.installed"; then
       umount "${root}/dev/shm" 2>/dev/null || true
       die "steam bake incomplete (no steamui.so / .installed) — the seed is broken. Re-run (STEAMLING_REBOOTSTRAP_STEAM=1 forces a clean rebake)."
     fi

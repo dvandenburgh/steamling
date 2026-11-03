@@ -32,11 +32,12 @@ cd "${CLIENT_DIR}" 2>/dev/null || { echo "missing ${CLIENT_DIR}" >&2; exit 1; }
 # Marker Decky's CEF remote-debugging connection looks for.
 touch "${STEAM}/.cef-enable-remote-debugging" 2>/dev/null || true
 
-# Re-pin EVERY launch: the ARM64 Big-Picture client only works on steamdeck_publicbeta, and
-# anything that flips the channel leaves Steam reading "installed version 0", stuck on
-# "Installing update" with steamwebhelper crash-looping until this reasserts it.
+# Re-pin EVERY launch: the ARM64 Big-Picture client needs a steamdeck_ channel (stable here, as
+# steamling-steam-install installs), and anything that flips the channel leaves Steam reading
+# "installed version 0", stuck on "Installing update" with steamwebhelper crash-looping until this
+# reasserts it. A handheld that was on steamdeck_publicbeta moves to stable on its next launch.
 mkdir -p "${STEAM}/package"
-echo steamdeck_publicbeta > "${STEAM}/package/beta"
+echo steamdeck_stable > "${STEAM}/package/beta"
 
 # Must precede Steam, which enumerates controllers once at startup; desktop mode leaves the pad
 # on xb360, and only a Deck target gives Steam Input the Steam-native pad (Guide, QAM, L4/L5).

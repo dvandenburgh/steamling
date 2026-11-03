@@ -1,7 +1,10 @@
 #!/bin/bash
 # steamling-steam-install — download Valve's NATIVE ARM64 Steam runtime + client, and bootstrap the
-# client into a complete install tree. The channel must be steamdeck_publicbeta, not plain
-# publicbeta: only it carries the gamepadui font + vgui payload (otherwise CreateGlFont fails).
+# client into a complete install tree. The channel is steamdeck_stable: Valve's stable arm64 client
+# now carries the gamepadui font + vgui payload Big Picture needs, which once only the
+# steamdeck_publicbeta channel did (plain publicbeta never has it: CreateGlFont fails). Armada moved
+# its new installs to stable on the same client. steam and steamling-steam pin the same name, and
+# build-image.sh reads it from here for the baked seed.
 set -e
 set -o pipefail
 
@@ -11,7 +14,7 @@ RUNTIME_DIR="${STEAM}/steam-runtime-steamrt-arm64"
 CLIENT_DIR="${STEAM}/steamrtarm64"
 RUNTIME_TAR_URL="https://repo.steampowered.com/steamrt3c/images/latest-public-beta/steam-runtime-steamrt-arm64.tar.xz"
 STEAM_CDN="https://client-update.steamstatic.com"
-STEAM_ARM_CHANNEL="steamdeck_publicbeta"
+STEAM_ARM_CHANNEL="steamdeck_stable"
 STEAM_ARM_MANIFEST_NAME="steam_client_${STEAM_ARM_CHANNEL}_linuxarm64"
 STEAM_MANIFEST_URL="${STEAM_CDN}/${STEAM_ARM_MANIFEST_NAME}"
 
