@@ -34,8 +34,8 @@ sudo steamling-bench sleep 30
 ```
 
 The handheld goes to sleep straight away and wakes itself after 30 minutes. If it can't wake
-itself, or you'd rather use the power button, add `--manual`: it then waits for you to sleep and
-wake the handheld yourself.
+itself, it says so and waits for you instead. Add `--manual` to use the power button from the
+start: it then waits for you to sleep and wake the handheld yourself.
 
 You get the drain in percent per hour and, where the battery reports it, in milliwatts. You also
 get what share of the time it actually spent asleep, and which wakeup sources fired. A long list
@@ -66,9 +66,10 @@ sudo steamling-bench input 10
 
 Move both sticks in circles for the whole 10 seconds. It reports how many times a second the
 controller sends an update and how even the gaps between updates are. The RP6's controller should
-show close to 250 Hz with a tight spread. If it reports almost nothing, something else is holding
-the controller exclusively: it prints the list of input devices, and you can name another one, for
-example `sudo steamling-bench input 10 "X-Box"`.
+show close to 250 Hz with a tight spread. It picks the first controller nothing else holds
+exclusively: InputPlumber takes the built-in pad and passes it on to Steam as another one, and
+that one is what gets measured. To measure a particular device, name it, for example
+`sudo steamling-bench input 10 "X-Box"`.
 
 This measures the time between the controller's own reports, not the whole delay from your thumb
 to the screen. That needs a camera.

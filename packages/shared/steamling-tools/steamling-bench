@@ -176,10 +176,12 @@ def cmd_boot(_args):
         elif "reached after" in part:
             lines.append(f"systemd target: {part.strip()}")
     # Seconds since the kernel started, as the journal counts them.
-    for label, match in (("gamescope started", "_COMM=gamescope"),
-                         ("steam started", "_COMM=steam"),
-                         ("es-de started", "_COMM=es-de")):
-        t = first_monotonic(match)
+    # Process names are cut at 15 characters, so gamescope can show as gamescope-wl.
+    for label, matches in (("gamescope started", ("_COMM=gamescope", "_COMM=gamescope-wl")),
+                           ("steam started", ("_COMM=steam",)),
+                           ("es-de started", ("_COMM=es-de",))):
+        found = [t for t in (first_monotonic(m) for m in matches) if t is not None]
+        t = min(found) if found else None
         if t is not None:
             lines.append(f"{label} (s): {fmt(t)}")
     if not any(line.startswith("gamescope started") for line in lines):
@@ -234,10 +236,14 @@ def cmd_sleep(args):
     src0 = wakeup_sources()
     ok0 = int(read("/sys/power/suspend_stats/success", "0"))
     boot0, mono0 = clocks()
+    woke = False
     if not manual and os.path.exists("/sys/class/rtc/rtc0/wakealarm"):
         print(f"sleeping for {minutes:g} minutes; the handheld wakes itself up")
-        subprocess.run(["rtcwake", "-m", "mem", "-s", str(int(minutes * 60))], capture_output=True)
-    else:
+        r = subprocess.run(["rtcwake", "-m", "mem", "-s", str(int(minutes * 60))], capture_output=True, text=True)
+        woke = r.returncode == 0 and int(read("/sys/power/suspend_stats/success", "0")) > ok0
+        if not woke:
+            print(f"rtcwake couldn't do it ({(r.stderr or r.stdout).strip() or 'no sleep happened'})")
+    if not woke:
         print("press the power button to sleep, wake it whenever you like; waiting for the resume...")
         while int(read("/sys/power/suspend_stats/success", "0")) == ok0:
             time.sleep(2)
@@ -372,6 +378,25 @@ def cmd_load(args):
 
 EVENT = struct.Struct("llHHi")  # struct input_event on 64-bit: timeval, type, code, value
 EV_SYN, SYN_REPORT = 0, 0
+EVIOCGRAB = 0x40044590
+
+
+def held_elsewhere(event):
+    # A device someone has grabbed (InputPlumber takes the built-in pad) delivers nothing to
+    # other readers. Grabbing it ourselves for a moment tells: EBUSY means it is taken.
+    import fcntl
+    try:
+        fd = os.open(f"/dev/input/{event}", os.O_RDONLY | os.O_NONBLOCK)
+    except OSError:
+        return True
+    try:
+        fcntl.ioctl(fd, EVIOCGRAB, 1)
+        fcntl.ioctl(fd, EVIOCGRAB, 0)
+        return False
+    except OSError:
+        return True
+    finally:
+        os.close(fd)
 
 
 def input_devices():
@@ -397,10 +422,13 @@ def cmd_input(args):
     want = next((a for a in args if not a.replace(".", "").isdigit()), "")
     devs = input_devices()
     pick = None
-    for d in devs:
-        if (want and want.lower() in d["name"].lower()) or (not want and "gamepad" in d["name"].lower()):
-            pick = d
-            break
+    if want:
+        pick = next((d for d in devs if want.lower() in d["name"].lower()), None)
+    else:
+        # The first controller nobody holds exclusively: with InputPlumber running, that is the
+        # pad it presents to Steam rather than the built-in one it reads from.
+        pads = [d for d in devs if any(k in d["name"].lower() for k in ("gamepad", "pad", "controller", "x-box", "steam deck"))]
+        pick = next((d for d in pads if not held_elsewhere(d["event"])), None)
     if not pick:
         die("no matching controller; pick one by name:\n  " + "\n  ".join(d["name"] for d in devs))
     print(f"reading '{pick['name']}' for {seconds:g} s: move both sticks in circles the whole time")
