@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "David J. Vandenburgh" <david@vandenburgh.co>
+Date: Tue, 3 Nov 2026 11:00:00 -0500
+Subject: [PATCH] usb_gadget: take the bulk packet size from the link speed
+
+check_and_send_USB_ZLP() ends a transfer with a zero length packet
+when its size is a multiple of the bulk packet size, and that size was
+fixed by usb_max_packet_size in the config. The right value depends on
+the speed the host connected at: 64 bytes at full speed, 512 at high
+speed, 1024 at SuperSpeed. With one fixed value, enabling SuperSpeed
+would end some transfers early at one speed or add a stray packet at
+another.
+
+Once FunctionFS enables the function, ask it for the IN endpoint's
+descriptor for the current speed and use its wMaxPacketSize. The
+config value stays as the fallback when the ioctl fails.
+---
+diff --git a/src/usb_gadget.c b/src/usb_gadget.c
+index 74d9d2a..f44df9b 100644
+--- a/src/usb_gadget.c
++++ b/src/usb_gadget.c
+@@ -814,6 +814,19 @@ int handle_ffs_ep0(usb_gadget * ctx)
+ 
+ 				if (!status)
+ 				{
++					/* The link speed is only known now: take the bulk packet size from the
++					 * endpoint descriptor FunctionFS picked for it (64, 512 or 1024), so the
++					 * zero length packet check matches the speed the host connected at. */
++					struct usb_endpoint_descriptor ep_desc;
++
++					memset(&ep_desc, 0, sizeof(ep_desc));
++					if (ioctl(ctx->ep_handles[EP_DESCRIPTOR_IN], FUNCTIONFS_ENDPOINT_DESC, &ep_desc) >= 0 &&
++					    le16toh(ep_desc.wMaxPacketSize))
++					{
++						mtp_context->max_packet_size = le16toh(ep_desc.wMaxPacketSize) & 0x7FF;
++						PRINT_MSG("USB bulk max packet size for this link : %d bytes", mtp_context->max_packet_size);
++					}
++
+ 					ctx->stop = 0;
+ 					if( ctx->thread_not_started )
+ 						ctx->thread_not_started = pthread_create(&ctx->thread, NULL, io_thread, ctx);

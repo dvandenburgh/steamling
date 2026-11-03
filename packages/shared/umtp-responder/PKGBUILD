@@ -4,7 +4,7 @@
 pkgname=umtp-responder
 _commit=153f76d65608c184a972ad7d0b4ae605e56c0972
 pkgver=1.8.1.r18.153f76d
-pkgrel=1
+pkgrel=2
 pkgdesc="Lightweight USB Media Transfer Protocol (MTP) responder"
 arch=('aarch64')
 url="https://github.com/viveris/uMTP-Responder"
@@ -16,8 +16,10 @@ source=("uMTP-Responder::git+https://github.com/viveris/uMTP-Responder.git#commi
         '0002-storage-use-configured-gid.patch'
         '0003-path-harden-object-path-containment.patch'
         '0004-unicode-support-full-utf8-utf16-conversion.patch'
-        '0005-inotify-synchronize-session-database-lifetime.patch')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        '0005-inotify-synchronize-session-database-lifetime.patch'
+        '0006-usb_gadget-take-the-bulk-packet-size-from-the-link-speed.patch'
+        '0007-buildconf-build-with-USB-3.0-SuperSpeed-support.patch')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
   cd uMTP-Responder
