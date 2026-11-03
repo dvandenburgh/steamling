@@ -195,6 +195,7 @@ version, it is moved into `~/Emulation/emulators/eden/` for you and keeps workin
 - **PlayStation 2 (ARMSX2)**: setup wizard skipped, Vulkan renderer, controller bound, and
   upscaling enabled. You only supply `ps2-bios.bin` and your games.
 - **Nintendo Switch (Eden or Ryujinx, your own build)**: controller bound, fullscreen, vsync and
-  resolution tuned for the panel. You supply the emulator, your keys and firmware (see above)
-  and your games.
+  resolution tuned for the panel. Eden also builds shaders in the background, so a new effect
+  doesn't freeze the game while it compiles. You supply the emulator, your keys and firmware
+  (see above) and your games.
 - **ES-DE**: scans `~/Emulation/ROMs` and already knows where every emulator is installed.

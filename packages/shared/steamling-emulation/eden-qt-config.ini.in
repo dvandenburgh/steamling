@@ -83,3 +83,5 @@ accelerate_astc\default=false
 accelerate_astc=0
 gpu_accuracy\default=false
 gpu_accuracy=0
+use_asynchronous_shaders\default=false
+use_asynchronous_shaders=true
