@@ -5,7 +5,7 @@
 # Bump = move _commit, pkgver <commit date>.<short sha>.
 pkgname=libretro-swanstation
 pkgver=20261024.631f0fb
-pkgrel=1
+pkgrel=2
 _commit=631f0fb31b809e0f889d7c551fe695788e39c1d3
 pkgdesc="SwanStation libretro core — PlayStation, Vulkan and OpenGL (SoC-tuned)"
 arch=('aarch64')
@@ -13,8 +13,14 @@ url="https://github.com/libretro/swanstation"
 license=('GPL-3.0-or-later')
 depends=('glibc' 'gcc-libs')
 makedepends=('git' 'cmake' 'ninja')
-source=("swanstation::git+https://github.com/libretro/swanstation.git#commit=${_commit}")
-sha256sums=('SKIP')
+# 0001: the shader worker warms only the texture filter in use (PATCHES.md has where it's from).
+source=("swanstation::git+https://github.com/libretro/swanstation.git#commit=${_commit}"
+        '0001-vulkan-warm-only-the-active-texture-filter.patch')
+sha256sums=('SKIP' 'SKIP')
+
+prepare() {
+  patch -d swanstation -Np1 -i "${srcdir}/0001-vulkan-warm-only-the-active-texture-filter.patch"
+}
 
 build() {
   # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
