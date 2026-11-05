@@ -184,6 +184,11 @@ def cmd_boot(_args):
         t = min(found) if found else None
         if t is not None:
             lines.append(f"{label} (s): {fmt(t)}")
+    # Game mode's own phases, as steamling-steam logs them: what the black screen is spent on.
+    for entry in run(["journalctl", "-b", "-t", "steamling-steam", "-o", "cat", "--no-pager"]).splitlines():
+        if entry.startswith("+") and "s: " in entry:
+            when, what = entry[1:].split("s: ", 1)
+            lines.append(f"game mode: {what} (s): {when}")
     if not any(line.startswith("gamescope started") for line in lines):
         lines.append("note: no gamescope in this boot's journal (desktop mode, or run with sudo)")
     save("boot", lines)
