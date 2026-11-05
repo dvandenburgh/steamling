@@ -21,7 +21,7 @@ if [ -z "${SIZE}" ] || [ $# -eq 0 ]; then
   exit 2
 fi
 
-T0="${STEAMLING_STEAM_T0:-$(date +%s)}"
+T0="${STEAMLING_STEAM_T0:-$(date +%s%3N)}"
 
 # two-step draws the watermark DeviceScale-times its size, placed by truncated logical-pixel maths,
 # on its BackgroundStartColor; read all of it back so boot -> game mode stays one still screen.
@@ -39,7 +39,8 @@ BG="$(ply_key BackgroundStartColor "${THEME}/steamling.plymouth")"
 [[ "${BG}" =~ ^0x[0-9A-Fa-f]{6}$ ]] || BG=0x202126
 
 mark() {
-  local msg="+$(( $(date +%s) - T0 ))s: $*"
+  local ms=$(( $(date +%s%3N) - T0 ))
+  local msg="+$(( ms / 1000 )).$(printf '%03d' $(( ms % 1000 )))s: $*"
   echo "[${TAG}] ${msg}" >&2
   logger -t "${TAG}" -- "${msg}" 2>/dev/null || true
 }

@@ -8,9 +8,11 @@ CLIENT_DIR="${STEAM}/steamrtarm64"
 CLIENT="${CLIENT_DIR}/steam"
 
 # Elapsed marks for the phases the user sees as a black screen; the splash shares the clock.
-export STEAMLING_STEAM_T0="$(date +%s)"
+# Milliseconds: most phases take well under a second, so whole seconds showed only zeros.
+export STEAMLING_STEAM_T0="$(date +%s%3N)"
 mark() {
-  local m="+$(( $(date +%s) - STEAMLING_STEAM_T0 ))s: $*"
+  local ms=$(( $(date +%s%3N) - STEAMLING_STEAM_T0 ))
+  local m="+$(( ms / 1000 )).$(printf '%03d' $(( ms % 1000 )))s: $*"
   echo "[steamling-steam] ${m}"
   logger -t steamling-steam -- "${m}" 2>/dev/null || true
 }
