@@ -2,7 +2,7 @@
 # Input sees a proper pad (Guide button, rumble). Upstream's PREBUILT aarch64 release, so the
 # build chroot needs no Rust toolchain; the per-device config ships in steamling-bsp-<soc>.
 pkgname=inputplumber
-pkgver=0.83.1
+pkgver=0.84.0
 pkgrel=1
 pkgdesc="Open source input router and remapper daemon (prebuilt aarch64 release)"
 arch=('aarch64')
@@ -25,7 +25,7 @@ _bsp_replaces=(
   50-retroid_pocket_flip2.yaml                                      # sm8250 01-retroid-flip2
 )
 source=("inputplumber-aarch64-${pkgver}.tar.gz::https://github.com/ShadowBlip/InputPlumber/releases/download/v${pkgver}/inputplumber-aarch64.tar.gz")
-sha256sums=('4aa6b8c38c32af5de18750e49285cb22031b7716d98d016eb08d2e99054f5a31')
+sha256sums=('c1ef0534f9ec488cc7abe2bc5fe6b16bd575f8ed9549372c8c7472341785bc19')
 
 package() {
   # The release tarball has usr/ at the top, sometimes inside one wrapper dir.
