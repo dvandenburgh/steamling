@@ -5,7 +5,6 @@ base
 systemd
 systemd-sysvcompat
 dbus-broker
-mkinitcpio
 
 # --- boot splash ---
 plymouth
