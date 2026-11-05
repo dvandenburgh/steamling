@@ -3,7 +3,7 @@
 # live in devices/<name>/packages/steamling-bsp-<name>, which depends on this package.
 pkgname=steamling-bsp-common
 pkgver=0.1.1
-pkgrel=1
+pkgrel=1.1
 pkgdesc="steamling shared board support: sleep.d dispatcher, suspend hooks, power-key policy, session udev rules, wheel sudo, fan/scheduler daemons, ABL updater, power profiles daemon, realtime priority ladder, zram swap and memory sysctls, deck session limits, kernel /flash deploy, volume rocker daemon, journal cap, iwd Wi-Fi backend, panel refresh calibration, controller MCU mode quirks"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

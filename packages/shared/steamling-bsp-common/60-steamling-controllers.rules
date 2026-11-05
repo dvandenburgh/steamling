@@ -9,15 +9,28 @@ KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0660", GROUP="input", OPTIONS+="stati
 KERNEL=="hidraw*", KERNELS=="000[356]:28DE:*", GROUP="input", MODE="0660", TAG+="uaccess"
 SUBSYSTEM=="input", KERNELS=="000[356]:28DE:*", MODE="0660", TAG+="uaccess"
 
+# Two matches per vendor. ATTRS{idVendor} covers USB pads, including those with no HID node at
+# all (xpad's wired Xbox pads). A Bluetooth pad has no USB idVendor, so that match missed every
+# wireless one and Steam Input fell back to the bare gamepad (no gyro, no rumble); the HID node's
+# own name, 0005:<vendor>:<product>, carries the vendor for those.
 # Sony (DualShock 3/4, DualSense)
 KERNEL=="hidraw*", ATTRS{idVendor}=="054c", MODE="0660", TAG+="uaccess"
 SUBSYSTEM=="input", ATTRS{idVendor}=="054c", MODE="0660", TAG+="uaccess"
+KERNEL=="hidraw*", KERNELS=="0005:054C:*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="input", KERNELS=="0005:054C:*", MODE="0660", TAG+="uaccess"
 # Microsoft (Xbox)
 KERNEL=="hidraw*", ATTRS{idVendor}=="045e", MODE="0660", TAG+="uaccess"
 SUBSYSTEM=="input", ATTRS{idVendor}=="045e", MODE="0660", TAG+="uaccess"
-# Nintendo (Switch Pro / Joy-Con)
+KERNEL=="hidraw*", KERNELS=="0005:045E:*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="input", KERNELS=="0005:045E:*", MODE="0660", TAG+="uaccess"
+# Nintendo (Switch Pro / Joy-Con, and third-party pads in Switch mode, which report as a Pro
+# Controller, 057E:2009)
 KERNEL=="hidraw*", ATTRS{idVendor}=="057e", MODE="0660", TAG+="uaccess"
 SUBSYSTEM=="input", ATTRS{idVendor}=="057e", MODE="0660", TAG+="uaccess"
+KERNEL=="hidraw*", KERNELS=="0005:057E:*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="input", KERNELS=="0005:057E:*", MODE="0660", TAG+="uaccess"
 # 8BitDo
 KERNEL=="hidraw*", ATTRS{idVendor}=="2dc8", MODE="0660", TAG+="uaccess"
 SUBSYSTEM=="input", ATTRS{idVendor}=="2dc8", MODE="0660", TAG+="uaccess"
+KERNEL=="hidraw*", KERNELS=="0005:2DC8:*", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="input", KERNELS=="0005:2DC8:*", MODE="0660", TAG+="uaccess"
