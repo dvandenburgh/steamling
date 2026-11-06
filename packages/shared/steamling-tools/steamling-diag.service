@@ -8,6 +8,11 @@ Type=oneshot
 # delay so device probing AND a wifi association attempt have time to settle
 ExecStartPre=/bin/sh -c 'sleep 30'
 ExecStart=/usr/bin/steamling-diag
+# A report nobody waits for: it runs about when Steam or a game is starting, so it gets only the CPU
+# and disk time nothing else wants.
+Nice=19
+CPUSchedulingPolicy=idle
+IOSchedulingClass=idle
 RemainAfterExit=yes
 
 [Install]

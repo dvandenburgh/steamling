@@ -35,7 +35,9 @@ OUT=/var/log/steamling-diag.txt
   cat /etc/iwd/main.conf 2>/dev/null || echo "(none)"
   printf '\n## wifi: regulatory domain (5 GHz needs a country set)\n'; iw reg get 2>/dev/null || echo "(iw n/a)"
   printf '\n## wifi: scan — does NM see any APs?\n'
-  nmcli -f SSID,SIGNAL,SECURITY,CHAN device wifi list 2>/dev/null | head -30 || echo "(nmcli wifi list n/a)"
+  # --rescan no: the list NetworkManager already has. A forced scan on every boot briefly takes the
+  # radio off the access point, just as a game or a download is starting.
+  nmcli -f SSID,SIGNAL,SECURITY,CHAN device wifi list --rescan no 2>/dev/null | head -30 || echo "(nmcli wifi list n/a)"
   printf '\n## wifi: wlan0 detail\n'
   nmcli device show wlan0 2>/dev/null | grep -E 'GENERAL.STATE|GENERAL.CONNECTION|IP4.ADDRESS|WIFI-PROPERTIES' || true
   nmcli networking connectivity 2>/dev/null
@@ -71,7 +73,9 @@ OUT=/var/log/steamling-diag.txt
   printf '\n## graphical session: processes (etimes = seconds alive; STAT D/Z = stuck; tar/zstd = seed extract)\n'
   ps -eo pid,ppid,stat,etimes,comm 2>/dev/null | grep -iE 'gamescope|steam|Xwayland|kwin|seatd|plasma|tar|zstd|cpio' | grep -v grep || echo "(no gamescope/steam/kwin/tar running)"
   printf '\n## seed extract: Steam dir size (re-run the diag; growing = extract in progress, not hung)\n'
-  du -sh /home/deck/.local/share/Steam 2>/dev/null || echo "(no ~deck Steam dir yet)"
+  # Not steamapps: the installed games are tens of GB of files to walk on every boot, and the seed
+  # extract this answers only fills the client tree.
+  du -sh --exclude=steamapps /home/deck/.local/share/Steam 2>/dev/null || echo "(no ~deck Steam dir yet)"
   ls -1 /usr/share/steamling-steam/steam-seed.tar.zst 2>/dev/null && echo "seed present (offline first-boot)" || echo "(no seed -> first boot downloads)"
   printf '\n## graphical session: which session is selected\n'
   cat /home/deck/.local/state/steamling-session 2>/dev/null || echo "(none -> default gamescope)"
