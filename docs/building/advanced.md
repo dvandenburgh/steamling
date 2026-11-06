@@ -112,6 +112,7 @@ environment (for example `make image SSH=1`, `export SSH=1` to make it the defau
 | `--emulation` | `STEAMLING_EMULATION=1` | bake the emulation layer (ES-DE and emulators) into the image |
 | (none) | `STEAMLING_IMAGE_PKG_CACHE=1` | keep a copy of every installed package in the image's `/var/cache/pacman/pkg` (several GB; handy on test devices for rolling a package back offline) |
 | (none) | `STEAMLING_NOEXTRACT=` | keep package documentation in the image (left out by default; the value is pacman's `NoExtract` list) |
+| (none) | `STEAMLING_FIRMWARE_SKIP=` | keep every Qualcomm platform's firmware in the image (by default the folders for platforms no Steamling board uses, about 430 MB, are left out, now and on updates) |
 | `--jobs N` | `JOBS=N` | parallel jobs for the kernel build (default: all cores) |
 | (none) | `STEAMLING_CCACHE=off` | compile packages from scratch instead of reusing the ccache in `build/cache/ccache-pkg` (`STEAMLING_CCACHE_SIZE` sets its limit, 20G by default) |
 | `--no-sd-image` | `SD_IMAGE=off` | stop at the finished rootfs (`make rootfs`) |

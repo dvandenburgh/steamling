@@ -26,6 +26,10 @@ STEAMLING_EMULATION="${STEAMLING_EMULATION:-0}"
 # strip_docs clears what the base tarball unpacked before pacman.conf existed. Licenses
 # (/usr/share/licenses) and man pages stay.
 STEAMLING_NOEXTRACT="${STEAMLING_NOEXTRACT-usr/share/doc/* usr/share/gtk-doc/* usr/share/help/*}"
+# linux-firmware-qcom carries every Qualcomm platform's firmware, laptops and modems included. These
+# are platforms no Steamling board is, about 430 MB on a card (measured on an RP6). They join
+# NoExtract, so updates on the handheld leave them out too; set it empty to keep them all.
+STEAMLING_FIRMWARE_SKIP="${STEAMLING_FIRMWARE_SKIP-x1e80100 sc8280xp kaanapali sa8775p qcs6490 sdm845 qcm2290 maili glymur apq8096 qcm6490 hawi qrb4210 qdu100 nord apq8016 qcs615}"
 # The image used to carry a copy of every installed package in /var/cache/pacman/pkg, several GB
 # on the card that nothing on the device reads. =1 brings it back (an offline reinstall source).
 STEAMLING_IMAGE_PKG_CACHE="${STEAMLING_IMAGE_PKG_CACHE:-0}"
@@ -34,7 +38,20 @@ render_pacman_conf() {
   local out="$1"
   log "rendering pacman.conf (base: ${STEAMLING_BASE_SNAPSHOT:-live ALARM})"
   render_base_pacman_conf "${out}"
-  [ -z "${STEAMLING_NOEXTRACT}" ] || sed -i "/^\[options\]$/a NoExtract   = ${STEAMLING_NOEXTRACT}" "${out}"
+  local skip="${STEAMLING_NOEXTRACT}" fw
+  for fw in ${STEAMLING_FIRMWARE_SKIP}; do skip+=" usr/lib/firmware/qcom/${fw}/*"; done
+  skip="${skip# }"
+  [ -z "${skip}" ] || sed -i "/^\[options\]$/a NoExtract   = ${skip}" "${out}"
+}
+
+# The base tarball already holds the firmware NoExtract would have left out.
+strip_firmware() {
+  local root="$1" d n=0
+  for d in ${STEAMLING_FIRMWARE_SKIP}; do
+    [ -d "${root}/usr/lib/firmware/qcom/${d}" ] || continue
+    find "${root}/usr/lib/firmware/qcom/${d}" -mindepth 1 -delete; n=$((n + 1))
+  done
+  [ "${n}" -eq 0 ] || log "left out the firmware of ${n} Qualcomm platforms no board uses"
 }
 
 strip_docs() {
@@ -384,6 +401,7 @@ main() {
   STEAMLING_OUR_PACKAGES="${ours}" "${STEAMLING_ROOT}/scripts/check-sonames.sh" "${ROOTFS_DIR}" \
     || die "a package in the image needs a library version the image doesn't have (listed above)"
   strip_docs "${ROOTFS_DIR}"
+  strip_firmware "${ROOTFS_DIR}"
 
   # A live build has no frozen base to lock to, so mark it rolling (the flag `steamling-base
   # rolling` sets). Without it steamling-lock-migrate moves the device onto the pinned base at its
