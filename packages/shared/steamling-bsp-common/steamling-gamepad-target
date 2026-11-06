@@ -66,15 +66,33 @@ done
 [ "${1:-}" = --apply ] && load_profile
 [ -n "${KIND}" ] || exit 0
 
+targets_of() {
+  busctl --system get-property "${SERVICE}" "$1" "${IFACE}" TargetDevices 2>/dev/null \
+    | grep -o '"[^"]*"' | tr -d '"'
+}
+
 for path in $(composites); do
-  targets="$(busctl --system get-property "${SERVICE}" "${path}" "${IFACE}" TargetDevices 2>/dev/null \
-             | grep -o '"[^"]*"' | tr -d '"')"
+  # InputPlumber creates a composite's targets one by one after the composite itself, so
+  # right after a start the list can be empty or missing the keyboard. Wait for the first
+  # one, and always keep the keyboard (every Steamling controller config has one), or a
+  # replay that lands mid-creation drops it and the volume rocker goes dead.
+  j=0
+  targets="$(targets_of "${path}")"
+  while [ -z "${targets}" ] && [ "${j}" -lt 30 ]; do
+    j=$((j + 1))
+    sleep 0.1
+    targets="$(targets_of "${path}")"
+  done
   have_pad=0
-  keep=""
+  keep="keyboard"
   for t in ${targets}; do
     k="$(kind_of "${t}")"
     [ -n "${k}" ] || continue
-    if is_pad_kind "${k}"; then have_pad=1; else keep="${keep} ${k}"; fi
+    if is_pad_kind "${k}"; then
+      have_pad=1
+    else
+      case " ${keep} " in *" ${k} "*) ;; *) keep="${keep} ${k}" ;; esac
+    fi
   done
   [ "${have_pad}" = 1 ] || continue
 
