@@ -156,17 +156,6 @@ def cmd_info(_args):
 
 # --- boot --------------------------------------------------------------------------------------
 
-def first_monotonic(field_match):
-    # The first entry of this boot that matches, in seconds since the kernel started.
-    out = run(["journalctl", "-b", "-o", "json", "--no-pager", field_match])
-    for line in out.splitlines():
-        try:
-            return int(json.loads(line)["__MONOTONIC_TIMESTAMP"]) / 1e6
-        except (ValueError, KeyError):
-            continue
-    return None
-
-
 def cmd_boot(_args):
     lines = info_lines()
     analyze = run(["systemd-analyze"])
@@ -175,22 +164,24 @@ def cmd_boot(_args):
             lines.append(f"systemd: {part.replace('Startup finished in ', '')}")
         elif "reached after" in part:
             lines.append(f"systemd target: {part.strip()}")
-    # Seconds since the kernel started, as the journal counts them.
-    # Process names are cut at 15 characters, so gamescope can show as gamescope-wl.
-    for label, matches in (("gamescope started", ("_COMM=gamescope", "_COMM=gamescope-wl")),
-                           ("steam started", ("_COMM=steam",)),
-                           ("es-de started", ("_COMM=es-de",))):
-        found = [t for t in (first_monotonic(m) for m in matches) if t is not None]
-        t = min(found) if found else None
-        if t is not None:
-            lines.append(f"{label} (s): {fmt(t)}")
-    # Game mode's own phases, as steamling-steam logs them: what the black screen is spent on.
-    for entry in run(["journalctl", "-b", "-t", "steamling-steam", "-o", "cat", "--no-pager"]).splitlines():
-        if entry.startswith("+") and "s: " in entry:
-            when, what = entry[1:].split("s: ", 1)
-            lines.append(f"game mode: {what} (s): {when}")
-    if not any(line.startswith("gamescope started") for line in lines):
-        lines.append("note: no gamescope in this boot's journal (desktop mode, or run with sudo)")
+    # Game mode's own phases, as steamling-steam and its splash log them (the splash marks when
+    # Steam's window appears): seconds since the kernel started (the
+    # journal's own clock) and since game mode's launcher began. gamescope and Steam log to files
+    # of their own, not the journal, so these marks are what shows where the black screen goes.
+    marks = 0
+    for raw in run(["journalctl", "-b", "-t", "steamling-steam", "-t", "steamling-steam-splash", "-o", "json", "--no-pager"]).splitlines():
+        try:
+            entry = json.loads(raw)
+            msg, mono = entry["MESSAGE"], int(entry["__MONOTONIC_TIMESTAMP"]) / 1e6
+        except (ValueError, KeyError, TypeError):
+            continue
+        if isinstance(msg, str) and msg.startswith("+") and "s: " in msg:
+            when, what = msg[1:].split("s: ", 1)
+            lines.append(f"game mode: {what} (s after boot): {fmt(mono, 2)}")
+            lines.append(f"game mode: {what} (s after launch): {when}")
+            marks += 1
+    if not marks:
+        lines.append("note: no game mode timings in this boot's journal (desktop mode?)")
     save("boot", lines)
 
 
