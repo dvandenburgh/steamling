@@ -22,7 +22,9 @@ run_core() {
 }
 
 run_emu() {  # $1 = emulator name; remaining args = emulator flags (rom appended by caller)
-  local app; app="$(emu_path "$1")" || emu_missing "$1"; shift
+  local app; app="$(emu_path "$1")" || emu_missing "$1"
+  case "$1" in eden|ryujinx) switch_console_mode "$1" ;; esac
+  shift
   case "${app}" in
     *.AppImage|*.appimage)
       # emu-resolve.sh already dropped Steam's LD_PRELOAD and LD_LIBRARY_PATH; an AppImage also

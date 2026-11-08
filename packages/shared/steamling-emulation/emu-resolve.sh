@@ -63,3 +63,80 @@ emu_missing() {  # $1 name: the user-facing "not installed" exit
   echo "steamling: $1 is not installed. Drop its AppImage into ${EMU_DROP}/$1/ (see ~/Emulation/README.txt)." >&2
   exit 1
 }
+
+# The handheld's own panel is DSI (eDP on a few boards); any other connected output is a TV or
+# monitor, such as the Retroid dock's.
+on_external_display() {
+  local s c
+  for s in /sys/class/drm/card*-*/status; do
+    [ -r "${s}" ] || continue
+    c="${s%/status}"; c="${c##*/}"
+    case "${c}" in *-DSI-*|*-eDP-*|*-Writeback-*) continue ;; esac
+    [ "$(cat "${s}" 2>/dev/null)" = connected ] && return 0
+  done
+  return 1
+}
+
+# Switch emulators start in handheld mode on the built-in screen and docked on a TV, as a real
+# Switch does. Docked mode renders the TV resolution with the games' heavier TV-mode effects,
+# which on the handheld's own screen mostly costs battery. ~/.config/steamling/switch-mode
+# holding "handheld" or "docked" pins one instead. $1 = eden or ryujinx; writes the emulator's
+# config just before it starts, so a mode picked in the emulator's own menu lasts one session.
+switch_console_mode() {
+  local m="" docked=false
+  IFS= read -r m 2>/dev/null < "${HOME}/.config/steamling/switch-mode"
+  case "${m}" in
+    docked)   docked=true ;;
+    handheld) docked=false ;;
+    *)        on_external_display && docked=true ;;
+  esac
+  command -v python3 >/dev/null 2>&1 || return 0
+  case "$1" in
+    eden)    python3 -I - "${HOME}/.config/eden/qt-config.ini" "${docked}" <<'PY' ;;
+import os, sys
+path, docked = sys.argv[1], sys.argv[2] == "true"
+try:
+    with open(path) as f:
+        lines = f.read().split("\n")
+except OSError:
+    lines = []
+keys = ("use_docked_mode=", "use_docked_mode\\default=")
+new = ["use_docked_mode\\default=false", f"use_docked_mode={1 if docked else 0}"]
+out, placed = [], False
+for line in lines:
+    if line.strip() == "[System]" and not placed:
+        out.append(line)
+        out.extend(new)
+        placed = True
+        continue
+    if placed and line.startswith(keys):
+        continue
+    out.append(line)
+if not placed:
+    if out and out[-1] != "":
+        out.append("")
+    out += ["[System]"] + new + [""]
+os.makedirs(os.path.dirname(path), exist_ok=True)
+tmp = path + ".steamling"
+with open(tmp, "w") as f:
+    f.write("\n".join(out))
+os.replace(tmp, path)
+PY
+    ryujinx) python3 -I - "${HOME}/.config/Ryujinx/Config.json" "${docked}" <<'PY' ;;
+import os, re, sys
+path, docked = sys.argv[1], sys.argv[2]
+try:
+    with open(path) as f:
+        text = f.read()
+except OSError:
+    sys.exit(0)  # first start: Ryujinx writes its own config, docked, and the next launch fixes it
+new, n = re.subn(r'("docked_mode"\s*:\s*)(true|false)', r"\g<1>" + docked, text, count=1)
+if n and new != text:
+    tmp = path + ".steamling"
+    with open(tmp, "w") as f:
+        f.write(new)
+    os.replace(tmp, path)
+PY
+  esac
+  return 0
+}

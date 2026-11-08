@@ -198,4 +198,16 @@ version, it is moved into `~/Emulation/emulators/eden/` for you and keeps workin
   resolution tuned for the panel. Eden also builds shaders in the background, so a new effect
   doesn't freeze the game while it compiles. You supply the emulator, your keys and firmware
   (see above) and your games.
+
+  Like a real Switch, games run in **handheld mode** on the built-in screen and in **docked
+  mode** when a TV or monitor is connected (the Retroid dock, for example). Handheld mode renders
+  less, so it goes easier on the battery. The mode is set each time a game starts, so a change
+  in the emulator's own menu only lasts until you quit. To always use one mode, put the word
+  `handheld` or `docked` in `~/.config/steamling/switch-mode`, for example:
+
+  ```bash
+  mkdir -p ~/.config/steamling && echo docked > ~/.config/steamling/switch-mode
+  ```
+
+  Delete that file to go back to following the screen.
 - **ES-DE**: scans `~/Emulation/ROMs` and already knows where every emulator is installed.
