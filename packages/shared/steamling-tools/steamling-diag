@@ -24,10 +24,10 @@ OUT=/var/log/steamling-diag.txt
   nmcli -f NAME,TYPE,DEVICE connection show 2>/dev/null
   printf '\n## wifi: iwd devices\n'; iwctl device list 2>/dev/null || echo "(iwctl n/a)"
   printf '\n## wifi: connection profile baked?\n'; ls -l /etc/NetworkManager/system-connections/ 2>/dev/null || echo "(none)"
-  printf '\n## wifi: profile contents (psk redacted) — confirms SSID actually baked in\n'
+  printf '\n## wifi: profile contents (secrets redacted) — confirms SSID actually baked in\n'
   for f in /etc/NetworkManager/system-connections/*.nmconnection; do
     [ -e "$f" ] || { echo "(NO .nmconnection files — SD_WIFI_SSID didn't reach the build)"; break; }
-    echo "--- $f ---"; sed 's/^psk=.*/psk=<redacted>/' "$f" 2>/dev/null
+    echo "--- $f ---"; sed -E 's/^([^=]*(psk|password|wep-key|secret|pin)[^=]*)=.*/\1=<redacted>/' "$f" 2>/dev/null
   done
   printf '\n## wifi: NM conf.d (backend should be iwd; wlan0 NOT unmanaged)\n'
   cat /usr/lib/NetworkManager/conf.d/*.conf /etc/NetworkManager/conf.d/*.conf 2>/dev/null || echo "(none)"
