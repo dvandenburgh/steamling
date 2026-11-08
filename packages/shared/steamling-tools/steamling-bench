@@ -196,8 +196,11 @@ def battery():
 
 def battery_state(bat):
     s = {"capacity": float(read(f"{bat}/capacity", "nan")), "status": read(f"{bat}/status", "?")}
+    # energy_now where the firmware has it; SM8550-class qcom_battmgr reports only
+    # charge_counter (uAh), SM8350-class charge_now; either times the voltage is the energy.
     energy = read(f"{bat}/energy_now")
-    charge, volt = read(f"{bat}/charge_now"), read(f"{bat}/voltage_now")
+    charge = read(f"{bat}/charge_now") or read(f"{bat}/charge_counter")
+    volt = read(f"{bat}/voltage_now")
     if energy:
         s["energy_uwh"] = float(energy)
     elif charge and volt:
