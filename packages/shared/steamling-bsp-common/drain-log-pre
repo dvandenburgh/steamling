@@ -1,7 +1,13 @@
 #!/bin/sh
-# Realtime, not monotonic: the monotonic clock stops during s2idle.
+# Realtime, not monotonic: the monotonic clock stops during s2idle. The battery is whichever
+# supply says it is one (qcom_battmgr calls it qcom-battmgr-bat, not battery); its charge comes
+# from charge_counter (SM8550-class firmware) or charge_now (SM8350-class), both in uAh.
+bat=""
+for d in /sys/class/power_supply/*; do
+  [ "$(cat "$d/type" 2>/dev/null)" = Battery ] && { bat="$d"; break; }
+done
+c=""
+[ -n "$bat" ] && c=$(cat "$bat/charge_counter" 2>/dev/null || cat "$bat/charge_now" 2>/dev/null)
 mkdir -p /run/steamling
-printf '%s %s\n' "$(date +%s)" \
-  "$(cat /sys/class/power_supply/battery/charge_counter 2>/dev/null)" \
-  > /run/steamling/drain-log
+printf '%s %s %s\n' "$(date +%s)" "${c:--}" "${bat:--}" > /run/steamling/drain-log
 exit 0
