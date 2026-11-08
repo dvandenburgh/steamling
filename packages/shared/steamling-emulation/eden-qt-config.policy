@@ -28,8 +28,3 @@ was Controls/player_0_rstick "engine:analog_from_button,up:engine$0keyboard$1cod
 # so the seed's background shader building reaches installs from before it was added.
 was Renderer/use_asynchronous_shaders false
 was Renderer/use_asynchronous_shaders\default true
-# Reactive flushing off, as Eden's Android build ships it: on a phone-class CPU the page faults it
-# takes on GPU-tracked memory cost the main emulation thread time and battery. Eden's desktop
-# default (on) left unchanged means nobody chose it.
-was Renderer/use_reactive_flushing true
-was Renderer/use_reactive_flushing\default true
