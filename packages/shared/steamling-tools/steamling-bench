@@ -221,7 +221,9 @@ def clocks():
 
 def cmd_sleep(args):
     need_root("sleep")
-    minutes = float(args[0]) if args else 30
+    # --manual can come before or after the minutes, or on its own.
+    numbers = [a for a in args if a.replace(".", "", 1).isdigit()]
+    minutes = float(numbers[0]) if numbers else 30
     manual = "--manual" in args
     bat = battery()
     if not bat:
