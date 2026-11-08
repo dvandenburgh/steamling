@@ -2,13 +2,20 @@
 # steamling-steam-channel <Steam dir> - pin the client channel in package/beta before Steam starts.
 # The ARM64 Big Picture client needs a steamdeck_ channel, and anything that flips the channel
 # leaves Steam reading "installed version 0", stuck on "Installing update" with steamwebhelper
-# crash-looping. So the pin is whichever steamdeck_ channel this install already has a client
-# for: an install from before the move to stable stays on the beta and is never made to re-install
-# mid-launch. A fresh install, or one with neither, gets stable, as steamling-steam-install does.
+# crash-looping. So the pin never moves an install off a channel it has a client for:
+#  - a steamdeck_ channel already set and installed stays (that includes one picked in Steam's own
+#    settings, which leaves the other channel's manifest behind);
+#  - otherwise stable if its client is installed, else the beta if that's the one installed (an
+#    install from before the move to stable);
+#  - a fresh install, or one with neither, gets stable, as steamling-steam-install does.
 steam="${1:?usage: steamling-steam-channel <Steam dir>}"
+installed() { [ -e "${steam}/package/steam_client_$1_linuxarm64.installed" ]; }
+current="$(cat "${steam}/package/beta" 2>/dev/null)"
+case "${current}" in
+  steamdeck_*) installed "${current}" && exit 0 ;;
+esac
 channel=steamdeck_stable
-if [ ! -e "${steam}/package/steam_client_steamdeck_stable_linuxarm64.installed" ] \
-   && [ -e "${steam}/package/steam_client_steamdeck_publicbeta_linuxarm64.installed" ]; then
+if ! installed steamdeck_stable && installed steamdeck_publicbeta; then
   channel=steamdeck_publicbeta
 fi
 mkdir -p "${steam}/package"
