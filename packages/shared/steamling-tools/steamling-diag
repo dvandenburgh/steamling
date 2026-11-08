@@ -76,7 +76,8 @@ OUT=/var/log/steamling-diag.txt
   # Not steamapps: the installed games are tens of GB of files to walk on every boot, and the seed
   # extract this answers only fills the client tree.
   du -sh --exclude=steamapps /home/deck/.local/share/Steam 2>/dev/null || echo "(no ~deck Steam dir yet)"
-  ls -1 /usr/share/steamling-steam/steam-seed.tar.zst 2>/dev/null && echo "seed present (offline first-boot)" || echo "(no seed -> first boot downloads)"
+  # The image build unpacks the seeded client straight into ~deck, so its manifests are the sign.
+  ls -1 /home/deck/.local/share/Steam/package/*.installed 2>/dev/null && echo "client installed (seeded, or downloaded on an earlier boot)" || echo "(no client manifest yet -> first launch downloads it)"
   printf '\n## graphical session: which session is selected\n'
   cat /home/deck/.local/state/steamling-session 2>/dev/null || echo "(none -> default gamescope)"
   printf '\n## failed systemd units\n'; systemctl --failed --no-legend 2>/dev/null || true
