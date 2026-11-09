@@ -32,3 +32,8 @@
 # rebuild: preempt=lazy (or full, voluntary, none) on the kernel command line, or at runtime
 # `echo lazy > /sys/kernel/debug/sched/preempt`. Full stays the default.
 --enable PREEMPT_DYNAMIC
+
+# One memory node on every one of these SoCs. NUMA support only adds per-node lookups to page
+# allocation and the scheduler, and NUMA balancing's page scanning, for a topology that never
+# exists here. The ACPI/HMAT, OF_NUMA and futex memory policy pieces go with it.
+--disable NUMA
