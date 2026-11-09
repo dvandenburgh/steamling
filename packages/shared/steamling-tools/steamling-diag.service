@@ -4,10 +4,12 @@ After=multi-user.target
 Wants=multi-user.target
 
 [Service]
-Type=oneshot
+# Type=exec with the wait inside the service: as a oneshot (and with the wait in ExecStartPre) the
+# start job lasted the whole half minute, so systemd held "boot finished" back that long and
+# systemd-analyze, and steamling-bench boot with it, had no startup time to give.
+Type=exec
 # delay so device probing AND a wifi association attempt have time to settle
-ExecStartPre=/bin/sh -c 'sleep 30'
-ExecStart=/usr/bin/steamling-diag
+ExecStart=/bin/sh -c 'sleep 30; exec /usr/bin/steamling-diag'
 # A report nobody waits for: it runs about when Steam or a game is starting, so it gets only the CPU
 # and disk time nothing else wants.
 Nice=19
