@@ -37,3 +37,9 @@
 # allocation and the scheduler, and NUMA balancing's page scanning, for a topology that never
 # exists here. The ACPI/HMAT, OF_NUMA and futex memory policy pieces go with it.
 --disable NUMA
+
+# Zeroing every kernel stack frame on entry is hardening against leaks of uninitialized stack
+# data, paid on every syscall and interrupt. FEX and Wine make syscalls by the hundred thousand
+# a second, so a handheld that runs nothing untrusted in the kernel's way takes the speed.
+--disable INIT_STACK_ALL_ZERO
+--enable INIT_STACK_NONE
