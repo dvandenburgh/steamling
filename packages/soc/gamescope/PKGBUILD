@@ -6,7 +6,7 @@
 pkgname=gamescope
 epoch=1
 pkgver=3.17.0.rocknix.20261031.309eee7
-pkgrel=1
+pkgrel=2
 _commit=309eee74f967d458cf71836619132010f88ee796
 install=gamescope.install
 pkgdesc="SteamOS session compositing WM — patched (for msm handhelds)"
@@ -19,7 +19,7 @@ depends=('wayland' 'libdrm' 'libinput' 'libxkbcommon' 'pixman' 'systemd-libs' 'l
          'luajit' 'libdecor' 'libx11' 'libxext' 'libxfixes' 'libxdamage' 'libxcomposite'
          'libxrender' 'libxxf86vm' 'libxtst' 'libxi' 'libxcursor' 'libxmu' 'libxres'
          'libxcb' 'xcb-util-wm' 'seatd' 'hwdata' 'sdl2' 'pipewire' 'vulkan-icd-loader'
-         'glslang' 'xorg-xwayland' 'libdisplay-info')
+         'glslang' 'xorg-xwayland' 'libdisplay-info' 'libei')
 makedepends=('git' 'meson' 'ninja' 'cmake' 'pkgconf' 'glslang' 'vulkan-headers'
              'wayland-protocols' 'python' 'libxkbcommon' 'wayland'
              # wlroots subproject build-deps (else meson tries to build them itself):
@@ -82,7 +82,7 @@ build() {
     -Denable_openvr_support=false \
     -Davif_screenshots=disabled \
     -Dbenchmark=disabled \
-    -Dinput_emulation=disabled \
+    -Dinput_emulation=enabled \
     -Drt_cap=enabled \
     -Denable_tests=false \
     -Dsdl2_backend=enabled
