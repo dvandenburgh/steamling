@@ -121,3 +121,18 @@ echo lazy | sudo tee /sys/kernel/debug/sched/preempt
 Then run the load and frames tests, put it back with `echo full | sudo tee
 /sys/kernel/debug/sched/preempt`, and run them again. `steamling-bench info` shows the model in
 use, so every result records which one it was measured with.
+
+## Trying 64 KB pages
+
+Steamling has the kernel back memory with 64 KB blocks wherever it can, instead of only 4 KB
+pages. The processor then needs far fewer lookups to find its way around a big game's memory,
+which tends to help emulators and Windows games most. You can check whether it helps on your
+handheld. To turn it off until the next reboot:
+
+```bash
+echo never | sudo tee /sys/kernel/mm/transparent_hugepage/hugepages-64kB/enabled
+```
+
+Run the load and frames tests, put it back with `echo always | sudo tee
+/sys/kernel/mm/transparent_hugepage/hugepages-64kB/enabled`, and run them again. Memory a game
+already has keeps the size it got, so restart the game after each switch.

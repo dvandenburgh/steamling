@@ -3,7 +3,7 @@
 # live in devices/<name>/packages/steamling-bsp-<name>, which depends on this package.
 pkgname=steamling-bsp-common
 pkgver=0.1.1
-pkgrel=1.3
+pkgrel=1.4
 pkgdesc="steamling shared board support: sleep.d dispatcher, suspend hooks, power-key policy, session udev rules, wheel sudo, fan/scheduler daemons, ABL updater, power profiles daemon, realtime priority ladder, zram swap and memory sysctls, deck session limits, kernel /flash deploy, volume rocker daemon, journal cap, iwd Wi-Fi backend, panel refresh calibration, controller MCU mode quirks"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -36,7 +36,7 @@ source=('steamling-sleep' 'sdam-debug-pre' 'sdam-debug-post'
         '60-steamling-sdl-xb360.conf' 'steamling-sdl-xb360.sh'
         'steamling-rt-ladder' 'steamling-rt-ladder.service' 'rtkit-limits.conf'
         '70-steamling-cache.conf' '10-steamling-stop-timeout.conf' 'steamling-coredump.conf'
-        '60-steamling-gaming.conf' 'zram-generator.conf' 'steamling-mglru.conf'
+        '60-steamling-gaming.conf' 'zram-generator.conf' 'steamling-mglru.conf' 'steamling-thp.conf'
         'steamling-zram-recompress' 'steamling-zram-recompress.service' 'steamling-zram-recompress.timer'
         '60-steamling-deck.conf'
         'steamling-cmdline-sync' '91-steamling-cmdline.hook' 'cores.sh'
@@ -48,7 +48,7 @@ source=('steamling-sleep' 'sdam-debug-pre' 'sdam-debug-post'
         '99-steamling-usb-autosuspend.rules' '71-steamling-bottom-touch.rules'
         'ayn.icna3512.oled.lua' 'ayn.icna3520.oled.lua' 'retroid.ch13726a.oled.lua'
         'retroid.il97680a.oled.lua' 'retroid.rp6.oled.lua')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   # gamescope panel profiles, one per panel, whichever family carries it: each matches on
@@ -154,6 +154,7 @@ package() {
   install -Dm644 "${srcdir}/60-steamling-gaming.conf" "${pkgdir}/usr/lib/sysctl.d/60-steamling-gaming.conf"
   install -Dm644 "${srcdir}/zram-generator.conf" "${pkgdir}/usr/lib/systemd/zram-generator.conf"
   install -Dm644 "${srcdir}/steamling-mglru.conf" "${pkgdir}/usr/lib/tmpfiles.d/steamling-mglru.conf"
+  install -Dm644 "${srcdir}/steamling-thp.conf" "${pkgdir}/usr/lib/tmpfiles.d/steamling-thp.conf"
   install -Dm755 "${srcdir}/steamling-zram-recompress" "${pkgdir}/usr/lib/steamling/steamling-zram-recompress"
   install -Dm644 "${srcdir}/steamling-zram-recompress.service" \
     "${pkgdir}/usr/lib/systemd/system/steamling-zram-recompress.service"
