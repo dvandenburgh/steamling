@@ -50,3 +50,8 @@
 # the LSM list, so it was built and unused.
 --disable AUDIT
 --disable SECURITY_SELINUX
+
+# Pressure stall accounting off unless booted with psi=1. It does bookkeeping on every task
+# switch, sleep and wake, and nothing here reads /proc/pressure. The shared tree already
+# builds this way; this brings the SM8550 tree in line.
+--enable PSI_DEFAULT_DISABLED
