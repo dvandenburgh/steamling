@@ -1,0 +1,48 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] soc: qcom: apr: set the GPR callback before probing the driver
+
+apr_device_probe() only stores the driver's gpr_callback in the service
+once the driver's probe has returned, and gpr_do_rx_callback() silently
+drops a packet for a service whose callback is not set. A response to
+anything a driver sends from its own probe can therefore never arrive.
+
+q6apm does exactly that: apm_probe() sends APM_CMD_GET_SPF_STATE and
+waits 5 seconds for the response. Every boot of an AudioReach device
+logs
+
+  qcom-apm gprsvc:service:2:1: CMD timeout for [1001021] opcode
+
+5 seconds into that probe, and the sound card is registered 5 seconds
+late. On a Retroid Pocket 6 the ADSP is up at 3.3 s and the card
+appeared at 10 s. Asking again every 250 ms for those 5 seconds never
+got an answer either, while the same query from q6prm's probe, once
+q6apm's had returned, was answered at once.
+
+Set the callback before calling probe, and clear it again if probe
+fails.
+
+Signed-off-by: David J. Vandenburgh <david@vandenburgh.co>
+---
+diff --git a/drivers/soc/qcom/apr.c b/drivers/soc/qcom/apr.c
+index ea7f839..f0cb1ed 100644
+--- a/drivers/soc/qcom/apr.c
++++ b/drivers/soc/qcom/apr.c
+@@ -367,9 +367,16 @@ static int apr_device_probe(struct device *dev)
+ 	struct apr_driver *adrv = to_apr_driver(dev->driver);
+ 	int ret;
+ 
++	/*
++	 * The callback has to be in place before probe runs: a driver that
++	 * sends a command from its probe and waits for the response (q6apm
++	 * asks for the APM state) would otherwise never see it, because
++	 * gpr_do_rx_callback() drops packets for a service with no callback.
++	 */
++	adev->svc.callback = adrv->gpr_callback;
+ 	ret = adrv->probe(adev);
+-	if (!ret)
+-		adev->svc.callback = adrv->gpr_callback;
++	if (ret)
++		adev->svc.callback = NULL;
+ 
+ 	return ret;
+ }
