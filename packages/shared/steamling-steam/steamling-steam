@@ -154,6 +154,10 @@ touch "${GS_CONFIG}/modes.cfg" "${GS_CONFIG}/edid.bin" 2>/dev/null || true
 GS_ENV+=(GAMESCOPE_MODE_SAVE_FILE="${GS_CONFIG}/modes.cfg"
          GAMESCOPE_PATCHED_EDID_FILE="${GS_CONFIG}/edid.bin")
 
+# Remote Play's NV12 frames are tagged BT.601: Wayland has no way to say which colour space an
+# NV12 buffer is in, so gamescope and the stream agree on it through this variable.
+GS_ENV+=(GAMESCOPE_NV12_COLORSPACE=k_EStreamColorspace_BT601)
+
 # Do NOT pin the client itself: scx_lavd places the bursty threads itself and needs the littles free
 # for batch work. Game launches get the big cores through steam-launch-wrapper instead.
 . /usr/lib/steamling/steamling-steam-env
