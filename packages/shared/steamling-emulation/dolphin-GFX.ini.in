@@ -4,3 +4,8 @@
 [Settings]
 InternalResolution = 2
 ShaderCompilationMode = 3
+# 4x anisotropic filtering (0 = 1x, 1 = 2x, 2 = 4x, 3 = 8x, 4 = 16x). At 2x internal resolution,
+# floors and walls seen at an angle are where GameCube and Wii textures still smear; 4x cleans
+# that up for next to no GPU time on these Adrenos.
+[Enhancements]
+MaxAnisotropy = 2
