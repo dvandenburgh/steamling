@@ -1,0 +1,130 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] drm/panel: vtdr6130-rp6: offer the 60Hz mode behind a switch,
+ and pick the panel's rate by refresh
+
+1021 took the 60Hz mode away because, with both modes offered, the panel
+at times came up programmed for one rate while the DPU drove the other.
+That also took away any way to find out why, or to run a 60 fps game at
+60Hz.
+
+Two changes, neither of which alters the default:
+
+- A sixty_hz module parameter (off, writable at runtime) offers the 60Hz
+  mode again. Writing 1 and then "detect" to the connector's status file
+  re-reads the mode list, so the mode can be tried from a running system
+  and is gone again at the next boot.
+
+- The init sequence chooses between its 120Hz and 60Hz programming by
+  the refresh rate of the mode being set rather than by an exact timing
+  and clock match. A mode a compositor generated itself matched nothing
+  and was always programmed as 120Hz, which is one way to end up with the
+  mismatch 1021 describes.
+
+Signed-off-by: David J. Vandenburgh <david@vandenburgh.co>
+---
+diff --git a/drivers/gpu/drm/panel/panel-visionox-vtdr6130-cog.c b/drivers/gpu/drm/panel/panel-visionox-vtdr6130-cog.c
+index 448359e..bb76934 100644
+--- a/drivers/gpu/drm/panel/panel-visionox-vtdr6130-cog.c
++++ b/drivers/gpu/drm/panel/panel-visionox-vtdr6130-cog.c
+@@ -8,7 +8,9 @@
+ #include <linux/backlight.h>
+ #include <linux/delay.h>
+ #include <linux/gpio/consumer.h>
++#include <linux/math.h>
+ #include <linux/module.h>
++#include <linux/moduleparam.h>
+ #include <linux/mutex.h>
+ #include <linux/of.h>
+ #include <linux/of_graph.h>
+@@ -76,26 +78,51 @@ static inline struct panel_info *to_panel_info(struct drm_panel *panel)
+ 	return container_of(panel, struct panel_info, panel);
+ }
+ 
++/*
++ * The panel has a 60Hz mode next to its 120Hz one, but with both offered a
++ * Retroid Pocket 6 at times came up with the panel programmed for one rate
++ * and the DPU driving the other: TE never lined up and every commit timed
++ * out. So only 120Hz is offered unless this is set, which is how the 60Hz
++ * mode is tried out: write 1, then "detect" to the connector's status file
++ * to have the mode list read again.
++ */
++static bool sixty_hz;
++module_param(sixty_hz, bool, 0644);
++MODULE_PARM_DESC(sixty_hz, "Offer the 60Hz mode as well as 120Hz");
++
++static unsigned int vtdr6130_num_modes(struct panel_info *pinfo)
++{
++	return sixty_hz ? pinfo->desc->num_modes : 1;
++}
++
+ static int vtdr6130_get_current_mode(struct panel_info *pinfo)
+ {
+ 	struct drm_connector *connector = pinfo->connector;
+ 	struct drm_crtc_state *crtc_state;
+-	int i;
++	int i, best = 0, vrefresh;
+ 
+ 	/* Return the default (first) mode if no info available yet */
+ 	if (!connector->state || !connector->state->crtc)
+ 		return 0;
+ 
+ 	crtc_state = connector->state->crtc->state;
++	if (!crtc_state || !crtc_state->enable)
++		return 0;
+ 
+-	for (i = 0; i < pinfo->desc->num_modes; i++) {
+-		if (drm_mode_match(&crtc_state->mode,
+-				   &pinfo->desc->modes[i],
+-				   DRM_MODE_MATCH_TIMINGS | DRM_MODE_MATCH_CLOCK))
+-			return i;
++	/*
++	 * By refresh rate, not by exact timings: a compositor may set a mode it
++	 * generated itself, and one that matched nothing used to be programmed
++	 * as 120Hz whatever its rate. The panel only tells 120Hz from 60Hz, so
++	 * take whichever of ours is nearer.
++	 */
++	vrefresh = drm_mode_vrefresh(&crtc_state->mode);
++	for (i = 1; i < pinfo->desc->num_modes; i++) {
++		if (abs(drm_mode_vrefresh(&pinfo->desc->modes[i]) - vrefresh) <
++		    abs(drm_mode_vrefresh(&pinfo->desc->modes[best]) - vrefresh))
++			best = i;
+ 	}
+ 
+-	return 0;
++	return best;
+ }
+ 
+ static void vtdr6130_rp6_set_frame_len(struct mipi_dsi_multi_context *dsi_ctx,
+@@ -255,12 +282,8 @@ static const struct drm_display_mode vtdr6130_rp6_modes[] = {
+ 
+ static struct panel_desc vtdr6130_rp6_desc = {
+ 	.modes = vtdr6130_rp6_modes,
+-	/*
+-	 * 120Hz only: init_sequence guesses the active mode at prepare() time
+-	 * and races when more than one mode is exposed (60Hz programming vs
+-	 * 120Hz DPU timings kills TE -> every commit times out). See 1021.
+-	 */
+-	.num_modes = 1,
++	/* Only the first is offered unless sixty_hz is set. */
++	.num_modes = ARRAY_SIZE(vtdr6130_rp6_modes),
+ 	.width_mm = 120,
+ 	.height_mm = 68,
+ 	.bpc = 8,
+@@ -371,7 +394,7 @@ static int vtdr6130_get_modes(struct drm_panel *panel,
+ 	struct panel_info *pinfo = to_panel_info(panel);
+ 	int i;
+ 
+-	for (i = 0; i < pinfo->desc->num_modes; i++) {
++	for (i = 0; i < vtdr6130_num_modes(pinfo); i++) {
+ 		const struct drm_display_mode *m = &pinfo->desc->modes[i];
+ 		struct drm_display_mode *mode;
+ 
+@@ -395,7 +418,7 @@ static int vtdr6130_get_modes(struct drm_panel *panel,
+ 	connector->display_info.bpc = pinfo->desc->bpc;
+ 	pinfo->connector = connector;
+ 
+-	return pinfo->desc->num_modes;
++	return vtdr6130_num_modes(pinfo);
+ }
+ 
+ static enum drm_panel_orientation vtdr6130_get_orientation(struct drm_panel *panel)
