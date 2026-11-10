@@ -1,6 +1,6 @@
 pkgname=steamling-session
 pkgver=0.1.1
-pkgrel=1
+pkgrel=1.1
 pkgdesc="steamling tty1 session service + game/desktop session supervisor"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

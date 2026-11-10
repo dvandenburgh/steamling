@@ -102,12 +102,22 @@ release_display() {
 }
 
 fastfails=0
+first=1
 while true; do
   session="$(cat "${STATE}" 2>/dev/null || echo gamescope)"
   rm -f "${SWITCH}"
   blank
   # Before the clock starts: time spent waiting here is no evidence the session works.
-  release_display
+  # Not on the first pass with no compositor of ours alive, which is every boot: nothing can be
+  # holding the display then, and release_display would wait out the user manager's own startup
+  # jobs instead (PipeWire's sockets and the rest), about a second and a half of black screen
+  # measured on an RP6. A restart of this unit after a crash still finds kwin and waits.
+  if [ "${first}" = 1 ] && ! pgrep -u "$(id -u)" -x 'kwin_wayland|kwin_wayland_wr|gamescope-wl' >/dev/null 2>&1; then
+    :
+  else
+    release_display
+  fi
+  first=0
   start="$(date +%s)"
   case "${session}" in
     plasma|desktop) command -v steamling-desktop >/dev/null 2>&1 && run steamling-desktop
