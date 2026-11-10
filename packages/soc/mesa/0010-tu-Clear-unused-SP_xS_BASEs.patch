@@ -1,0 +1,76 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Rob Clark <rob.clark@oss.qualcomm.com>
+Date: Mon, 9 Nov 2026 08:22:58 -0800
+Subject: [PATCH] tu: Clear unused SP_xS_BASEs
+
+With the gen8 devcoredump+crashdec support, I traced mystery UCHE faults
+down to unused GS or tess stages.  Ie. the fault address would be
+the left over SP_GS_BASE or SP_HS_BASE from another deqp-vk process.
+
+It seems like we need to write _something_ (really _anything_) to the
+unused shader BASE regs to latch the SP_xS_CONFIG/CONST_CONFIG changes,
+otherwise the old values are not propagated thru SP and HLSQ, leading
+the hw to try fetching from the state BASE addrs.
+
+Signed-off-by: Rob Clark <rob.clark@oss.qualcomm.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46105>
+---
+ src/freedreno/vulkan/tu_clear_blit.cc |  5 ++++-
+ src/freedreno/vulkan/tu_shader.cc     | 22 ++++++++++++++++++++++
+ 2 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/src/freedreno/vulkan/tu_clear_blit.cc b/src/freedreno/vulkan/tu_clear_blit.cc
+index 1acf4557446..53c8e8c20e4 100644
+--- a/src/freedreno/vulkan/tu_clear_blit.cc
++++ b/src/freedreno/vulkan/tu_clear_blit.cc
+@@ -1217,10 +1217,13 @@ r3d_common(struct tu_cmd_buffer *cmd, struct tu_cs *cs, enum r3d_type type,
+          .cs_bindless = CHIP == A6XX ? 0x1f : 0xff,
+          .gfx_bindless = CHIP == A6XX ? 0x1f : 0xff,));
+ 
+-   with_crb (cs, 2 * 5 + 2 * 12) {
++   with_crb (cs, 2 * 5 + 2 * 12 + 2 * 3) {
+       tu6_emit_xs_config<CHIP>(crb, { .vs = vs, .fs = fs });
+       struct tu_pvtmem_config pvtmem = {};
+       tu6_emit_xs<CHIP>(crb, cs->device, MESA_SHADER_VERTEX, vs, &pvtmem, vs_iova);
++      tu6_emit_xs<CHIP>(crb, cs->device, MESA_SHADER_TESS_CTRL, NULL, &pvtmem, 0);
++      tu6_emit_xs<CHIP>(crb, cs->device, MESA_SHADER_TESS_EVAL, NULL, &pvtmem, 0);
++      tu6_emit_xs<CHIP>(crb, cs->device, MESA_SHADER_GEOMETRY, NULL, &pvtmem, 0);
+       tu6_emit_xs<CHIP>(crb, cs->device, MESA_SHADER_FRAGMENT, fs, &pvtmem, fs_iova);
+    }
+ 
+diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.cc
+index f9538255a67..a105e39048e 100644
+--- a/src/freedreno/vulkan/tu_shader.cc
++++ b/src/freedreno/vulkan/tu_shader.cc
+@@ -2171,6 +2171,28 @@ tu6_emit_xs(struct tu_crb &crb,
+ {
+    if (!xs) {
+       /* shader stage disabled */
++      if (CHIP >= A8XX) {
++         switch (stage) {
++         case MESA_SHADER_VERTEX:
++            crb.add(A6XX_SP_VS_BASE());
++            break;
++         case MESA_SHADER_TESS_CTRL:
++            crb.add(A6XX_SP_HS_BASE());
++            break;
++         case MESA_SHADER_TESS_EVAL:
++            crb.add(A6XX_SP_DS_BASE());
++            break;
++         case MESA_SHADER_GEOMETRY:
++            crb.add(A6XX_SP_GS_BASE());
++            break;
++         case MESA_SHADER_FRAGMENT:
++            crb.add(A6XX_SP_PS_BASE());
++            break;
++         case MESA_SHADER_COMPUTE:
++            crb.add(A6XX_SP_CS_BASE());
++            break;
++         }
++      }
+       return;
+    }
+ 
+-- 
+2.34.1
+
