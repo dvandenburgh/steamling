@@ -1,0 +1,57 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] power: supply: qcom_battmgr: work power_now out from current
+ and voltage on SM8350-class firmware
+
+On SM8350-class firmware the driver hands BATT_POWER_NOW to userspace as
+it comes. On the Retroid Pocket 6 (SM8550) that property is not the
+power: it read 55187189 with the handheld idle, while current_now and
+voltage_now read -360360 uA and 4246826 uV, which is 1.53 W, and it
+stayed between 53 and 55 million through ten minutes of a game.
+Anything that trusts power_now, UPower's energy rate and time remaining
+for one, is out by a factor of thirty or more.
+
+Current and voltage are correct on the same firmware, so compute
+power_now from them, as a magnitude in microwatts, and stop asking the
+firmware for it.
+
+Signed-off-by: David J. Vandenburgh <david@vandenburgh.co>
+---
+diff --git a/drivers/power/supply/qcom_battmgr.c b/drivers/power/supply/qcom_battmgr.c
+index 27c49e8..aa8beb4 100644
+--- a/drivers/power/supply/qcom_battmgr.c
++++ b/drivers/power/supply/qcom_battmgr.c
+@@ -15,6 +15,7 @@
+ #include <linux/soc/qcom/pdr.h>
+ #include <linux/soc/qcom/pmic_glink.h>
+ #include <linux/math.h>
++#include <linux/math64.h>
+ #include <linux/units.h>
+ 
+ #define BATTMGR_CHEMISTRY_LEN	4
+@@ -469,7 +470,25 @@ static int qcom_battmgr_bat_sm8350_update(struct qcom_battmgr *battmgr,
+ 	prop = sm8350_bat_prop_map[psp];
+ 
+ 	mutex_lock(&battmgr->lock);
+-	ret = qcom_battmgr_request_property(battmgr, BATTMGR_BAT_PROPERTY_GET, prop, 0);
++	if (psp == POWER_SUPPLY_PROP_POWER_NOW) {
++		/*
++		 * BATT_POWER_NOW is not the power on every firmware: the Retroid
++		 * Pocket 6 answers about 55 W whether it draws 1.5 W idle or
++		 * several watts in a game. Current and voltage are right
++		 * there, so work the power out from them.
++		 */
++		ret = qcom_battmgr_request_property(battmgr, BATTMGR_BAT_PROPERTY_GET,
++						    BATT_CURR_NOW, 0);
++		if (!ret)
++			ret = qcom_battmgr_request_property(battmgr, BATTMGR_BAT_PROPERTY_GET,
++							    BATT_VOLT_NOW, 0);
++		if (!ret)
++			battmgr->status.power_now =
++				div_u64((u64)abs(battmgr->status.current_now) *
++					battmgr->status.voltage_now, 1000000);
++	} else {
++		ret = qcom_battmgr_request_property(battmgr, BATTMGR_BAT_PROPERTY_GET, prop, 0);
++	}
+ 	mutex_unlock(&battmgr->lock);
+ 
+ 	return ret;
