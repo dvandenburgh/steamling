@@ -158,6 +158,11 @@ GS_ENV+=(GAMESCOPE_MODE_SAVE_FILE="${GS_CONFIG}/modes.cfg"
 # NV12 buffer is in, so gamescope and the stream agree on it through this variable.
 GS_ENV+=(GAMESCOPE_NV12_COLORSPACE=k_EStreamColorspace_BT601)
 
+# Mesa hands a GL game's calls to a second thread, as on a Steam Deck. GL emulators and RetroArch
+# spend much of one core in the driver; this moves that work off the thread running the game.
+# A game that misbehaves with it takes mesa_glthread=false in its launch options.
+GS_ENV+=(mesa_glthread=true)
+
 # Do NOT pin the client itself: scx_lavd places the bursty threads itself and needs the littles free
 # for batch work. Game launches get the big cores through steam-launch-wrapper instead.
 . /usr/lib/steamling/steamling-steam-env
