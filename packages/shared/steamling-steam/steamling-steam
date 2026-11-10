@@ -162,6 +162,16 @@ trap 'pkill -TERM -P "${PBD}" 2>/dev/null; kill "${PBD}" 2>/dev/null' EXIT
 # Log to a file, never the tty: tty1 is what shows between compositors on a session switch and
 # must stay blank. Do NOT exec gamescope either, since the session switch pkills it by name.
 GS_LOG="${HOME}/steamling-steam.log"
+# On a cold boot this script can get here while the user manager is still starting. gamescope
+# connects to PipeWire once, at startup (Steam's recording and Remote Play streams come from that
+# connection), and Steam needs the session bus, so wait for both sockets; they are already
+# there on a session switch. 5 s at most: a system without them still gets its game mode.
+_rt="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+for _ in $(seq 1 50); do
+  [ -S "${_rt}/pipewire-0" ] && [ -S "${_rt}/bus" ] && break
+  sleep 0.1
+done
+mark "user services ready"
 # gamescope paints black until a client presents; the splash covers that, then execs Steam.
 mark "starting gamescope"
 # gamepadui sizes its UI from the output's physical mm; the ~96 DPI default reads as a desktop
