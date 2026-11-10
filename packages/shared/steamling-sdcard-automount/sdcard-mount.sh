@@ -33,7 +33,8 @@ if [[ -e $MOUNT_LOCK && $(pgrep -F "$MOUNT_LOCK") ]]; then
     exit 1
 fi
 
-MOUNT_POINT=$(mount | grep -F "${DEVICE}" | awk '{ print $3 }')
+# findmnt, not a parse of `mount`: a label with a space in it splits there.
+MOUNT_POINT=$(findmnt -n -o TARGET --source "${DEVICE}" 2>/dev/null | head -n 1)
 
 urlencode()
 {
@@ -79,12 +80,13 @@ do_mount()
     ID_FS_LABEL=$(jq -r '.label | select(type == "string")' <<< "$dev_json")
     ID_FS_TYPE=$(jq -r '.fstype | select(type == "string")' <<< "$dev_json")
 
+    # The label names a folder under /run/media/deck and comes off the card, so one that would
+    # leave that folder ("..", or anything with a slash) is not used.
     LABEL=${ID_FS_LABEL}
-    if [[ -z "${LABEL}" ]]; then
-        LABEL=${DEVBASE}
-    elif /bin/grep -qF " /run/media/deck/${LABEL} " /etc/mtab; then
-        LABEL+="-${DEVBASE}"
-    fi
+    case "${LABEL}" in
+        ""|.|..|*/*) LABEL=${DEVBASE} ;;
+        *) /usr/bin/mountpoint -q -- "/run/media/deck/${LABEL}" && LABEL+="-${DEVBASE}" ;;
+    esac
     MOUNT_POINT="/run/media/deck/${LABEL}"
 
     echo "Mount point: ${MOUNT_POINT}"
@@ -131,7 +133,7 @@ do_unmount()
     for f in /run/media/deck/* ; do
         [[ -e $f ]] || continue
         if [[ -n $(/usr/bin/find "$f" -maxdepth 0 -type d -empty) ]]; then
-            if ! /bin/grep -qF " $f " /etc/mtab; then
+            if ! /usr/bin/mountpoint -q -- "$f"; then
                 echo "**** Removing mount point $f"
                 /bin/rmdir "$f"
             fi
