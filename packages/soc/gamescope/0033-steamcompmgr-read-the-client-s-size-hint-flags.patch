@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Schwartz <matthew.schwartz@linux.dev>
+Date: Mon, 9 Nov 2026 15:28:15 -0800
+Subject: [PATCH] steamcompmgr: read the client's size hint flags
+
+get_size_hints tests the supplied mask from XGetWMNormalHints, which lists
+the fields the property format holds and is 0x3ff for any current client.
+Since 6bda0eec accepted zero positions, a static gravity window at a
+nonnegative position counts as positioned even without PPosition, so a
+maximized skip-taskbar popup becomes a dropdown. RPG Maker games using
+Fullscreen++, such as Waste Walkers (371100), map a black maximized
+backdrop that gets painted over the game as the override, leaving the
+screen black.
+
+Use hints.flags instead. Wine sets PPosition on every window that is not
+minimized or maximized, so maximized and minimized Wine windows stop
+qualifying through this check.
+---
+ src/steamcompmgr.cpp | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/steamcompmgr.cpp b/src/steamcompmgr.cpp
+index 8d4f5a3..c168398 100644
+--- a/src/steamcompmgr.cpp
++++ b/src/steamcompmgr.cpp
+@@ -5752,10 +5752,12 @@ get_win_type(xwayland_ctx_t *ctx, steamcompmgr_win_t *w)
+ static void
+ get_size_hints(xwayland_ctx_t *ctx, steamcompmgr_win_t *w)
+ {
+-	XSizeHints hints;
+-	long hintsSpecified = 0;
++	XSizeHints hints = {};
++	long hintsSupplied = 0;
+ 
+-	XGetWMNormalHints(ctx->dpy, w->xwayland().id, &hints, &hintsSpecified);
++	// Xlib's supplied mask lists the fields the property can hold, not the ones the client set.
++	XGetWMNormalHints(ctx->dpy, w->xwayland().id, &hints, &hintsSupplied);
++	const long hintsSpecified = hints.flags;
+ 
+ 	const bool bHasPositionAndGravityHints = ( hintsSpecified & ( PPosition | PWinGravity ) ) == ( PPosition | PWinGravity );
+ 	if ( bHasPositionAndGravityHints &&
+-- 
+2.34.1
+
