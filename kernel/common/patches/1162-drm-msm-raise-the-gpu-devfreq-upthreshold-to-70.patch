@@ -1,0 +1,48 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] drm/msm: raise the GPU devfreq upthreshold to 70
+
+simple_ondemand jumps to the top frequency whenever the GPU is busier
+than upthreshold, and only sizes the frequency to the load below it.
+With the default of 50, a Retroid Pocket 6 (A740) running a 30 fps game
+made 700 to 900 jumps to 680 MHz from each middle step and spent 29.4%
+of the run at the top frequency while averaging 437 MHz.
+
+Measured on that handheld over two runs of the same game:
+
+  upthreshold           50        80
+  GPU clock avg         437 MHz   256 MHz
+  time at 680 MHz       29.4%     8.1%
+  battery power avg     4673 mW   4194 mW
+  hottest CPU zone max  80.0 C    70.5 C
+
+The game held its frame rate at 80. Use 70, which keeps part of the
+margin the original 50 was chosen for. debugfs still overrides it.
+
+Signed-off-by: David J. Vandenburgh <david@vandenburgh.co>
+---
+diff --git a/drivers/gpu/drm/msm/msm_gpu_devfreq.c b/drivers/gpu/drm/msm/msm_gpu_devfreq.c
+index 2e1d5c3..5a91d92 100644
+--- a/drivers/gpu/drm/msm/msm_gpu_devfreq.c
++++ b/drivers/gpu/drm/msm/msm_gpu_devfreq.c
+@@ -147,12 +147,17 @@ void msm_devfreq_init(struct msm_gpu *gpu)
+ 		return;
+ 
+ 	/*
+-	 * Setup default values for simple_ondemand governor tuning.  We
+-	 * want to throttle up at 50% load for the double-buffer case,
++	 * Setup default values for simple_ondemand governor tuning.
++	 * Mainline throttles up at 50% load for the double-buffer case,
+ 	 * where due to stalling waiting for vblank we could get stuck
+-	 * at (for ex) 30fps at 50% utilization.
++	 * at (for ex) 30fps at 50% utilization. Past the threshold the
++	 * governor goes straight to the top frequency, and at 50 a
++	 * Retroid Pocket 6 spent 29% of a 30fps game there while
++	 * averaging 437 MHz of 680. At 80 it averaged 256 MHz, held its
++	 * frame rate and drew about 10% less from the battery, so 70
++	 * keeps some of mainline's margin. Still tunable in debugfs.
+ 	 */
+-	priv->gpu_devfreq_config.upthreshold = 50;
++	priv->gpu_devfreq_config.upthreshold = 70;
+ 	priv->gpu_devfreq_config.downdifferential = 10;
+ 
+ 	mutex_init(&df->lock);
