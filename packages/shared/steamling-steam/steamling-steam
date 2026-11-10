@@ -145,6 +145,15 @@ GAMESCOPE_LIMITER_FILE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/steamling-gamesco
 : > "${GAMESCOPE_LIMITER_FILE}" 2>/dev/null || true
 GS_ENV+=(GAMESCOPE_LIMITER_FILE="${GAMESCOPE_LIMITER_FILE}")
 
+# gamescope remembers the mode picked for each external display, so a TV on the dock keeps its
+# resolution and refresh rate across sessions, and keeps the EDID it patched for HDR, as a
+# Steam Deck's session does.
+GS_CONFIG="${XDG_CONFIG_HOME:-${HOME}/.config}/gamescope"
+mkdir -p "${GS_CONFIG}" 2>/dev/null || true
+touch "${GS_CONFIG}/modes.cfg" "${GS_CONFIG}/edid.bin" 2>/dev/null || true
+GS_ENV+=(GAMESCOPE_MODE_SAVE_FILE="${GS_CONFIG}/modes.cfg"
+         GAMESCOPE_PATCHED_EDID_FILE="${GS_CONFIG}/edid.bin")
+
 # Do NOT pin the client itself: scx_lavd places the bursty threads itself and needs the littles free
 # for batch work. Game launches get the big cores through steam-launch-wrapper instead.
 . /usr/lib/steamling/steamling-steam-env
