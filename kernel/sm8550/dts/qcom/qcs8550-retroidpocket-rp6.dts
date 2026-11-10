@@ -220,6 +220,12 @@
 	panel@0 {
 		reg = <0>;
 		compatible = "vtdr6130,rp6";
+		/*
+		 * gamescope drives this panel through the DPU's 10-bit colour
+		 * pipeline (plane LUTs, HDR), and the DSI link carries 8 bits, so
+		 * without the ordered dither dark gradients band on the OLED.
+		 */
+		steamling,dpu-8bpc-dither;
 
 		pinctrl-0 = <&dsi_p_rst_active>, <&dsi_p_te_active>;
 		pinctrl-1 = <&dsi_p_rst_suspend>, <&dsi_p_te_suspend>;
