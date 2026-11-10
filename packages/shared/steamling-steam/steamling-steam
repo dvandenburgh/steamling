@@ -138,6 +138,13 @@ MANGOHUD_CONFIGFILE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/steamling-mangohud.c
 printf 'no_display\n' > "${MANGOHUD_CONFIGFILE}" 2>/dev/null || true
 GS_ENV+=(MANGOHUD_CONFIGFILE="${MANGOHUD_CONFIGFILE}")
 
+# gamescope writes 1 here while its frame limiter is on and 0 while it is off. Mesa (patch 0013)
+# reads it in every GL game and swaps with vsync while it says 1, so a GL game or emulator that
+# turned vsync off is paced by the limiter instead of drawing frames that are thrown away.
+GAMESCOPE_LIMITER_FILE="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/steamling-gamescope-limiter"
+: > "${GAMESCOPE_LIMITER_FILE}" 2>/dev/null || true
+GS_ENV+=(GAMESCOPE_LIMITER_FILE="${GAMESCOPE_LIMITER_FILE}")
+
 # Do NOT pin the client itself: scx_lavd places the bursty threads itself and needs the littles free
 # for batch work. Game launches get the big cores through steam-launch-wrapper instead.
 . /usr/lib/steamling/steamling-steam-env
