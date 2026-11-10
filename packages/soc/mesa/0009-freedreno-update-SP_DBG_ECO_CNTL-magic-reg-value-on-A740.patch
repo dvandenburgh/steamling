@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Zan Dobersek <zdobersek@igalia.com>
+Date: Sat, 7 Nov 2026 14:10:40 +0100
+Subject: [PATCH] freedreno: update SP_DBG_ECO_CNTL magic reg value on A740
+
+On A740 devices, the SP_DBG_ECO_CNTL value should be updated to match newer
+versions of the proprietary driver. Leaving the changed bit unset leads to
+random but consistent GPU hangs even on the most trivial Vulkan content.
+
+This was first found with Turnip running on Adreno X1-85 device. The changed
+value doesn't seem to have adverse effects when running on A740 devices where
+the proprietary driver still uses the old value.
+
+Cc: mesa-stable
+Signed-off-by: Zan Dobersek <zdobersek@igalia.com>
+Acked-by: Rob Clark <robclark@freedesktop.org>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46051>
+---
+ src/freedreno/common/freedreno_devices.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/freedreno/common/freedreno_devices.py b/src/freedreno/common/freedreno_devices.py
+index a04268f21c6..f679fa95421 100644
+--- a/src/freedreno/common/freedreno_devices.py
++++ b/src/freedreno/common/freedreno_devices.py
+@@ -925,7 +925,7 @@ a740_raw_magic_regs = [
+         [A6XXRegs.REG_A7XX_UCHE_UNKNOWN_0E10, 0x00000000],
+         [A6XXRegs.REG_A7XX_UCHE_UNKNOWN_0E11, 0x00000000],
+         [A6XXRegs.REG_A7XX_SP_HLSQ_DBG_ECO_CNTL, 0x00000000],
+-        [A6XXRegs.REG_A6XX_SP_DBG_ECO_CNTL, 0x10000000],
++        [A6XXRegs.REG_A6XX_SP_DBG_ECO_CNTL, 0x10200000],
+         [A6XXRegs.REG_A6XX_PC_MODE_CNTL,    0x1f1f],
+         [A6XXRegs.REG_A6XX_PC_DBG_ECO_CNTL, 0x00100000],
+         [A6XXRegs.REG_A7XX_PC_UNKNOWN_9E24, 0x21585600],
+-- 
+2.34.1
+

@@ -7,7 +7,7 @@ epoch=2
 pkgver=26.2.6
 # differs from pkgver only for RCs: the tarball keeps the hyphen makepkg forbids in pkgver
 _srcver=${pkgver}
-pkgrel=5
+pkgrel=6
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${_srcver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -25,7 +25,7 @@ options=(!lto)
 # Turnip and freedreno fixes no 26.2 point release has yet. 0001 is still an open merge request
 # and 0002 is on main only, adapted to 26.2; 0003 is from staging/26.2, queued for the next one;
 # 0004 is a shader compiler crash fix armada carries until upstream has one; 0005-0008 are on
-# main only. Each stays until a release has it.
+# main only; 0009 is queued for 26.3. Each stays until a release has it.
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
@@ -34,7 +34,8 @@ source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0005-freedreno-Take-only-in-fence-as-a-hint-for-explicit-sync.patch'
         '0006-ir3-move-is_cat-23-_float-helper-up-in-their-file.patch'
         '0007-ir3-only-fold-fsat-to-sat-on-cat2-3-float-instructions.patch'
-        '0008-ir3-don-t-emit-alias.rt-for-relative-const-movs.patch')
+        '0008-ir3-don-t-emit-alias.rt-for-relative-const-movs.patch'
+        '0009-freedreno-update-SP_DBG_ECO_CNTL-magic-reg-value-on-A740.patch')
 sha256sums=('b9436b3e1a8be76fbd4823dc884f90596ab7c6ac5e1867a305e66ffccfb31a92'
             '9593e966d7b29efa23a547da07d1dae14a9f34a088c7df37214545b4a1bb8313'
             '1079d658026ea175fddf582cb709f4e3925446b3c1512cecc043861b75aa392e'
@@ -43,7 +44,8 @@ sha256sums=('b9436b3e1a8be76fbd4823dc884f90596ab7c6ac5e1867a305e66ffccfb31a92'
             '6f4813950202a925df5d014a8d4665c1274a710ccd6779350bbc3b36cc5ffff2'
             'b155fbbd9b3c59c0cd931ba17ce8014b4b0b962a2c0a2f9484b2371d2c5c53ee'
             '8b078d901fc5b28aca2c20009cfbcd74d52498f653e44cd6d07521ab70bb4d9c'
-            '5950dd425963b74e68d8c247ddfa723f81e4b19e25cc0cc90767aa2b912a4cb6')
+            '5950dd425963b74e68d8c247ddfa723f81e4b19e25cc0cc90767aa2b912a4cb6'
+            'eab02e64ad38dc4974a0e50b6cde27b65f2268ae6b2a33bfd20836226beded19')
 
 prepare() {
   cd "mesa-${_srcver}"
