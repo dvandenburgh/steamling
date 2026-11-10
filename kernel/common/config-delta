@@ -43,3 +43,10 @@
 # a second, so a handheld that runs nothing untrusted in the kernel's way takes the speed.
 --disable INIT_STACK_ALL_ZERO
 --enable INIT_STACK_NONE
+
+# No audit. journald switches kernel auditing on at boot, and from then on every task takes the
+# slow syscall entry and exit path so audit can look at each call, with nothing reading the
+# result. FEX and Wine live on syscalls. SELinux goes too: it selects AUDIT, and it was never in
+# the LSM list, so it was built and unused.
+--disable AUDIT
+--disable SECURITY_SELINUX
