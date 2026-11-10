@@ -2,7 +2,7 @@
 # which live here rather than in the image overlay so fixes reach fielded SDs on -Syu (#34).
 pkgname=steamling-tools
 pkgver=0.1.1
-pkgrel=1.10
+pkgrel=1.11
 pkgdesc="Steamling maintenance app: snapshot rollback, base mode switch, internal install, SSH, file sharing and USB file transfer toggles, emulation layer, desktop picker, first-boot diagnostics and root expansion"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"

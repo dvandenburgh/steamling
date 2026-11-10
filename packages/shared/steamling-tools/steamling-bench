@@ -305,12 +305,17 @@ def fan_input():
 
 
 def power_mw(bat):
-    p = read(f"{bat}/power_now") if bat else ""
-    if p:
-        return abs(float(p)) / 1000
-    i, v = read(f"{bat}/current_now") if bat else "", read(f"{bat}/voltage_now") if bat else ""
+    # Current times voltage first, as MangoHud and Steamling Control do: SM8550-class battery
+    # firmware fills power_now with something that is not power (the RP6 read 55187189 while
+    # current and voltage gave 1.53 W), so power_now is only the fallback.
+    if not bat:
+        return None
+    i, v = read(f"{bat}/current_now"), read(f"{bat}/voltage_now")
     if i and v:
         return abs(float(i) * float(v)) / 1e9
+    p = read(f"{bat}/power_now")
+    if p:
+        return abs(float(p)) / 1000
     return None
 
 
