@@ -7,7 +7,7 @@ epoch=2
 pkgver=26.2.6
 # differs from pkgver only for RCs: the tarball keeps the hyphen makepkg forbids in pkgver
 _srcver=${pkgver}
-pkgrel=6
+pkgrel=7
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${_srcver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -26,7 +26,8 @@ options=(!lto)
 # and 0002 is on main only, adapted to 26.2; 0003 is from staging/26.2, queued for the next one;
 # 0004 is a shader compiler crash fix armada carries until upstream has one; 0005-0008 and 0010
 # are on main only; 0009 is queued for 26.3; 0011/0012 fix A8xx GL hangs with no upstream fix yet
-# (PATCHES.md says where each comes from). Each stays until a release has it.
+# (PATCHES.md says where each comes from). Each stays until a release has it. 0013 is the
+# other half of steamling-steam's GAMESCOPE_LIMITER_FILE and is kept across Mesa releases.
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
@@ -39,7 +40,8 @@ source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0009-freedreno-update-SP_DBG_ECO_CNTL-magic-reg-value-on-A740.patch'
         '0010-tu-Clear-unused-SP_xS_BASEs.patch'
         '0011-freedreno-a8xx-wait-for-zpass-sample-counts.patch'
-        '0012-freedreno-a8xx-rb-done-ts-after-each-draw.patch')
+        '0012-freedreno-a8xx-rb-done-ts-after-each-draw.patch'
+        '0013-dri3-gamescope-limiter-swap-interval-override.patch')
 sha256sums=('b9436b3e1a8be76fbd4823dc884f90596ab7c6ac5e1867a305e66ffccfb31a92'
             '9593e966d7b29efa23a547da07d1dae14a9f34a088c7df37214545b4a1bb8313'
             '1079d658026ea175fddf582cb709f4e3925446b3c1512cecc043861b75aa392e'
@@ -52,7 +54,8 @@ sha256sums=('b9436b3e1a8be76fbd4823dc884f90596ab7c6ac5e1867a305e66ffccfb31a92'
             'eab02e64ad38dc4974a0e50b6cde27b65f2268ae6b2a33bfd20836226beded19'
             'a664c683a68911d647c7b6e2437829126e0791ff1f2405f881d8a3c2422ddc34'
             '5f221633956a3dcc18bee93ff24fb55b2be7a4999921bdb3595b8d2f25420110'
-            '4cbf76a691177761669610e052f0e9c8f2a20835db1d313ef159f40fbbe72840')
+            '4cbf76a691177761669610e052f0e9c8f2a20835db1d313ef159f40fbbe72840'
+            '0359c7c8dfcd5fbf652d2e3d168a501b4de2a7aa55e3bfb8a18c5971e10abdc4')
 
 prepare() {
   cd "mesa-${_srcver}"
