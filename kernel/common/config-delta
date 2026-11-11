@@ -55,3 +55,9 @@
 # switch, sleep and wake, and nothing here reads /proc/pressure. The shared tree already
 # builds this way; this brings the SM8550 tree in line.
 --enable PSI_DEFAULT_DISABLED
+
+# zram keeps a second compression algorithm for recompressing idle pages. zram-generator.conf
+# sets lz4 for speed with zstd behind it, and steamling-zram-recompress.timer moves cold pages
+# over; without this the second algorithm and the timer silently do nothing. The SM8550 config
+# had it, the shared tree's did not.
+--enable ZRAM_MULTI_COMP
