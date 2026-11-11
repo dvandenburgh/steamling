@@ -4,10 +4,10 @@
 pkgbase=mesa
 pkgname=(mesa vulkan-freedreno)
 epoch=2
-pkgver=26.2.6
+pkgver=26.2.7
 # differs from pkgver only for RCs: the tarball keeps the hyphen makepkg forbids in pkgver
 _srcver=${pkgver}
-pkgrel=7
+pkgrel=1
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${_srcver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -23,34 +23,30 @@ makedepends=(
 # upstream considers LTO broken until explicit notice
 options=(!lto)
 # Turnip and freedreno fixes no 26.2 point release has yet. 0001 is still an open merge request
-# and 0002 is on main only, adapted to 26.2; 0003 is from staging/26.2, queued for the next one;
-# 0004 is a shader compiler crash fix armada carries until upstream has one; 0005-0008 and 0010
-# are on main only; 0009 is queued for 26.3; 0011/0012 fix A8xx GL hangs with no upstream fix yet
-# (PATCHES.md says where each comes from). Each stays until a release has it. 0013 is the
-# other half of steamling-steam's GAMESCOPE_LIMITER_FILE and is kept across Mesa releases.
+# and 0002 is on main only, adapted to 26.2; 0004 is a shader compiler crash fix armada carries
+# until upstream has one; 0005-0007 and 0010 are on main only; 0009 is queued for 26.3; 0011/0012
+# fix A8xx GL hangs with no upstream fix yet (PATCHES.md says where each comes from). Each stays
+# until a release has it (gaps in the numbers are patches a release took). 0013 is the other half of steamling-steam's
+# GAMESCOPE_LIMITER_FILE and is kept across Mesa releases.
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
-        '0003-freedreno-Don-t-double-close-imported-syncobj-fd.patch'
         '0004-ir3-array_to_ssa-follow-trivial-phi-chains.patch'
         '0005-freedreno-Take-only-in-fence-as-a-hint-for-explicit-sync.patch'
         '0006-ir3-move-is_cat-23-_float-helper-up-in-their-file.patch'
         '0007-ir3-only-fold-fsat-to-sat-on-cat2-3-float-instructions.patch'
-        '0008-ir3-don-t-emit-alias.rt-for-relative-const-movs.patch'
         '0009-freedreno-update-SP_DBG_ECO_CNTL-magic-reg-value-on-A740.patch'
         '0010-tu-Clear-unused-SP_xS_BASEs.patch'
         '0011-freedreno-a8xx-wait-for-zpass-sample-counts.patch'
         '0012-freedreno-a8xx-rb-done-ts-after-each-draw.patch'
         '0013-dri3-gamescope-limiter-swap-interval-override.patch')
-sha256sums=('b9436b3e1a8be76fbd4823dc884f90596ab7c6ac5e1867a305e66ffccfb31a92'
+sha256sums=('04294f75d22e9f61cd1e050206bc48b3d39366e788f1803a3368e3d5a872ce18'
             '9593e966d7b29efa23a547da07d1dae14a9f34a088c7df37214545b4a1bb8313'
             '1079d658026ea175fddf582cb709f4e3925446b3c1512cecc043861b75aa392e'
-            'da924879cd46ec4ba839082cf7ec1b5d12488888b836efe95ae9c6f3218beb34'
             '876e395ae200b6ba675889537e4c9e62da3449da7662cf665e7056e711a7c185'
             '6f4813950202a925df5d014a8d4665c1274a710ccd6779350bbc3b36cc5ffff2'
             'b155fbbd9b3c59c0cd931ba17ce8014b4b0b962a2c0a2f9484b2371d2c5c53ee'
             '8b078d901fc5b28aca2c20009cfbcd74d52498f653e44cd6d07521ab70bb4d9c'
-            '5950dd425963b74e68d8c247ddfa723f81e4b19e25cc0cc90767aa2b912a4cb6'
             'eab02e64ad38dc4974a0e50b6cde27b65f2268ae6b2a33bfd20836226beded19'
             'a664c683a68911d647c7b6e2437829126e0791ff1f2405f881d8a3c2422ddc34'
             '5f221633956a3dcc18bee93ff24fb55b2be7a4999921bdb3595b8d2f25420110'
