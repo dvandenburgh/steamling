@@ -224,8 +224,14 @@ class Perf:
     def set_profile(self, pid):
         if not self.eff or pid not in self.eff["profiles"]:
             return False
+        old = self.profile
         self.profile = pid
-        self.apply()
+        try:
+            self.apply()
+        except OSError:
+            # Report what is still in force, not a profile whose clocks never went in.
+            self.profile = old
+            raise
         self.save_state()
         self.emit(IFACE_PROFILE, NATIVE)
         return True
@@ -234,6 +240,7 @@ class Perf:
         v = value.unpack()
         if name in ("PerformanceProfile", "Profile"):
             return self.set_profile(v)
+        old = (self.gpu_level, self.manual_mhz)
         if name == "GpuPerformanceLevel":
             if v not in ("auto", "manual") or not self.hw.gpu:
                 return False
@@ -252,7 +259,11 @@ class Perf:
             return True
         else:
             return False
-        self.apply()
+        try:
+            self.apply()
+        except OSError:
+            self.gpu_level, self.manual_mhz = old
+            raise
         self.save_state()
         self.emit(IFACE_GPU)
         return True
