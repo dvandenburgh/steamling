@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ryan Houdek <Sonicadvance1@gmail.com>
+Date: Tue, 10 Nov 2026 19:14:13 -0800
+Subject: [PATCH] CPUID: Fixes ApicIdSize.
+
+This was supposed to be ilog2
+---
+ FEXCore/Source/Interface/Core/CPUID.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/FEXCore/Source/Interface/Core/CPUID.cpp b/FEXCore/Source/Interface/Core/CPUID.cpp
+index 57928bb91..5a3b0d811 100644
+--- a/FEXCore/Source/Interface/Core/CPUID.cpp
++++ b/FEXCore/Source/Interface/Core/CPUID.cpp
+@@ -1264,9 +1264,9 @@ FEXCore::CPUID::FunctionResults CPUIDEmu::Function_8000_0008h(uint32_t Leaf) con
+             (CTX->HostFeatures.SupportsCLZERO << 0); // CLZERO support
+ 
+   uint32_t CoreCount = Cores - 1;
+-  Res.ecx = (0 << 16) |                    // PerfTscSize: Performance timestamp count size
+-            (std::bit_ceil(Cores) << 12) | // ApicIdSize: Number of bits in ApicID
+-            (CoreCount << 0);              // Count count subtract one
++  Res.ecx = (0 << 16) |                                    // PerfTscSize: Performance timestamp count size
++            (FEXCore::ilog2(std::bit_ceil(Cores)) << 12) | // ApicIdSize: Number of bits in ApicID
++            (CoreCount << 0);                              // Count count subtract one
+ 
+   return Res;
+ }
+-- 
+2.34.1
+

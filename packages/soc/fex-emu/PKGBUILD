@@ -5,7 +5,7 @@
 pkgname=fex-emu
 _commit=34d0d55f7c121a9fcc45e62a8f9d9cee76646d28
 pkgver=2611
-pkgrel=1
+pkgrel=2
 pkgdesc="Fast usermode x86/x86-64 emulator for AArch64, built with host+guest thunks"
 arch=('aarch64')
 url="https://github.com/FEX-Emu/FEX"
@@ -35,6 +35,8 @@ source=("fex::git+https://github.com/FEX-Emu/FEX.git#commit=${_commit}"
         'toolchain_x86_64.cmake'
         'toolchain_x86_32.cmake'
         'Config.json'
+        '0001-CPUID-Fixes-for-CPU-count.patch'
+        '0002-CPUID-Fixes-ApicIdSize.patch'
         "fexsysroot-glibc.pkg.tar.zst::${_arch}/g/glibc/glibc-${_glibc}-x86_64.pkg.tar.zst"
         "fexsysroot-lib32-glibc.pkg.tar.zst::${_arch}/l/lib32-glibc/lib32-glibc-${_glibc}-x86_64.pkg.tar.zst"
         "fexsysroot-gcc.pkg.tar.zst::${_arch}/g/gcc/gcc-${_gcc}-x86_64.pkg.tar.zst"
@@ -47,7 +49,7 @@ noextract=('fexsysroot-glibc.pkg.tar.zst'
            'fexsysroot-gcc-libs.pkg.tar.zst'
            'fexsysroot-lib32-gcc-libs.pkg.tar.zst'
            'fexsysroot-linux-api-headers.pkg.tar.zst')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP'
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
             'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
@@ -55,6 +57,11 @@ prepare() {
   # FEX pins its deps (vixl, jemalloc, Vulkan-Headers, zydis) as submodules and makepkg's
   # git source does not recurse them.
   git submodule update --init --recursive
+  # Fixes from FEX main after the pinned release, until the next release has them (PATCHES.md).
+  local p
+  for p in "${source[@]}"; do
+    case "${p}" in *.patch) patch -p1 < "${srcdir}/${p}" ;; esac
+  done
 
   msg2 "assembling x86 dev sysroot from pinned Arch x86_64 + lib32 packages"
   rm -rf "${srcdir}/sysroot"; mkdir -p "${srcdir}/sysroot"
