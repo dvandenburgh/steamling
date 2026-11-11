@@ -333,3 +333,17 @@
 	};
 };
 
+
+/*
+ * The Portal's built-in microphone is DMIC3 on SWR_MIC7, fed by MIC BIAS3. This replaces the
+ * common routing as a whole, so the headset routes are repeated.
+ */
+&{/sound} {
+	audio-routing =
+			"IN1_HPHL", "HPHL_OUT",
+			"IN2_HPHR", "HPHR_OUT",
+			"AMIC2", "MIC BIAS2",
+			"TX SWR_INPUT1", "ADC2_OUTPUT",
+			"DMIC3", "MIC BIAS3",
+			"TX SWR_INPUT7", "DMIC3_OUTPUT";
+};
