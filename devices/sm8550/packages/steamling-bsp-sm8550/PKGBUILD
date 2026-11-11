@@ -2,7 +2,7 @@
 # RP6 standard and TOP-DPAD models share rp6.conf) and the input maps are model-gated.
 pkgname=steamling-bsp-sm8550
 pkgver=0.2.0
-pkgrel=27
+pkgrel=28
 pkgdesc="steamling board support: SM8550 family (Retroid Pocket 6, Nova; AYN Odin 2 / Mini / Portal, Thor; AYANEO Pocket ACE / DMG / DS / EVO / S) - board dispatch, input maps, suspend config, audio UCM"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
