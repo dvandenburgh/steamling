@@ -23,7 +23,10 @@ always tell two runs apart later.
 ### Boot
 
 Run it any time after the handheld has started. It reads this boot's log, so it only knows about
-the most recent boot. Run it with `sudo` if it says it can't find gamescope.
+the most recent boot. You get systemd's own startup times, then each step of game mode starting,
+timed twice: in seconds since the handheld was switched on, and in seconds since game mode's
+launcher began. The last step, "Steam window mapped", is when Steam is on screen. In desktop mode
+there are no game mode steps to show, and it says so.
 
 ### Sleep
 
