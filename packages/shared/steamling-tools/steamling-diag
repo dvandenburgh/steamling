@@ -143,6 +143,8 @@ OUT=/var/log/steamling-diag.txt
     echo "panel: ${STEAMLING_PANEL_W}x${STEAMLING_PANEL_H}@${STEAMLING_PANEL_REFRESH} orient=${STEAMLING_PANEL_ORIENT} output=${STEAMLING_PANEL_OUTPUT}" )
   printf '\n## controls: InputPlumber virtual pads (name, then the source and target devices)\n'
   echo "inputplumber: $(systemctl is-active inputplumber 2>/dev/null)"
+  echo "gyro: steamling-ssc $(systemctl is-active steamling-ssc 2>/dev/null), $(cat /run/steamling/gyro.env 2>/dev/null | tr '\n' ' ')"
+  journalctl -b -u inputplumber --no-pager -o cat 2>/dev/null | grep -iE 'ssc|fastrpc|imu' | tail -n 8
   for cd in $(busctl --system tree org.shadowblip.InputPlumber 2>/dev/null | grep -o '/org/shadowblip/InputPlumber/CompositeDevice[0-9]*' | sort -u); do
     echo "$cd: $(busctl --system get-property org.shadowblip.InputPlumber "$cd" org.shadowblip.Input.CompositeDevice Name 2>/dev/null)"
     echo "  sources: $(busctl --system get-property org.shadowblip.InputPlumber "$cd" org.shadowblip.Input.CompositeDevice SourceDevicePaths 2>/dev/null)"
@@ -158,7 +160,7 @@ OUT=/var/log/steamling-diag.txt
   printf '\n## battery and fan\n'
   for ps in /sys/class/power_supply/*; do
     [ -e "$ps/type" ] || continue
-    echo "$(basename "$ps"): type=$(cat "$ps/type") status=$(cat "$ps/status" 2>/dev/null) capacity=$(cat "$ps/capacity" 2>/dev/null)"
+    echo "$(basename "$ps"): type=$(cat "$ps/type") status=$(cat "$ps/status" 2>/dev/null) capacity=$(cat "$ps/capacity" 2>/dev/null) online=$(cat "$ps/online" 2>/dev/null)"
   done
   for h in /sys/class/hwmon/hwmon*; do
     [ -e "$h/name" ] || continue
