@@ -15,7 +15,10 @@
 # LeftPaddle1/RightPaddle1 (the Deck's L4/L5 back buttons). That node also
 # carries the volume-up rocker (KEY_VOLUMEUP); because the grab is exclusive,
 # the map re-emits it on the keyboard target so volume up keeps working.
-# (Gyro is still unavailable — no IIO/IMU.)
+#
+# The gyro and accelerometer come from the Qualcomm sensor core over FastRPC, not
+# IIO. InputPlumber only opens that source with INPUTPLUMBER_FASTRPC=1, which
+# steamling-ssc sets on boards whose sensor data ships.
 #
 # Target = `deck` (Steam Deck controller) so Steam Input gets a first-class
 # Steam-native pad.
@@ -79,6 +82,20 @@ source_devices:
       phys_path: gpio-keys/input0
       handler: event*
     capability_map_id: sm8550_gamepad
+
+  # Every board here with sensor data has its IMU mounted the same way. Lying flat,
+  # the deck-uhid pad must read gravity on +Z.
+  - group: imu
+    fastrpc:
+      name: fastrpc-adsp
+    config:
+      imu:
+        # QMI8658 on the RP6
+        mount_matrix:
+          x: [0, -1, 0]
+          y: [0, 0, 1]
+          z: [-1, 0, 0]
+        gyro_auto_calibration: true
 
 options:
   auto_manage: true
