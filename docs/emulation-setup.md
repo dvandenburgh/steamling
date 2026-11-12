@@ -198,4 +198,5 @@ version, it is moved into `~/Emulation/emulators/eden/` for you and keeps workin
   resolution tuned for the panel. Eden also builds shaders in the background, so a new effect
   doesn't freeze the game while it compiles. You supply the emulator, your keys and firmware
   (see above) and your games.
-- **ES-DE**: scans `~/Emulation/ROMs` and already knows where every emulator is installed.
+- **ES-DE**: reads `~/Emulation/Library` (your games on the handheld and on a microSD card, see
+  [above](#more-room-games-on-a-microsd-card)) and already knows where every emulator is installed.
