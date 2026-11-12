@@ -1,18 +1,21 @@
 # inputplumber — input router/remapper daemon: presents a unified virtual controller so Steam
-# Input sees a proper pad (Guide button, rumble). Upstream's PREBUILT aarch64 release, so the
-# build chroot needs no Rust toolchain; the per-device config ships in steamling-bsp-<soc>.
+# Input sees a proper pad (Guide button, rumble, gyro). Built from source, not upstream's prebuilt
+# release, for the gyro: the patches (PATCHES.md) add a FastRPC source that reads the IMU off the
+# Qualcomm sensor core through libssc. The per-device config ships in steamling-bsp-<soc>.
 pkgname=inputplumber
 pkgver=0.84.0
-pkgrel=1
-pkgdesc="Open source input router and remapper daemon (prebuilt aarch64 release)"
+pkgrel=2
+_commit=117cb04e949f842397b96178bcc0d7fc7ba23acf   # v0.84.0
+_rustver=1.99.0
+pkgdesc="Open source input router and remapper daemon"
 arch=('aarch64')
 url="https://github.com/ShadowBlip/InputPlumber"
 license=('GPL3')
-depends=('systemd' 'libevdev' 'polkit' 'dbus')
-provides=('inputplumber')
-conflicts=('inputplumber')
-# Prebuilt binary.
-options=('!strip' '!debug' '!lto')
+depends=('systemd' 'libevdev' 'polkit' 'dbus' 'libcap')
+# libssc is loaded at runtime, only on boards whose sensor core steamling-ssc brings up.
+optdepends=('libssc: gyro and accelerometer on Qualcomm sensor core boards')
+makedepends=('git' 'pkgconf' 'clang')
+options=('!lto' '!debug')
 # Upstream device configs a steamling BSP replaces with its own: two configs matching one board
 # compete for the same source devices, and which one grabs the pad is down to load order.
 # Boards no BSP config covers (Thor Lite, Pocket DS, Pocket S2, Odin 3, the KONKRs) keep
@@ -24,25 +27,52 @@ _bsp_replaces=(
   50-retroid_pocket5.yaml 50-retroid_pocket_mini.yaml               # sm8250 01-retroid
   50-retroid_pocket_flip2.yaml                                      # sm8250 01-retroid-flip2
 )
-source=("inputplumber-aarch64-${pkgver}.tar.gz::https://github.com/ShadowBlip/InputPlumber/releases/download/v${pkgver}/inputplumber-aarch64.tar.gz")
-sha256sums=('c1ef0534f9ec488cc7abe2bc5fe6b16bd575f8ed9549372c8c7472341785bc19')
+source=("InputPlumber::git+https://github.com/ShadowBlip/InputPlumber.git#commit=${_commit}"
+        "https://static.rust-lang.org/dist/rust-${_rustver}-aarch64-unknown-linux-gnu.tar.xz"
+        '0001-feat-ssc-qualcomm-sensor-core-support.patch'
+        '0002-feat-ssc-gyro-auto-calibration.patch'
+        '0003-feat-ssc-suspend-source-devices-across-system-sleep.patch'
+        '0004-feat-ssc-mount-correction-from-the-environment.patch')
+sha256sums=('SKIP'
+            '5a30ce742be0835d9b23fc862db5cbbbc71464e1c9b1fca22917e10e4ba32a92'
+            'SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+_toolchain() {
+  export PATH="${srcdir}/rust/bin:${PATH}"
+  # Crate downloads cached beside the other sources so rebuilds stay offline.
+  export CARGO_HOME="${SRCDEST:-${srcdir}}/cargo-home"
+}
+
+prepare() {
+  "${srcdir}/rust-${_rustver}-aarch64-unknown-linux-gnu/install.sh" \
+    --prefix="${srcdir}/rust" --disable-ldconfig \
+    --components=rustc,cargo,rust-std-aarch64-unknown-linux-gnu >/dev/null
+  _toolchain
+  cd InputPlumber
+  local p
+  for p in "${srcdir}"/000[1-9]-*.patch; do
+    patch -p1 < "${p}"
+  done
+  cargo fetch --locked
+}
+
+build() {
+  _toolchain
+  cd InputPlumber
+  cargo build --release --frozen --target aarch64-unknown-linux-gnu
+}
 
 package() {
-  # The release tarball has usr/ at the top, sometimes inside one wrapper dir.
-  local usrdir
-  if [ -d "${srcdir}/usr" ]; then
-    usrdir="${srcdir}/usr"
-  else
-    usrdir="$(find "${srcdir}" -maxdepth 2 -type d -name usr | head -1)"
-  fi
-  [ -n "${usrdir}" ] || { echo "could not find usr/ in the release tarball"; return 1; }
-  cp -a "${usrdir}" "${pkgdir}/usr"
+  _toolchain
+  cd InputPlumber
+  # The build is already done, so make's build prerequisite finds it current.
+  make install PREFIX="${pkgdir}/usr" TARGET_ARCH=aarch64-unknown-linux-gnu NO_RELOAD=true
   local f
   for f in "${_bsp_replaces[@]}"; do
     rm "${pkgdir}/usr/share/inputplumber/devices/${f}"
   done
-  # Loads iio_trig_hrtimer for IMU polling. No steamling kernel builds it (no board has an IMU
-  # InputPlumber drives), and a module that is not there fails systemd-modules-load every boot.
+  # Loads iio_trig_hrtimer for IIO IMU polling. No steamling kernel builds it (the gyro here comes
+  # through the sensor core, not IIO), and a missing module fails systemd-modules-load every boot.
   rm "${pkgdir}/usr/lib/modules-load.d/inputplumber-hrtimer.conf"
   rmdir "${pkgdir}/usr/lib/modules-load.d"
 }

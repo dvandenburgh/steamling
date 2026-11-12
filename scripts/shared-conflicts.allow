@@ -14,7 +14,6 @@ steamling-base-lock :: replaces=verdict<1.4.5-3 :: opencv's dep, orphaned with i
 steamling-gamepad-calibration :: replaces=python-pyxel :: retires the GPcal app's runtime
 steamling-gamepad-calibration :: conflicts=python-pyxel :: pairs the replaces=
 es-de :: conflicts=emulationstation-de :: provides the old name, one ES-DE install at a time
-inputplumber :: conflicts=inputplumber :: our build takes the name over ALARM's
 wxwidgets-steamling :: conflicts=wxwidgets-common :: provides ALARM's wxwidgets split in one package
 wxwidgets-steamling :: conflicts=wxwidgets-gtk3 :: provides ALARM's wxwidgets split in one package
 steamling-bsp-common :: conflicts=linux-steamling-sm8550<7.2.10-3 :: the /flash deploy scripts and hook these kernels shipped (#126)
