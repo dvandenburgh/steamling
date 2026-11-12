@@ -33,9 +33,11 @@ open a terminal and do whatever you like.
   curve and graphics drivers are set up for smooth frame times. Set a frame cap and play.
 - **Governor**, a Quick Access Menu plugin for per-game settings, fan and CPU modes,
   controller and screen calibration, stick lights, SD card formatting, file sharing over the
-  network or a USB cable, and SSH.
+  network or a USB cable, emulator save sync with your PC, and SSH.
 - **Epic, GOG and Amazon games** through the Heroic Games Launcher, right in your Steam library.
 - **Emulation** through ES-DE and a full set of emulators, if you want it.
+- **Gyro and TV docking** on the Retroid Pocket 6: gyro aiming through Steam Input, and game mode
+  moves to a TV when you plug in a USB-C dock.
 - **A stable base.** Packages come from a frozen snapshot of Arch Linux ARM, so things don't shift
   under you. If you'd rather live on the edge, you can switch to rolling Arch.
 

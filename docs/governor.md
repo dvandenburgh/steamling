@@ -14,7 +14,7 @@ tapping the icons:
 | This Game (a cartridge) | One game's settings, or the Default for every game: suggested settings, per-game performance, game tweaks, the shader cache |
 | Performance (a gauge) | The performance overlay, the CPU scheduler and fan curve, a live system monitor |
 | Controller (a gamepad) | Stick and trigger calibration, stick dead zone and full tilt, back paddles, rumble, stick lights |
-| Files (a folder) | Add non-Steam games, share your files over the network or a USB cable, format a microSD card for Steam |
+| Files (a folder) | Add non-Steam games, share your files over the network or a USB cable, sync emulator saves with a PC, format a microSD card for Steam |
 | System (a gear) | System updates and rollback, SSH, display refresh calibration, the menu width, your versions, restart game mode |
 
 Settings save automatically as you change them. The panel only shows what your handheld has:

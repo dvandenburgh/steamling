@@ -2,15 +2,16 @@
 
 User guides for Steamling. New here? Start with the [project README](../README.md).
 
-- [devices.md](devices.md) - every supported handheld, what "untested port" means, and how to
-  help test one
+- [devices.md](devices.md) - every supported handheld, what "untested port" means, docking to a
+  TV, the gyro, and how to help test one
 - [install.md](install.md) - flashing the SD card, installing the bootloader (OpenABL), and first
   boot
 - [updating.md](updating.md) - getting a newer build onto the handheld, by reflashing or over your
   home network
 - [known-issues.md](known-issues.md) - what does not work, or not well, yet
 - [governor.md](governor.md) - the in-game control panel: per-game tweaks, fan/CPU
-  modes, adding non-Steam games, file sharing over the network or USB, SSH, SD card formatting,
+  modes, full clocks on a charger, adding non-Steam games, file sharing over the network or USB,
+  syncing emulator saves with a PC, SSH, SD card formatting,
   controller calibration, stick lights, display calibration, and system updates
 - [emulation-setup.md](emulation-setup.md) - where to put ROMs, BIOS, and firmware, how to launch
   games, and how to tweak emulator settings
@@ -24,7 +25,7 @@ User guides for Steamling. New here? Start with the [project README](../README.m
 - [snapshots.md](snapshots.md) - automatic pre-update snapshots, one-button rollback, and
   manual recovery when an update goes wrong
 - [benchmarking.md](benchmarking.md) - measuring boot time, battery drain asleep, clocks and
-  temperatures, controller reports and frame times before and after a change
+  temperatures, controller reports, frame times and the video decoder before and after a change
 - [licensing.md](licensing.md) - the project license and the third-party components it ships
 - [about.md](about.md) - where Steamling came from, the projects and people it's built on, and
   who makes it
