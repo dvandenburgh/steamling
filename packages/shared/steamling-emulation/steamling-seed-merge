@@ -71,7 +71,11 @@ def class_a_file(src, dst, fallback=None):
         write(dst, new)
         log(dst, "seeded")
     elif cur == new:
+        # still record it: a user who copied .steamlingnew over the file would otherwise
+        # keep the older baseline and have every later default treated as their own edit
         remove(pn)
+        if read(base) != new:
+            write(base, new)
         return "current"
     elif old is not None and cur == old:
         write(dst, new, like=dst)
