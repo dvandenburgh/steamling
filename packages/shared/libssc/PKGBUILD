@@ -1,0 +1,38 @@
+# libssc - talks to the Qualcomm sensor core on the ADSP, where the gyro and accelerometer live.
+# Arch's own build, plus the patches armada carries: the sample rate setter is what lets
+# InputPlumber read the gyro fast enough for aiming (the sensor's first advertised rate is 20 Hz),
+# and the rest stop a failed open or close from leaking or hanging. Same pkgver as the base, so
+# this one wins from [steamling-shared].
+pkgname=libssc
+pkgver=0.4.4
+pkgrel=1.1
+pkgdesc="Library to access sensors managed by the Qualcomm Sensor Core"
+arch=('aarch64')
+url="https://codeberg.org/DylanVanAssche/libssc"
+license=('GPL-3.0-or-later')
+depends=('glib2' 'glibc' 'libgcc' 'libqmi' 'libqrtr-glib' 'protobuf-c')
+makedepends=('git' 'meson' 'ninja' 'protobuf')
+source=("libssc::git+https://codeberg.org/DylanVanAssche/libssc.git#tag=v${pkgver}"
+        '0001-meson-drop-the-mocking-and-tests-subdirs.patch'
+        '0002-sensor-allow-sample-rate-override.patch'
+        '0003-sensor-release-the-client-reference-taken-in-open-and-close.patch'
+        '0004-sensor-fail-an-open-that-is-never-confirmed.patch'
+        '0005-sensor-log-a-failed-disable-before-handing-its-error-to-the-task.patch')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+prepare() {
+  cd libssc
+  local p
+  for p in "${srcdir}"/000[1-9]-*.patch; do
+    patch -p1 < "${p}"
+  done
+}
+
+build() {
+  arch-meson libssc build
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "${pkgdir}"
+}
