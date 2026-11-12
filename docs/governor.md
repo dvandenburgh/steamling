@@ -224,6 +224,32 @@ The same toggle is in **Steamling Tools** on the desktop side.
 > [copying files over the network](emulation-setup.md#copying-files-over-the-network) for how to
 > connect.
 
+### Save sync
+
+**Sync emulator saves** keeps your RetroArch saves and save states (`~/Emulation/Saves` and
+`~/Emulation/States`) the same on the handheld and your PC, using
+[Syncthing](https://syncthing.net). Save on one, carry on from the same spot on the other. It
+works over your home network, and over the internet when the two aren't on the same one.
+Nothing leaves the handheld until you pair it with a device yourself.
+
+To pair it with your PC:
+
+1. Install Syncthing on the PC and open its web page (it opens at `http://127.0.0.1:8384`).
+2. On the handheld, turn on **Sync emulator saves**. Its device ID appears underneath.
+3. On the PC, choose **Add Remote Device** and type in the handheld's device ID.
+4. Within a minute, an **Accept** button with the PC's name shows up on the handheld. Press it.
+5. Back on the PC, Syncthing asks whether to add the two save folders. Say yes, and pick where
+   they go on the PC. If you use RetroArch on the PC too, point them at its saves and states
+   folders.
+
+When a save is replaced by a newer one from the other device, the old copy goes to a
+`.stversions` folder inside the save folder and stays there for 30 days, in case you need it
+back. The standalone emulators (Dolphin, PPSSPP and the rest) keep saves in their own folders,
+which aren't synced yet.
+
+From a terminal, `steamling-sync status` shows the same information, and
+`steamling-sync accept <DEVICE-ID>` accepts a device.
+
 ### USB file transfer
 
 **Show up on a computer** turns the USB-C port into a media device, the way a phone works: plug
