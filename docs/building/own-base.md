@@ -102,7 +102,7 @@ handheld for flashing and support.
 ## 4. Build the image
 
 `make image` (or `./build.sh`, which is the same thing with friendlier output) builds the whole SD
-card image and leaves it at `build/image/steamling-sm8550-sd.img`. Write that file to a microSD card
+card image and leaves it at `build/image/sm8550/steamling-sm8550-sd.img`. Write that file to a microSD card
 as an image, with balenaEtcher, Rufus or `dd`, and follow the [install guide](../install.md). To
 get a later build onto a handheld that already runs Steamling, see
 [Updating Steamling](../updating.md).

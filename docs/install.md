@@ -20,7 +20,7 @@ larger is recommended.
 ## 1. Flash the SD card
 
 Build the image yourself with the [build guide](building/README.md) (it comes out as
-`build/image/steamling-sm8550-sd.img`), or grab one from the
+`build/image/sm8550/steamling-sm8550-sd.img`), or grab one from the
 [Releases](https://github.com/dvandenburgh/steamling/releases) page once there are some.
 
 Write it to the card **as an image**, with [balenaEtcher](https://etcher.balena.io/), Rufus or `dd`.
