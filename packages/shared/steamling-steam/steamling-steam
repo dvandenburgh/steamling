@@ -83,11 +83,18 @@ case "${ORIENT}" in
   *)          GS_W="${W}"; GS_H="${H}" ;;
 esac
 
-# --prefer-output pins the panel when a board names its output.
-GS_OUTPUT=()
-if [ -n "${STEAMLING_PANEL_OUTPUT:-}" ]; then
-  GS_OUTPUT=(--prefer-output "${STEAMLING_PANEL_OUTPUT}")
-fi
+# Output order, as a Steam Deck's session does it: any external display first (a TV or monitor on
+# a USB-C dock), so plugging one in moves game mode there and unplugging it comes back, then the
+# board's panel, then any other built-in panel (the bottom screen on dual-screen boards). gamescope
+# keeps the last position of a name it sees twice, so each panel is listed once.
+# A board without STEAMLING_PANEL_OUTPUT has one panel, on DSI-1.
+PANEL_OUT="${STEAMLING_PANEL_OUTPUT:-}"
+[ -n "${PANEL_OUT}" ] || PANEL_OUT=DSI-1
+OUTPUTS="*,${PANEL_OUT}"
+for _o in DSI-1 DSI-2; do
+  [ "${_o}" = "${PANEL_OUT}" ] || OUTPUTS="${OUTPUTS},${_o}"
+done
+GS_OUTPUT=(--prefer-output "${OUTPUTS}")
 
 # Rotation autodetects (scanout when the plane can, else composited).
 # Panels past the DPU rotator's 1088-line cap must opt in here or scan out black.
