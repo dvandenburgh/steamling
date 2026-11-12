@@ -63,6 +63,17 @@ trying it and telling me what happened. See [Help test a device](#help-test-a-de
 | AYN Odin 3 | Untested port |
 | KONKR Pocket FIT Elite | Untested port |
 
+## Docking
+
+The Retroid Pocket 6 can drive a TV or monitor over USB-C, through a dock or a USB-C to HDMI
+adapter that supports video (DisplayPort Alt Mode). Plug it in while game mode is running and
+Steam moves to the big screen, with sound following it. Unplug it and Steam comes back to the
+handheld's own screen. A headset plugged into the handheld still gets the sound while docked.
+
+Steam remembers the resolution and refresh rate you pick for each TV in its display settings.
+If the dock also charges the handheld, the power profile runs full clocks while it's connected
+(see [Governor](governor.md#on-a-charger)).
+
 ## Gyro
 
 On the Retroid Pocket 6 the gyro and accelerometer show up in Steam as part of the built-in
