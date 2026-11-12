@@ -6,8 +6,8 @@
 # package writes there, so linux-firmware updates never revert the ath12k board file wifi needs.
 pkgname=steamling-firmware-sm8550
 pkgver=0.1.1
-pkgrel=1
-pkgdesc="SM8550 handheld vendor firmware (wifi, ADSP/CDSP, audio, VPU), immune to linux-firmware updates"
+pkgrel=2
+pkgdesc="SM8550 handheld vendor firmware (wifi, ADSP/CDSP, audio, VPU, sensor data), immune to linux-firmware updates"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
 license=('custom:qcom-firmware')   # Qualcomm vendor blobs
@@ -156,6 +156,18 @@ done
 for _f in "${_armada_files[@]}"; do
   source+=("${_f//\//_}::https://raw.githubusercontent.com/armada-os/armada/${_armada}/system_files/usr/lib/firmware/${_f}")
 done
+# Sensor core (gyro) data per board, captured by armada from each board's stock Android. The ADSP
+# reads it through hexagonrpcd (steamling-ssc), and it only works with the exact ADSP firmware it
+# was captured on, so package() checks its recorded hashes against the firmware above.
+# <board> <armada capture name>
+_ssc=b031deef99a095104ef234c5a0705850152dffe1   # armada-os/armada, packages/armada-ssc/data/
+_ssc_boards=(
+  'rp6 retroid-pocket-6'
+)
+for _b in "${_ssc_boards[@]}"; do
+  source+=("ssc-${_b%% *}.tar.gz::https://raw.githubusercontent.com/armada-os/armada/${_ssc}/packages/armada-ssc/data/${_b#* }.tar.gz")
+  noextract+=("ssc-${_b%% *}.tar.gz")
+done
 sha256sums=(
   '5660a1aa3db12716b42c687b0c88ef4f6ac80bd46e42cfe3636ed332d3f6e6ee'
   '8cc9a64baf68681ece5e26a8445630749eccbfb4517bdbf6802856787afa7c2d'
@@ -286,6 +298,7 @@ sha256sums=(
   '982a99853495e34726b8e44697fdfad303334de0a67cbf6cde306c8f1731000b'
   'a73ecfe2239a56eb7ad1573fa35977fd57557cfa7c220ba5437f88d256c907ad'
   'be8c6fba330908e4683fb6282761cb08485a302d6a66e09721e102e342f27236'
+  '3e8e93bfd6048eb0b724015c1852a0dd31033daa1798da8f41600ddad65b486f'
 )
 
 package() {
@@ -299,4 +312,22 @@ package() {
   # The RP6 and Nova card (SM8550-RetroidPocket-I2S, Retroid's name for it) uses the same graph:
   # speakers on Primary MI2S, headphones on RX codec DMA 0, mics on TX codec DMA 3, DP.
   ln -s AYN-Odin2-tplg.bin "${pkgdir}/usr/lib/firmware/updates/qcom/sm8550/SM8550-RetroidPocket-I2S-tplg.bin"
+
+  local _b _board _dest _e _fw
+  for _b in "${_ssc_boards[@]}"; do
+    _board="${_b%% *}"
+    _dest="${pkgdir}/usr/share/steamling/ssc/${_board}"
+    mkdir -p "${_dest}"
+    tar -xzf "${srcdir}/ssc-${_board}.tar.gz" -C "${_dest}" --no-same-owner
+    for _e in $(sed -n 's/^adsp_sha256=//p' "${_dest}/SOURCE"); do
+      _fw="${pkgdir}/usr/lib/firmware/updates/${_e%%:*}"
+      [ "$(sha256sum "${_fw}" 2>/dev/null | cut -d' ' -f1)" = "${_e#*:}" ] || {
+        echo "${_board}: sensor data was captured on a different ${_e%%:*}" >&2
+        return 1
+      }
+    done
+    # The registry records every config's mtime as 0; any other mtime makes the ADSP reparse
+    # them all at boot.
+    find "${_dest}" -newermt @0 -exec touch -h -d @0 {} +
+  done
 }
