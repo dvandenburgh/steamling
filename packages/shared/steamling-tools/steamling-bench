@@ -11,7 +11,10 @@ import pwd
 import statistics
 import struct
 import subprocess
+import resource
+import shutil
 import sys
+import tempfile
 import time
 
 USAGE = """usage: steamling-bench <test> [options]
@@ -22,6 +25,7 @@ USAGE = """usage: steamling-bench <test> [options]
   load [MINUTES]            clocks, temperatures, power and fan while you play (default 10)
   input [SECONDS] [DEVICE]  how often the controller reports and how evenly (sudo; default 10)
   frames [CSV]              frame times from a MangoHud log (default: the newest one)
+  video                     whether the video decoder chip works, and what it saves over the CPU
   compare A B               two results side by side
   list                      saved results
 """
@@ -509,6 +513,70 @@ def cmd_frames(args):
     save("frames", lines)
 
 
+# --- video -------------------------------------------------------------------------------------
+
+def video_devices():
+    """V4L2 nodes by driver name: the decoder chip shows up as a memory-to-memory device."""
+    out = []
+    for dev in sorted(glob.glob("/sys/class/video4linux/video*")):
+        name = read(os.path.join(dev, "name"))
+        if name:
+            out.append(f"{os.path.basename(dev)} ({name})")
+    return out
+
+
+def timed(cmd):
+    """Wall time, CPU time of the child, and whether it finished cleanly."""
+    before = resource.getrusage(resource.RUSAGE_CHILDREN)
+    start = time.monotonic()
+    try:
+        ok = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=300).returncode == 0
+    except subprocess.SubprocessError:
+        ok = False
+    wall = time.monotonic() - start
+    after = resource.getrusage(resource.RUSAGE_CHILDREN)
+    cpu = (after.ru_utime - before.ru_utime) + (after.ru_stime - before.ru_stime)
+    return wall, cpu, ok
+
+
+def cmd_video(_args):
+    if not shutil.which("ffmpeg"):
+        die("ffmpeg is not installed")
+    decoders = run(["ffmpeg", "-hide_banner", "-decoders"])
+    hw = {codec: f"{codec}_v4l2m2m" for codec in ("h264", "hevc", "vp9")
+          if f" {codec}_v4l2m2m " in decoders}
+    lines = info_lines() + [
+        f"video devices: {', '.join(video_devices()) or 'none'}",
+        f"ffmpeg hardware decoders: {', '.join(hw.values()) or 'none'}",
+    ]
+    # A 10 second 1080p60 clip, made here so every handheld decodes the same thing.
+    seconds, fps = 10, 60
+    frames = seconds * fps
+    encoders = {"h264": "libx264", "hevc": "libx265"}
+    with tempfile.TemporaryDirectory() as tmp:
+        for codec, encoder in encoders.items():
+            if codec not in hw:
+                continue
+            clip = os.path.join(tmp, f"{codec}.mkv")
+            print(f"making a {codec} test clip...", flush=True)
+            _, _, ok = timed(["ffmpeg", "-v", "error", "-f", "lavfi", "-i",
+                              f"testsrc2=size=1920x1080:rate={fps}", "-t", str(seconds),
+                              "-c:v", encoder, "-preset", "veryfast", "-pix_fmt", "yuv420p", clip])
+            if not ok:
+                lines.append(f"{codec}: could not make a test clip with {encoder}")
+                continue
+            for label, decoder in (("software", codec), ("hardware", hw[codec])):
+                print(f"decoding {codec} in {label}...", flush=True)
+                wall, cpu, ok = timed(["ffmpeg", "-v", "error", "-c:v", decoder, "-i", clip,
+                                       "-f", "null", "-"])
+                if not ok:
+                    lines.append(f"{codec} {label} decode: failed")
+                    continue
+                lines.append(f"{codec} {label} decode fps: {fmt(frames / wall)}")
+                lines.append(f"{codec} {label} decode cpu (% of one core): {fmt(cpu / wall * 100, 0)}")
+    save("video", lines)
+
+
 # --- compare / list ----------------------------------------------------------------------------
 
 def load_result(path):
@@ -550,7 +618,8 @@ def cmd_list(_args):
 
 def main():
     tests = {"info": cmd_info, "boot": cmd_boot, "sleep": cmd_sleep, "load": cmd_load,
-             "input": cmd_input, "frames": cmd_frames, "compare": cmd_compare, "list": cmd_list}
+             "input": cmd_input, "frames": cmd_frames, "video": cmd_video,
+             "compare": cmd_compare, "list": cmd_list}
     if len(sys.argv) < 2 or sys.argv[1] not in tests:
         print(USAGE, end="")
         sys.exit(0 if len(sys.argv) < 2 else 2)

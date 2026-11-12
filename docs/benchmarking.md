@@ -18,6 +18,7 @@ always tell two runs apart later.
 | `steamling-bench load 10` | CPU and GPU clocks, temperatures, battery power and fan while you play | 10 minutes |
 | `sudo steamling-bench input 10` | How often the controller reports, and how evenly | 10 seconds |
 | `steamling-bench frames` | Frame times from a MangoHud log | Instant |
+| `steamling-bench video` | Whether the video decoder chip works, and how much CPU it saves | About a minute |
 | `steamling-bench info` | Just the header: what is running right now | Instant |
 
 ### Boot
@@ -91,6 +92,15 @@ MANGOHUD_CONFIG=no_display,autostart_log=5,log_duration=60,output_folder=/home/d
 Start the game. Five seconds in, it records the next 60 seconds, without showing anything extra
 on screen. Then run `steamling-bench frames`, which reads the newest log. Remove the launch options
 again when you're done.
+
+### Video
+
+The SoC has a video decoder chip that plays H.264, HEVC and VP9 video without loading the CPU.
+Apps that play video through FFmpeg can use it, Moonlight among them, for streaming games from
+your PC. `steamling-bench video` makes a 10 second 1080p60 test clip, decodes it once on the CPU
+and once on the chip, and shows the speed and CPU use of each. The chip should use far less CPU.
+If its lines say `failed`, or `ffmpeg hardware decoders` says `none`, the chip isn't working on
+your handheld, and that output is useful in a bug report.
 
 ## Comparing two runs
 
