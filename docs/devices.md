@@ -80,17 +80,29 @@ On the Retroid Pocket 6 the gyro and accelerometer show up in Steam as part of t
 controller, so you can set up gyro aiming in a game's controller settings like on a Steam Deck.
 The gyro calibrates itself whenever the handheld sits still for a moment.
 
-The settings live in `/etc/steamling/gyro.conf`, which doesn't exist until you make it:
+To check it, open any game's controller settings in Steam, pick a gyro option such as **Gyro
+To Joystick Camera**, and tilt the handheld.
 
-```bash
-sudo mkdir -p /etc/steamling
-echo 'STEAMLING_GYRO=0' | sudo tee /etc/steamling/gyro.conf   # turn the gyro off
-sudo systemctl restart inputplumber
-```
+Two settings live in `/etc/steamling/gyro.conf`, a file you create yourself. You need a terminal
+for this: Konsole in desktop mode, or [SSH](governor.md#remote-access).
 
-If tilting the handheld moves things the wrong way around on your unit, a line like
-`STEAMLING_GYRO_CORRECTION="0, 1, 0; -1, 0, 0; 0, 0, 1"` rotates the axes before Steam sees them
-(each group of three numbers is one row of a rotation). Restart InputPlumber after changing it.
+- **Turning the gyro off.** Run these three lines:
+
+  ```bash
+  sudo mkdir -p /etc/steamling
+  echo 'STEAMLING_GYRO=0' | sudo tee /etc/steamling/gyro.conf
+  sudo systemctl restart inputplumber
+  ```
+
+  To turn it back on, delete the file (`sudo rm /etc/steamling/gyro.conf`) and restart
+  InputPlumber the same way.
+- **Axes the wrong way round.** If tilting the handheld moves the camera the wrong way, or turns
+  it when you tilt the other axis, your unit may have its sensor mounted differently.
+  `STEAMLING_GYRO_CORRECTION` in the same file rotates the axes before Steam sees them, written as
+  three rows of three numbers, for example
+  `STEAMLING_GYRO_CORRECTION="0, 1, 0; -1, 0, 0; 0, 0, 1"`. Working out the right rows is fiddly,
+  so please [open an issue](https://github.com/dvandenburgh/steamling/issues) with what you see
+  instead: if it's every RP6, the fix belongs in Steamling.
 
 ## Building for your handheld
 
