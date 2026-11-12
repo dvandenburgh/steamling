@@ -20,6 +20,9 @@ Open an [issue on GitHub](https://github.com/dvandenburgh/steamling/issues).
 - **No battery charge limit on the Retroid Pocket 6.** Its battery firmware refuses a charge
   limit (the request times out), so Steam doesn't offer the setting and the battery always charges
   to 100%. Other handhelds that support one, like the Odin 3, get the setting in Steam.
+- **Docking is new.** Moving game mode to a TV over a USB-C dock, and sound following it, are built
+  for the Retroid Pocket 6 but haven't been tried on many docks and TVs yet. If yours doesn't show
+  a picture, or the sound stays on the handheld, please say which dock or adapter you used.
 - **Gyro on the Retroid Pocket 6 only, and through Steam Input.** The RP6's gyro works for gyro
   aiming set up in Steam's controller settings, in any game. Emulators that read motion
   themselves (motion controls in Switch, Wii U and 3DS games) don't get it yet, because they see
