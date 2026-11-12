@@ -4,7 +4,7 @@
 # release's sha256sum.txt.asc.
 pkgname=syncthing-bin
 pkgver=2.1.7
-pkgrel=1
+pkgrel=2
 pkgdesc="Open source continuous file synchronization (official aarch64 release)"
 arch=('aarch64')
 url="https://syncthing.net"
@@ -13,8 +13,10 @@ depends=('glibc')
 provides=('syncthing')
 conflicts=('syncthing')
 options=('!strip' '!debug')
-source=("https://github.com/syncthing/syncthing/releases/download/v${pkgver}/syncthing-linux-arm64-v${pkgver}.tar.gz")
-sha256sums=('48e456690cd2b97e7d26b02b5ac35f62a3b36172267b144cfeaf02c993ab955c')
+source=("https://github.com/syncthing/syncthing/releases/download/v${pkgver}/syncthing-linux-arm64-v${pkgver}.tar.gz"
+        '10-steamling.conf')
+sha256sums=('48e456690cd2b97e7d26b02b5ac35f62a3b36172267b144cfeaf02c993ab955c'
+            'SKIP')
 
 package() {
   cd "syncthing-linux-arm64-v${pkgver}"
@@ -22,5 +24,7 @@ package() {
   # Not enabled: steamling-sync turns it on for the deck user when you ask for save sync.
   install -Dm644 etc/linux-systemd/user/syncthing.service \
     "${pkgdir}/usr/lib/systemd/user/syncthing.service"
+  install -Dm644 "${srcdir}/10-steamling.conf" \
+    "${pkgdir}/usr/lib/systemd/user/syncthing.service.d/10-steamling.conf"
   install -Dm644 LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.txt"
 }
