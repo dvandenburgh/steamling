@@ -3,7 +3,7 @@
 # The plugin frontend (dist/index.js) is prebuilt and committed — no node at package build time.
 pkgname=steamling-decky
 pkgver=0.1.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Decky Loader (native arm64) + the Governor QAM plugin"
 arch=('aarch64')
 # PluginLoader is a PyInstaller onefile build: stripping would cut off the archive appended to it.
