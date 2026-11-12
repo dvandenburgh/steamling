@@ -18,3 +18,4 @@ wxwidgets-steamling :: conflicts=wxwidgets-common :: provides ALARM's wxwidgets 
 wxwidgets-steamling :: conflicts=wxwidgets-gtk3 :: provides ALARM's wxwidgets split in one package
 steamling-bsp-common :: conflicts=linux-steamling-sm8550<7.2.10-3 :: the /flash deploy scripts and hook these kernels shipped (#126)
 heroic-games-launcher-bin :: conflicts=heroic-games-launcher :: the AUR names its Heroic package that; two copies of one launcher can't both be installed
+syncthing-bin :: conflicts=syncthing :: the official release takes the name over ALARM's
