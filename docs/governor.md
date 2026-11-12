@@ -37,7 +37,7 @@ CPU scheduler and fan curve are on the [Performance](#performance) tab. A game's
 also reachable from its library page: **Manage → Governor Settings**.
 
 **Performance** (per game only): the CPU scheduler and fan curve to use while this game runs,
-or **Use system setting** to follow the Performance tab.
+or **Use global** to follow the Performance tab.
 
 **Game Tweaks**
 
