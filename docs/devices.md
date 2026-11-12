@@ -63,6 +63,24 @@ trying it and telling me what happened. See [Help test a device](#help-test-a-de
 | AYN Odin 3 | Untested port |
 | KONKR Pocket FIT Elite | Untested port |
 
+## Gyro
+
+On the Retroid Pocket 6 the gyro and accelerometer show up in Steam as part of the built-in
+controller, so you can set up gyro aiming in a game's controller settings like on a Steam Deck.
+The gyro calibrates itself whenever the handheld sits still for a moment.
+
+The settings live in `/etc/steamling/gyro.conf`, which doesn't exist until you make it:
+
+```bash
+sudo mkdir -p /etc/steamling
+echo 'STEAMLING_GYRO=0' | sudo tee /etc/steamling/gyro.conf   # turn the gyro off
+sudo systemctl restart inputplumber
+```
+
+If tilting the handheld moves things the wrong way around on your unit, a line like
+`STEAMLING_GYRO_CORRECTION="0, 1, 0; -1, 0, 0; 0, 0, 1"` rotates the axes before Steam sees them
+(each group of three numbers is one row of a rotation). Restart InputPlumber after changing it.
+
 ## Building for your handheld
 
 Follow the [build guide](building/README.md), but add `--device` with your chip from the list
