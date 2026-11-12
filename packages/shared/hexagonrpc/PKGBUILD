@@ -1,0 +1,42 @@
+# hexagonrpc - answers the ADSP's file and callback requests over FastRPC. The ADSP has no
+# storage of its own: the sensor process that runs the gyro and accelerometer reads its config
+# and registry through hexagonrpcd, and won't start without it. steamling-ssc runs it at boot.
+# The patches (PATCHES.md) add what newer sensor firmware asks for: the sns_registry callback,
+# a writable registry, and large callbacks.
+pkgname=hexagonrpc
+pkgver=0.5.0
+pkgrel=1
+_commit=435ed1cd68e20f8a9fe4871233ed1f8ce7ccf9e8   # v0.5.0
+pkgdesc="FastRPC library and file server for Qualcomm DSPs"
+arch=('aarch64')
+url="https://github.com/linux-msm/hexagonrpc"
+license=('GPL-3.0-or-later')
+depends=('glibc')
+makedepends=('git' 'meson' 'ninja')
+source=("hexagonrpc::git+https://github.com/linux-msm/hexagonrpc.git#commit=${_commit}"
+        '0001-hexagonrpcd-add-sns-registry-reverse-interface.patch'
+        '0002-hexagonrpcd-add-writable-hexagonfs.patch'
+        '0003-hexagonrpcd-support-writable-sensor-registry.patch'
+        '0004-hexagonrpcd-support-large-and-extended-callbacks.patch'
+        '0005-hexagonrpcd-answer-a-request-it-cannot-serve.patch')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+prepare() {
+  cd hexagonrpc
+  local p
+  for p in "${srcdir}"/000[1-9]-*.patch; do
+    patch -p1 < "${p}"
+  done
+}
+
+build() {
+  arch-meson hexagonrpc build
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "${pkgdir}"
+  # Upstream's units start a generic daemon per DSP; steamling-ssc runs the one the sensor
+  # process needs, with the board's data, so they would only compete for the device node.
+  rm -r "${pkgdir}/usr/lib/systemd"
+}
