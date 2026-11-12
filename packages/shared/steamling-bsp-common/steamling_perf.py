@@ -8,7 +8,7 @@ import configparser
 UNDERCLOCK_LEVELS = ("none", "small", "medium", "large")
 PROFILE_KEYS = {"label", "underclock", "cpu_max", "gpu_min", "gpu_max"}
 SOC_OVERLAY_KEYS = {"gpu_min", "gpu_max"}
-GENERAL_KEYS = {"default_profile", "gpu_manual_min"}
+GENERAL_KEYS = {"default_profile", "gpu_manual_min", "charger_profile"}
 
 
 class FactoryError(ValueError):
@@ -120,6 +120,9 @@ def load_factory(text, dropins=()):
         data["gpu_manual_min"] = _ratio(g.get("gpu_manual_min", "0"), 0.0, 1.0)
     except ValueError as e:
         raise FactoryError(f"[general] gpu_manual_min: {e}") from e
+    data["charger_profile"] = g.get("charger_profile", "")
+    if data["charger_profile"] and data["charger_profile"] not in data["profiles"]:
+        raise FactoryError(f"charger_profile {data['charger_profile']!r} is not a profile")
     return data
 
 
@@ -133,6 +136,7 @@ def layer_override(factory, text):
         "tables": factory["tables"],
         "default": factory["default"],
         "gpu_manual_min": factory["gpu_manual_min"],
+        "charger_profile": factory.get("charger_profile", ""),
     }
     warnings = []
     if text is None:
@@ -170,6 +174,8 @@ def layer_override(factory, text):
             for k, v in p[sec].items():
                 if k == "default_profile" and v in factory["profiles"]:
                     eff["default"] = v
+                elif k == "charger_profile" and (v == "" or v in factory["profiles"]):
+                    eff["charger_profile"] = v
                 elif k == "gpu_manual_min":
                     try:
                         eff["gpu_manual_min"] = _ratio(v, 0.0, 1.0)
@@ -181,6 +187,16 @@ def layer_override(factory, text):
             # Underclock tables are hardware data, not a user preference.
             warnings.append(f"[{sec}] ignored: only profile and general sections are overridable")
     return eff, warnings
+
+
+def on_power(eff, pid, external_power):
+    """The profile whose clocks go in: the picked one, stepped up to charger_profile while the
+    handheld runs on external power. Profiles rank by their order in the file, fastest first, so
+    a pick already at or above charger_profile is never lowered."""
+    charger = eff.get("charger_profile", "")
+    if not external_power or not charger or charger not in eff["profiles"] or pid not in eff["order"]:
+        return pid
+    return charger if eff["order"].index(charger) < eff["order"].index(pid) else pid
 
 
 def choose_at_most(freqs, target):

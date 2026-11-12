@@ -1,0 +1,9 @@
+# Tells steamling-perfd when a charger or powered dock comes or goes, so a slower power profile can
+# run faster clocks while plugged in (charger_profile in power-profiles.conf). Battery changes are
+# left out: they arrive every few seconds and never change the answer. perfd re-reads the supplies
+# itself, so a removed one needs no attributes. Boot's add events are left out too: perfd reads
+# the supplies when it starts.
+SUBSYSTEM=="power_supply", ACTION=="change", ATTR{type}!="Battery", \
+  RUN+="/usr/bin/busctl --system --timeout=2 call org.steamling.Perf /org/steamling/Perf org.steamling.Perf1 PowerChanged"
+SUBSYSTEM=="power_supply", ACTION=="remove", \
+  RUN+="/usr/bin/busctl --system --timeout=2 call org.steamling.Perf /org/steamling/Perf org.steamling.Perf1 PowerChanged"

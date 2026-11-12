@@ -3,7 +3,7 @@
 # live in devices/<name>/packages/steamling-bsp-<name>, which depends on this package.
 pkgname=steamling-bsp-common
 pkgver=0.1.1
-pkgrel=1.6
+pkgrel=1.7
 pkgdesc="steamling shared board support: sleep.d dispatcher, suspend hooks, power-key policy, session udev rules, wheel sudo, fan/scheduler daemons, ABL updater, power profiles daemon, realtime priority ladder, zram swap and memory sysctls, deck session limits, kernel /flash deploy, volume rocker daemon, journal cap, iwd Wi-Fi backend, panel refresh calibration, controller MCU mode quirks, sensor core gyro"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -49,8 +49,9 @@ source=('steamling-sleep' 'sdam-debug-pre' 'sdam-debug-post'
         '99-steamling-usb-autosuspend.rules' '71-steamling-bottom-touch.rules'
         'ayn.icna3512.oled.lua' 'ayn.icna3520.oled.lua' 'retroid.ch13726a.oled.lua'
         'retroid.il97680a.oled.lua' 'retroid.rp6.oled.lua'
-        'steamling-ssc' 'steamling-ssc.service' 'inputplumber-gyro.conf')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        'steamling-ssc' 'steamling-ssc.service' 'inputplumber-gyro.conf'
+        '61-steamling-power.rules')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   # gamescope panel profiles, one per panel, whichever family carries it: each matches on
@@ -89,6 +90,8 @@ package() {
     "${pkgdir}/usr/lib/udev/rules.d/90-steamling-backlight.rules"
   install -Dm644 "${srcdir}/60-steamling-controllers.rules" \
     "${pkgdir}/usr/lib/udev/rules.d/60-steamling-controllers.rules"
+  install -Dm644 "${srcdir}/61-steamling-power.rules" \
+    "${pkgdir}/usr/lib/udev/rules.d/61-steamling-power.rules"
   install -Dm644 "${srcdir}/71-steamling-bottom-touch.rules" \
     "${pkgdir}/usr/lib/udev/rules.d/71-steamling-bottom-touch.rules"
   install -Dm644 "${srcdir}/99-steamling-usb-autosuspend.rules" \

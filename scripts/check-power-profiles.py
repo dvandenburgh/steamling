@@ -119,6 +119,21 @@ for name, text, want_warn in [
     else:
         check(out["profiles"][pid]["underclock"] == "small", "valid override not applied")
 
+# Charger stepping: a slower pick runs charger_profile's clocks on external power, never the
+# other way, and an empty override turns it off.
+eff, _ = pp.layer_override(factory, None)
+top, last = eff["order"][0], eff["order"][-1]
+charger = eff.get("charger_profile", "")
+check(not charger or charger in eff["profiles"], f"charger_profile {charger!r} is not a profile")
+if charger:
+    check(pp.on_power(eff, last, True) == charger, "a slower profile was not stepped up on a charger")
+    check(pp.on_power(eff, last, False) == last, "a profile was stepped up on battery")
+check(pp.on_power(eff, top, True) == top, "the fastest profile was stepped down on a charger")
+off, w = pp.layer_override(factory, "[general]\ncharger_profile =\n")
+check(not w and pp.on_power(off, last, True) == last, "an empty charger_profile did not turn stepping off")
+_, w = pp.layer_override(factory, "[general]\ncharger_profile = nope\n")
+check(bool(w), "an unknown charger_profile was accepted")
+
 if errors:
     print("\n".join(errors))
     sys.exit(1)

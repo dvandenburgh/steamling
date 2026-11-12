@@ -118,6 +118,24 @@ through. It's greyed out while the game is running.
 
 How hard the handheld runs, and the numbers that show whether a change helped.
 
+### On a charger
+
+Steam's power profile (Performance, Balanced or Powersave, in the quick access menu) saves
+battery by holding the clocks down. While the handheld is on a charger or a powered dock, there's
+no battery to save, so a slower profile runs with Performance clocks instead. Unplug it and your
+profile's own clocks come back. Steam keeps showing the profile you picked the whole time.
+
+To turn this off, or to step up to Balanced instead, add a `[general]` section to
+`/etc/steamling/power-profiles.conf` (create the file if it isn't there):
+
+```ini
+[general]
+charger_profile =
+```
+
+Leave the value empty to turn it off, or write `Balanced`. Then run
+`sudo systemctl restart steamling-perfd`.
+
 ### Performance overlay
 
 Shows live numbers on top of the game: **FPS only**, a **Compact bar** (FPS, CPU, GPU, RAM and
