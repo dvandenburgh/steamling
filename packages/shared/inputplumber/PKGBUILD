@@ -59,7 +59,11 @@ prepare() {
 build() {
   _toolchain
   cd InputPlumber
-  cargo build --release --frozen --target aarch64-unknown-linux-gnu
+  # Upstream's profile is fat LTO in one codegen unit: one core, for most of the build, under
+  # qemu on an x86 host. Thin LTO across 16 units builds about a third faster on two cores and
+  # better on more, and an input router has no hot loop for the difference to show in.
+  CARGO_PROFILE_RELEASE_LTO=thin CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 \
+    cargo build --release --frozen --target aarch64-unknown-linux-gnu
 }
 
 package() {
