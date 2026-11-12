@@ -1,5 +1,5 @@
 import { call } from "@decky/api";
-import type { CacheInfo, CalibrationStatus, Config, ConfigExportResult, ConfigImportResult, ConfigPreview, DeviceInfo, LedConfig, LedSideKey, OverlayStatus, PaddleStatus, PanelStatus, RumbleStatus, SdcardInfo, ShareStatus, SnapshotStatus, SshStatus, SystemStats, TuningStatus, Tweaks, UpdateInfo, UpdateStatus, UsbTransferStatus } from "./types";
+import type { CacheInfo, CalibrationStatus, Config, ConfigExportResult, ConfigImportResult, ConfigPreview, DeviceInfo, LedConfig, LedSideKey, OverlayStatus, PaddleStatus, PanelStatus, RumbleStatus, SdcardInfo, ShareStatus, SnapshotStatus, SyncStatus, SshStatus, SystemStats, TuningStatus, Tweaks, UpdateInfo, UpdateStatus, UsbTransferStatus } from "./types";
 
 export const getConfig = () => call<[], Config>("get_config");
 // The setters answer with only what they changed: a full get_config re-reads the whole Steam
@@ -25,6 +25,9 @@ export const formatSdcard = (label: string) => call<[string], SdcardInfo>("forma
 export const shareStatus = () => call<[], ShareStatus>("share_status");
 export const setShare = (on: boolean) => call<[boolean], ShareStatus>("set_share", on);
 export const installSamba = () => call<[], ShareStatus>("install_samba");
+export const syncStatus = () => call<[], SyncStatus>("sync_status");
+export const setSync = (on: boolean) => call<[boolean], SyncStatus>("set_sync", on);
+export const acceptDevice = (id: string) => call<[string], SyncStatus>("accept_device", id);
 export const deviceInfo = () => call<[], DeviceInfo>("device_info");
 export const sshStatus = () => call<[], SshStatus>("ssh_status");
 export const setSsh = (on: boolean) => call<[boolean], SshStatus>("set_ssh", on);

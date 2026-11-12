@@ -161,6 +161,19 @@ export type ShareStatus = {
   active: boolean;
 };
 
+export type SyncDevice = { id: string; name: string; connected: boolean };
+export type SyncPending = { id: string; name: string; address: string };
+export type SyncFolder = { id: string; label: string; path: string; shared: boolean };
+export type SyncStatus = {
+  installed: boolean;
+  on: boolean;
+  running: boolean;
+  deviceId: string;
+  devices: SyncDevice[];
+  pending: SyncPending[];
+  folders: SyncFolder[];
+};
+
 export type SshStatus = {
   available: boolean;
   on: boolean;

@@ -1,5 +1,6 @@
 import { AddGameSection } from "../components/AddGame";
 import { FileSharing } from "../components/FileSharing";
+import { SaveSync } from "../components/SaveSync";
 import { SdCard } from "../components/SdCard";
 import { UsbTransfer } from "../components/UsbTransfer";
 
@@ -10,6 +11,7 @@ export function Files() {
     <>
       <AddGameSection />
       <FileSharing />
+      <SaveSync />
       <UsbTransfer />
       <SdCard />
     </>

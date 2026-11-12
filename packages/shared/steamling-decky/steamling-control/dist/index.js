@@ -43,6 +43,9 @@ const formatSdcard = (label) => call("format_sdcard", label);
 const shareStatus = () => call("share_status");
 const setShare = (on) => call("set_share", on);
 const installSamba = () => call("install_samba");
+const syncStatus = () => call("sync_status");
+const setSync = (on) => call("set_sync", on);
+const acceptDevice = (id) => call("accept_device", id);
 const deviceInfo = () => call("device_info");
 const sshStatus = () => call("ssh_status");
 const setSsh = (on) => call("set_ssh", on);
@@ -1077,6 +1080,74 @@ function FileSharing() {
                     } }) }))] }));
 }
 
+// Syncthing pairing from a handheld: typing a 63-character device id with a gamepad is no fun,
+// so the id is shown here for the PC side, and the PC's request shows up here to accept.
+function SaveSync() {
+    const [sync, setSyncState] = SP_REACT.useState(null);
+    const [busy, setBusy] = SP_REACT.useState(false);
+    const [status, setStatus] = SP_REACT.useState("");
+    const busyRef = SP_REACT.useRef(false);
+    busyRef.current = busy;
+    const visible = useQamVisible();
+    // Polled only while the menu is open; each poll asks Syncthing, so not too often.
+    SP_REACT.useEffect(() => {
+        if (!visible)
+            return;
+        let cancelled = false;
+        const refresh = async () => {
+            if (busyRef.current)
+                return;
+            try {
+                const next = await syncStatus();
+                if (!cancelled && !busyRef.current)
+                    setSyncState(next);
+            }
+            catch (error) {
+                if (!cancelled)
+                    setStatus(String(error));
+            }
+        };
+        refresh();
+        const timer = window.setInterval(refresh, 10000);
+        return () => {
+            cancelled = true;
+            window.clearInterval(timer);
+        };
+    }, [visible]);
+    const run = async (action) => {
+        if (busyRef.current)
+            return;
+        setBusy(true);
+        setStatus("");
+        try {
+            setSyncState(await action());
+        }
+        catch (error) {
+            setStatus(String(error));
+        }
+        finally {
+            setBusy(false);
+        }
+    };
+    if (sync && !sync.installed)
+        return null;
+    const connected = sync?.devices.filter((d) => d.connected).length ?? 0;
+    const summary = () => {
+        if (status)
+            return status;
+        if (!sync)
+            return "Checking…";
+        if (!sync.on)
+            return "Off - saves stay on this handheld";
+        if (!sync.running)
+            return "Starting…";
+        if (!sync.devices.length)
+            return "On - add this handheld in Syncthing on your PC (device ID below)";
+        return `On - ${connected} of ${sync.devices.length} paired device(s) connected`;
+    };
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("SAVE SYNC"), children: [SP_JSX.jsx(DFL.Field, { label: t("Syncthing"), description: summary() }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Sync emulator saves"), description: t("Keeps ~/Emulation/Saves and States in step with your PC"), checked: !!sync?.on, disabled: busy || !sync, onChange: (on) => run(() => setSync(on)) }) }), sync?.on && sync.deviceId ? (SP_JSX.jsx(DFL.Field, { label: t("This handheld's device ID"), description: sync.deviceId })) : null, sync?.pending.map((p) => (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busy, description: `${p.id.slice(0, 7)}… ${p.address}`, onClick: () => run(() => acceptDevice(p.id)), children: t("Accept {name}", { name: p.name }) }) }, p.id)))] }));
+}
+
 function cardSummary(card) {
     if (!card)
         return "Checking…";
@@ -1223,7 +1294,7 @@ function UsbTransfer() {
 // Getting games and files onto the handheld. SD card last: formatting is the only destructive
 // action, kept away from the casual toggles.
 function Files() {
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(AddGameSection, {}), SP_JSX.jsx(FileSharing, {}), SP_JSX.jsx(UsbTransfer, {}), SP_JSX.jsx(SdCard, {})] }));
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(AddGameSection, {}), SP_JSX.jsx(FileSharing, {}), SP_JSX.jsx(SaveSync, {}), SP_JSX.jsx(UsbTransfer, {}), SP_JSX.jsx(SdCard, {})] }));
 }
 
 // Drives the same state as Steam's own per-game compatibility dropdown (SpecifyCompatTool +

@@ -18,6 +18,7 @@ from steamling_control.modes import fan_mode, lavd_mode, set_fan_mode, set_lavd_
 from steamling_control.overlay import overlay_status, reassert_in_background, set_overlay
 from steamling_control.paddles import paddle_status, set_paddles
 from steamling_control.rumble import restore_rumble, rumble_status, set_rumble
+from steamling_control.savesync import accept_device, set_sync, sync_status
 from steamling_control.sdcard import detect_sdcard, format_sdcard
 from steamling_control.sharing import install_samba, set_share, share_status
 from steamling_control.snapshots import reboot_system, snapshot_status, start_rollback
@@ -66,6 +67,15 @@ class Plugin:
 
     async def format_sdcard(self, label):
         return await asyncio.to_thread(format_sdcard, label)
+
+    async def sync_status(self):
+        return await asyncio.to_thread(sync_status)
+
+    async def set_sync(self, on):
+        return await asyncio.to_thread(set_sync, on)
+
+    async def accept_device(self, device_id):
+        return await asyncio.to_thread(accept_device, device_id)
 
     async def share_status(self):
         return await asyncio.to_thread(share_status)
