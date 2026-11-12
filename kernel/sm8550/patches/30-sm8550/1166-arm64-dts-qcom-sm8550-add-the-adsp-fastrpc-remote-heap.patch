@@ -1,0 +1,69 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] arm64: dts: qcom: sm8550: add the ADSP FastRPC remote heap
+
+The ADSP's sensors process (a static PD, which serves the gyro and
+accelerometer) asks the host for a remote heap when it starts and can't
+start without one. Give the ADSP FastRPC node a reserved region for it,
+plus the LPASS and ADSP_HEAP VMIDs it gets assigned to.
+
+Since "misc: fastrpc: Allocate entire reserved memory for Audio PD in
+probe" the driver hands the whole region to the DSP at probe instead of
+carving the heap out on demand, so the region is no-map here. A reusable
+(CMA) pool would let the kernel place pages in memory the DSP owns.
+
+qcs8550.dtsi replaces the SM8550 reserved-memory block, so it carries the
+heap node too.
+
+Heap size, alignment and VMIDs from justjoseorg's Odin 2 gyro work in
+SteamOS-ARM-Port (qcs8550-ayn-odin2-gyro.dtsi), by way of armada.
+---
+diff --git arch/arm64/boot/dts/qcom/qcs8550.dtsi arch/arm64/boot/dts/qcom/qcs8550.dtsi
+index f0acdd0..43ecada 100644
+--- a/arch/arm64/boot/dts/qcom/qcs8550.dtsi
++++ b/arch/arm64/boot/dts/qcom/qcs8550.dtsi
+@@ -13,6 +13,15 @@
+ 		#size-cells = <2>;
+ 		ranges;
+ 
++		/* Remote heap for the ADSP static (sensors) PD, handed to the DSP at probe */
++		adsp_rpc_remote_heap_mem: adsp-rpc-remote-heap {
++			compatible = "shared-dma-pool";
++			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
++			alignment = <0x0 0x400000>;
++			size = <0x0 0xc00000>;
++			no-map;
++		};
++
+ 
+ 		/* These are 3 types of reserved memory regions here:
+ 		 * 1. Firmware related regions which aren't shared with kernel.
+diff --git arch/arm64/boot/dts/qcom/sm8550.dtsi arch/arm64/boot/dts/qcom/sm8550.dtsi
+index 04dfc8e..0a4b930 100644
+--- a/arch/arm64/boot/dts/qcom/sm8550.dtsi
++++ b/arch/arm64/boot/dts/qcom/sm8550.dtsi
+@@ -838,6 +838,15 @@
+ 		#size-cells = <2>;
+ 		ranges;
+ 
++		/* Remote heap for the ADSP static (sensors) PD, handed to the DSP at probe */
++		adsp_rpc_remote_heap_mem: adsp-rpc-remote-heap {
++			compatible = "shared-dma-pool";
++			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
++			alignment = <0x0 0x400000>;
++			size = <0x0 0xc00000>;
++			no-map;
++		};
++
+ 		hyp_mem: hyp-region@80000000 {
+ 			reg = <0 0x80000000 0 0xa00000>;
+ 			no-map;
+@@ -3219,6 +3228,9 @@
+ 					qcom,glink-channels = "fastrpcglink-apps-dsp";
+ 					label = "adsp";
+ 					qcom,non-secure-domain;
++					memory-region = <&adsp_rpc_remote_heap_mem>;
++					/* LPASS, ADSP_HEAP */
++					qcom,vmids = <0x16 0x25>;
+ 					#address-cells = <1>;
+ 					#size-cells = <0>;
+ 
