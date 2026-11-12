@@ -1,0 +1,28 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] drm: apply the preferred mode to internal screens only
+
+-W, -H and -r give the size and rate of the built-in panel, and
+setup_best_connector() looked for that exact mode on whichever display
+it picked. On a docked TV that lists the same mode (1920x1080 at 120 Hz
+on many current TVs), gamescope pinned it and never reached the mode
+Steam saved for that TV in GAMESCOPE_MODE_SAVE_FILE, so the resolution
+picked in Steam's display settings was lost on every replug. An
+external display now goes straight to its saved mode, then to its own
+preferred one.
+---
+diff --git a/src/Backends/DRMBackend.cpp b/src/Backends/DRMBackend.cpp
+index b47b329..021c2e3 100644
+--- a/src/Backends/DRMBackend.cpp
++++ b/src/Backends/DRMBackend.cpp
+@@ -1444,7 +1444,10 @@ static bool setup_best_connector(struct drm_t *drm, bool force, bool initial)
+ 	s_ExternalBroadcastRGBMode = GAMESCOPE_BROADCAST_RGB_MODE_AUTOMATIC;
+ 
+ 	const drmModeModeInfo *mode = nullptr;
+-	if ( drm->preferred_width != 0 || drm->preferred_height != 0 || drm->preferred_refresh != 0 )
++	// -W/-H/-r describe the built-in panel. Applied to an external display they would pin a TV
++	// that happens to list that mode and skip the mode Steam saved for it below.
++	if ( best->GetScreenType() == gamescope::GAMESCOPE_SCREEN_TYPE_INTERNAL &&
++		( drm->preferred_width != 0 || drm->preferred_height != 0 || drm->preferred_refresh != 0 ) )
+ 	{
+ 		mode = find_mode(best->GetModeConnector(), drm->preferred_width, drm->preferred_height, gamescope::ConvertmHzToHz( drm->preferred_refresh ));
+ 	}

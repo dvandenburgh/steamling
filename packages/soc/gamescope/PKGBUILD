@@ -6,7 +6,7 @@
 pkgname=gamescope
 epoch=1
 pkgver=3.17.0.rocknix.20261031.309eee7
-pkgrel=3
+pkgrel=4
 _commit=309eee74f967d458cf71836619132010f88ee796
 install=gamescope.install
 pkgdesc="SteamOS session compositing WM — patched (for msm handhelds)"
@@ -52,8 +52,9 @@ source=("gamescope::git+https://github.com/ValveSoftware/gamescope.git#commit=${
         '0031-steamcompmgr-clock-anchored-fps-limiter.patch'
         # Steam's refresh slider gets the rate it asked for, not its highest multiple (armada 0032)
         '0032-steamcompmgr-use-the-exact-rate-for-refresh-only-requests.patch'
-        '0033-steamcompmgr-read-the-client-s-size-hint-flags.patch')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        '0033-steamcompmgr-read-the-client-s-size-hint-flags.patch'
+        '0034-drm-apply-the-preferred-mode-to-internal-screens-only.patch')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
   cd gamescope
