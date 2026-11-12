@@ -20,8 +20,10 @@ Open an [issue on GitHub](https://github.com/dvandenburgh/steamling/issues).
 - **No battery charge limit on the Retroid Pocket 6.** Its battery firmware refuses a charge
   limit (the request times out), so Steam doesn't offer the setting and the battery always charges
   to 100%. Other handhelds that support one, like the Odin 3, get the setting in Steam.
-- **Gyro on the Retroid Pocket 6 only.** The RP6's gyro and accelerometer reach Steam Input
-  (and through it, emulators that use motion controls). The other handhelds' motion sensors
+- **Gyro on the Retroid Pocket 6 only, and through Steam Input.** The RP6's gyro works for gyro
+  aiming set up in Steam's controller settings, in any game. Emulators that read motion
+  themselves (motion controls in Switch, Wii U and 3DS games) don't get it yet, because they see
+  Steam's virtual controller rather than the handheld's. The other handhelds' motion sensors
   aren't wired up yet. If the gyro reads its axes turned on your unit, or you'd rather have it
   off, see `/etc/steamling/gyro.conf` in [Supported devices](devices.md#gyro).
 
