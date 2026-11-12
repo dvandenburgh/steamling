@@ -66,7 +66,8 @@ Everything lives under `~/Emulation` (created for you on first login):
 
 Drop each game into the folder for its system (`~/Emulation/ROMs/gba/`, `~/Emulation/ROMs/snes/`,
 and so on), then rescan in ES-DE. A single copy of `~/Emulation` is self-contained: ROMs, BIOS,
-and saves all travel together.
+and saves all travel together. To keep `Saves` and `States` in step with a PC automatically, see
+[Save sync](governor.md#save-sync).
 
 ### More room: games on a microSD card
 
@@ -153,7 +154,9 @@ Once it is on, open one of these from the other computer:
 Favorite a game in ES-DE (the Favorite button), quit ES-DE, and re-enter Game Mode. The game
 appears in your Steam library in a "Steamling" collection, ready to launch straight from Big
 Picture. Un-favorite to remove it. Favorites are synced when you enter Game Mode, so they show up
-on the next entry, never mid-session.
+on the next entry, never mid-session. Two favorites with the same name, like Tetris on Game Boy
+and on NES, get their system added in Steam (`Tetris (gb)`) so they keep separate artwork and
+play time.
 
 ## Tweaking individual emulator settings
 
