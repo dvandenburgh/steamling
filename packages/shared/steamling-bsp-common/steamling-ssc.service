@@ -1,0 +1,12 @@
+[Unit]
+Description=Sensor core file server for the gyro and accelerometer
+# Boards without sensor data exit straight away.
+After=local-fs.target
+
+[Service]
+ExecStart=/usr/lib/steamling/steamling-ssc
+# The ADSP's sensor process can't attach twice in one boot, so a restart would never help.
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

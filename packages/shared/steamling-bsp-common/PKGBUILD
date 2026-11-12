@@ -3,8 +3,8 @@
 # live in devices/<name>/packages/steamling-bsp-<name>, which depends on this package.
 pkgname=steamling-bsp-common
 pkgver=0.1.1
-pkgrel=1.5
-pkgdesc="steamling shared board support: sleep.d dispatcher, suspend hooks, power-key policy, session udev rules, wheel sudo, fan/scheduler daemons, ABL updater, power profiles daemon, realtime priority ladder, zram swap and memory sysctls, deck session limits, kernel /flash deploy, volume rocker daemon, journal cap, iwd Wi-Fi backend, panel refresh calibration, controller MCU mode quirks"
+pkgrel=1.6
+pkgdesc="steamling shared board support: sleep.d dispatcher, suspend hooks, power-key policy, session udev rules, wheel sudo, fan/scheduler daemons, ABL updater, power profiles daemon, realtime priority ladder, zram swap and memory sysctls, deck session limits, kernel /flash deploy, volume rocker daemon, journal cap, iwd Wi-Fi backend, panel refresh calibration, controller MCU mode quirks, sensor core gyro"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
 license=('GPL-2.0-or-later')
@@ -15,7 +15,8 @@ depends=('bash' 'sudo' 'steamling-core' 'python' 'python-gobject' 'python-evdev'
 # kernel in the same transaction instead of failing on file conflicts.
 conflicts=('linux-steamling-sm8550<7.2.10-3')
 optdepends=('inputplumber: the 001-inputplumber suspend hooks manage its USB/IP deck target'
-            'scx-scheds: scx_lavd for steamling-lavd.service (unit self-skips without it)')
+            'scx-scheds: scx_lavd for steamling-lavd.service (unit self-skips without it)'
+            'hexagonrpc: the gyro on boards whose firmware package ships sensor core data')
 install=steamling-bsp-common.install
 backup=('etc/security/limits.d/60-steamling-deck.conf')
 source=('steamling-sleep' 'sdam-debug-pre' 'sdam-debug-post'
@@ -47,8 +48,9 @@ source=('steamling-sleep' 'sdam-debug-pre' 'sdam-debug-post'
         'steamling-gamepad-quirk' 'steamling-gamepad-quirk.service' 'steamling-board-env'
         '99-steamling-usb-autosuspend.rules' '71-steamling-bottom-touch.rules'
         'ayn.icna3512.oled.lua' 'ayn.icna3520.oled.lua' 'retroid.ch13726a.oled.lua'
-        'retroid.il97680a.oled.lua' 'retroid.rp6.oled.lua')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        'retroid.il97680a.oled.lua' 'retroid.rp6.oled.lua'
+        'steamling-ssc' 'steamling-ssc.service' 'inputplumber-gyro.conf')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   # gamescope panel profiles, one per panel, whichever family carries it: each matches on
@@ -118,6 +120,13 @@ package() {
   install -d "${pkgdir}/usr/lib/systemd/system/inputplumber.service.wants"
   ln -sf "../steamling-gamepad-target.service" \
     "${pkgdir}/usr/lib/systemd/system/inputplumber.service.wants/steamling-gamepad-target.service"
+  install -Dm755 "${srcdir}/steamling-ssc" "${pkgdir}/usr/lib/steamling/steamling-ssc"
+  install -Dm644 "${srcdir}/steamling-ssc.service" "${pkgdir}/usr/lib/systemd/system/steamling-ssc.service"
+  install -d "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants"
+  ln -sf "../steamling-ssc.service" \
+    "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/steamling-ssc.service"
+  install -Dm644 "${srcdir}/inputplumber-gyro.conf" \
+    "${pkgdir}/usr/lib/systemd/system/inputplumber.service.d/10-steamling-gyro.conf"
   install -Dm644 "${srcdir}/60-steamling-sdl-xb360.conf" \
     "${pkgdir}/usr/lib/environment.d/60-steamling-sdl-xb360.conf"
   install -Dm644 "${srcdir}/steamling-sdl-xb360.sh" "${pkgdir}/etc/profile.d/steamling-sdl-xb360.sh"

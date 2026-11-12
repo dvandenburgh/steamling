@@ -1,0 +1,58 @@
+#!/bin/sh
+# steamling-ssc - the gyro and accelerometer on boards whose IMU sits behind the Qualcomm sensor
+# core (SSC) on the ADSP. The ADSP has no storage of its own: its sensor process reads its config
+# and registry from the host, which hexagonrpcd serves from /usr/share/steamling/ssc/<board>
+# (shipped by the SoC's firmware package for each board with a capture). Without that directory
+# this does nothing.
+#   steamling-ssc env   writes InputPlumber's opt-in for its FastRPC IMU source (ExecStartPre)
+#   steamling-ssc       runs the file server (steamling-ssc.service)
+# /etc/steamling/gyro.conf: STEAMLING_GYRO=0 turns the gyro off; STEAMLING_GYRO_CORRECTION
+# ("x0, x1, x2; y0, y1, y2; z0, z1, z2") rotates the axes of a unit that reads them turned.
+set -u
+
+for _dc in /usr/lib/steamling/device.conf /etc/steamling/device.conf; do
+  [ -r "${_dc}" ] && . "${_dc}"
+done
+conf() { sed -n "s/^$1=//p" /etc/steamling/gyro.conf 2>/dev/null | tail -1 | tr -d '"'; }
+
+root="/usr/share/steamling/ssc/${STEAMLING_DEVICE:-rp6}"
+supported=0
+[ -d "${root}" ] && supported=1
+
+if [ "${1:-}" = env ]; then
+  enabled=0
+  [ "${supported}" = 1 ] && [ "$(conf STEAMLING_GYRO)" != 0 ] && enabled=1
+  correction="$(conf STEAMLING_GYRO_CORRECTION)"
+  mkdir -p /run/steamling
+  {
+    echo "INPUTPLUMBER_FASTRPC=${enabled}"
+    case "${correction}" in
+      "" | *[!0-9.,\;\ -]*) ;;
+      *) echo "INPUTPLUMBER_SSC_MOUNT_CORRECTION=\"${correction}\"" ;;
+    esac
+  } > /run/steamling/gyro.env
+  exit 0
+fi
+
+# Runs even with the gyro off: the sensor process only comes up if this attaches soon after the
+# ADSP boots, so turning the gyro back on would otherwise need a reboot.
+[ "${supported}" = 1 ] || exit 0
+
+# The sensor process rewrites its registry at boot, so it gets a fresh writable copy each boot.
+state=/run/steamling/ssc
+rm -rf "${state}"
+mkdir -p "${state}"
+cp -a "${root}/." "${state}/"
+
+# The ADSP has one FastRPC node; the devicetree decides whether it is the secure one. It shows
+# up once the ADSP has booted, a few seconds into boot.
+i=0
+while [ "${i}" -lt 60 ]; do
+  for node in /dev/fastrpc-adsp /dev/fastrpc-adsp-secure; do
+    [ -e "${node}" ] && exec hexagonrpcd -f "${node}" -d adsp -s -R "${state}"
+  done
+  sleep 1
+  i=$((i + 1))
+done
+echo "steamling-ssc: the ADSP's FastRPC node never appeared" >&2
+exit 1
