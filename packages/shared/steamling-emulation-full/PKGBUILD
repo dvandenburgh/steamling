@@ -3,7 +3,7 @@
 # are optdepends instead, so a failed optional build cannot block the layer.
 pkgname=steamling-emulation-full
 pkgver=0.1.1
-pkgrel=1
+pkgrel=2
 pkgdesc="steamling optional layer: ES-DE frontend, RetroArch cores, standalone emulators (Switch: bring your own)"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -25,7 +25,9 @@ depends=('steamling-emulation'
          'armsx2-bin'
          'rpcs3-bin'
          'xemu-bin'
-         'vita3k-bin')
+         'vita3k-bin'
+         # Save sync (steamling-sync, Governor's Save Sync); off until you turn it on.
+         'syncthing-bin')
 optdepends=('dolphin-emu: GameCube/Wii'
             'azahar: 3DS'
             'cemu: Wii U')

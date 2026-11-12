@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+# steamling-sync - keeps emulator saves in step with a PC or another handheld, through Syncthing.
+# Runs as the deck user (Governor calls it that way). Syncthing keeps its own config; this only
+# turns the user service on and off, adds the save folders, and accepts a device you pair from
+# the other side. Nothing leaves the handheld until you accept a device.
+#   steamling-sync on | off | status | accept <DEVICE-ID>
+import json
+import os
+import re
+import socket
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+import xml.etree.ElementTree as ET
+
+HOME = os.path.expanduser("~")
+UNIT = "syncthing.service"
+API = "http://127.0.0.1:8384/rest"
+
+# Folder ids are what the other device sees, so they never change. RetroArch keeps every core's
+# saves and states in these two (retroarch.cfg); the trash can keeps 30 days of replaced files,
+# so a save overwritten from the other side can still be dug out of .stversions.
+FOLDERS = [
+    ("steamling-saves", "Emulation saves", os.path.join(HOME, "Emulation", "Saves")),
+    ("steamling-states", "Emulation save states", os.path.join(HOME, "Emulation", "States")),
+]
+
+
+def die(msg):
+    print(f"steamling-sync: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def systemctl(*args):
+    return subprocess.run(["systemctl", "--user", *args], capture_output=True, text=True)
+
+
+def config_path():
+    state = os.environ.get("XDG_STATE_HOME") or os.path.join(HOME, ".local", "state")
+    for d in (os.path.join(state, "syncthing"), os.path.join(HOME, ".config", "syncthing")):
+        p = os.path.join(d, "config.xml")
+        if os.path.exists(p):
+            return p
+    return None
+
+
+def api_key():
+    p = config_path()
+    if not p:
+        return None
+    try:
+        return ET.parse(p).getroot().findtext("gui/apikey")
+    except (ET.ParseError, OSError):
+        return None
+
+
+def rest(method, path, body=None):
+    key = api_key()
+    if not key:
+        raise OSError("Syncthing has not written its config yet")
+    data = json.dumps(body).encode() if body is not None else None
+    req = urllib.request.Request(f"{API}/{path}", data=data, method=method,
+                                 headers={"X-API-Key": key, "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=10) as r:
+        text = r.read().decode()
+    return json.loads(text) if text.strip() else None
+
+
+def wait_for_api(seconds=30):
+    end = time.monotonic() + seconds
+    while time.monotonic() < end:
+        try:
+            return rest("GET", "system/status")
+        except (OSError, urllib.error.URLError, ValueError):
+            time.sleep(0.5)
+    die("Syncthing did not answer within 30 seconds")
+
+
+def ensure_folders():
+    have = {f["id"]: f for f in rest("GET", "config/folders")}
+    for fid, label, path in FOLDERS:
+        os.makedirs(path, exist_ok=True)
+        if fid in have:
+            continue
+        rest("PUT", f"config/folders/{fid}", {
+            "id": fid, "label": label, "path": path, "type": "sendreceive",
+            "versioning": {"type": "trashcan", "params": {"cleanoutDays": "30"}},
+        })
+
+
+def cmd_on():
+    r = systemctl("enable", "--now", UNIT)
+    if r.returncode != 0:
+        die(r.stderr.strip() or "could not start Syncthing")
+    status = wait_for_api()
+    ensure_folders()
+    # The default name is the hostname; say which handheld it is.
+    me = status["myID"]
+    dev = rest("GET", f"config/devices/{me}")
+    name = f"Steamling ({socket.gethostname()})"
+    if dev.get("name") != name:
+        rest("PATCH", f"config/devices/{me}", {"name": name})
+    cmd_status()
+
+
+def cmd_off():
+    r = systemctl("disable", "--now", UNIT)
+    if r.returncode != 0:
+        die(r.stderr.strip() or "could not stop Syncthing")
+    cmd_status()
+
+
+def cmd_accept(device_id):
+    if not re.fullmatch(r"[A-Z2-7]{7}(-[A-Z2-7]{7}){7}", device_id):
+        die(f"{device_id!r} is not a Syncthing device id")
+    wait_for_api(10)
+    pending = rest("GET", "cluster/pending/devices") or {}
+    name = (pending.get(device_id) or {}).get("name") or device_id[:7]
+    rest("PUT", f"config/devices/{device_id}", {"deviceID": device_id, "name": name})
+    for fid, _label, _path in FOLDERS:
+        folder = rest("GET", f"config/folders/{fid}")
+        ids = [d["deviceID"] for d in folder.get("devices", [])]
+        if device_id not in ids:
+            folder["devices"] = folder.get("devices", []) + [{"deviceID": device_id}]
+            rest("PUT", f"config/folders/{fid}", folder)
+    cmd_status()
+
+
+def status():
+    st = {"installed": os.path.exists("/usr/bin/syncthing"),
+          "on": systemctl("is-enabled", "--quiet", UNIT).returncode == 0,
+          "running": systemctl("is-active", "--quiet", UNIT).returncode == 0,
+          "deviceId": "", "devices": [], "pending": [], "folders": []}
+    if not st["running"]:
+        return st
+    try:
+        me = rest("GET", "system/status")["myID"]
+        conns = (rest("GET", "system/connections") or {}).get("connections", {})
+        st["deviceId"] = me
+        st["devices"] = [{"id": d["deviceID"], "name": d.get("name") or d["deviceID"][:7],
+                          "connected": bool(conns.get(d["deviceID"], {}).get("connected"))}
+                         for d in rest("GET", "config/devices") if d["deviceID"] != me]
+        st["pending"] = [{"id": i, "name": p.get("name") or i[:7], "address": p.get("address", "")}
+                         for i, p in (rest("GET", "cluster/pending/devices") or {}).items()]
+        ours = {fid for fid, _, _ in FOLDERS}
+        st["folders"] = [{"id": f["id"], "label": f.get("label", f["id"]), "path": f["path"],
+                          "shared": len(f.get("devices", [])) > 1}
+                         for f in rest("GET", "config/folders") if f["id"] in ours]
+    except (OSError, urllib.error.URLError, ValueError, KeyError):
+        pass  # still starting: report what is known
+    return st
+
+
+def cmd_status():
+    print(json.dumps(status()))
+
+
+def main():
+    args = sys.argv[1:]
+    if args == ["on"]:
+        cmd_on()
+    elif args == ["off"]:
+        cmd_off()
+    elif args == ["status"]:
+        cmd_status()
+    elif len(args) == 2 and args[0] == "accept":
+        cmd_accept(args[1])
+    else:
+        print(__doc__ or "usage: steamling-sync on | off | status | accept <DEVICE-ID>", file=sys.stderr)
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main()
