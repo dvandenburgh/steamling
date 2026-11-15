@@ -2,7 +2,7 @@
 # "Mesa Version" tweak selects by pointing VK_DRIVER_FILES at them (ARM Proton path).
 # Counterpart of steamling-turnip-x86; same per-SoC tuning contract as packages/soc/mesa.
 pkgname=steamling-turnip-arm
-pkgver=20261025
+pkgver=20261115
 pkgrel=1
 pkgdesc="Pinned aarch64 Turnip builds for per-game Mesa selection (SoC-tuned)"
 arch=('aarch64')
@@ -17,17 +17,19 @@ makedepends=(meson ninja python-mako python-packaging python-yaml python-ply gls
              wayland wayland-protocols zlib zstd
              xorgproto libx11 libxcb libxext libxshmfence libxxf86vm libxrandr xcb-util-keysyms)
 options=(!lto)
-# Two entries build from a pinned commit rather than a release tarball, fetched as GitLab's
-# commit-addressed archive: 26.3's release candidate (the newest Adreno 7xx fixes that have a
-# release behind them) and a mesa main snapshot. Pinned, not floating, so rebuilds reproduce;
-# refresh the commits deliberately. Their checksums are SKIP: the commit in the URL fixes the
+# One entry builds from a pinned commit rather than a release tarball, fetched as GitLab's
+# commit-addressed archive: a mesa main snapshot. Pinned, not floating, so rebuilds reproduce;
+# refresh the commit deliberately. Its checksum is SKIP: the commit in the URL fixes the
 # tree, and GitLab regenerates the archive, so its compressed bytes are not stable.
+# The newest release entry is the one the system Mesa was on before its current series,
+# unpatched: the way back for a game the current one breaks.
 declare -gA _commits=(
-  ['26.3.0rc2']=b34c71d9ff2f6514a1f947609d00e49be639edf8    # tag mesa-26.3.0-rc2
   ['27.0.0devel']=e7371b0711bb1cd38c39d1c05e5578c445cc6bca  # main, 2026-10-25
 )
 # The series mesa itself ships comes from its vk-arm payload; pinning mesa's pkgver here = file conflict.
-_versions=('25.0.7' '25.1.9' '25.2.8' '25.3.6' '26.0.8' '26.1.6' '26.3.0rc2' '27.0.0devel')
+# Older vulkan-freedreno builds own a payload dir this package now ships, hence the conflict.
+conflicts=('vulkan-freedreno<2:26.3.0')
+_versions=('25.0.7' '25.1.9' '25.2.8' '25.3.6' '26.0.8' '26.1.6' '26.2.7' '27.0.0devel')
 source=('0001-c11-threads-fix-build-on-c23.patch'
         'https://archive.mesa3d.org/mesa-25.0.7.tar.xz'
         'https://archive.mesa3d.org/mesa-25.1.9.tar.xz'
@@ -35,7 +37,7 @@ source=('0001-c11-threads-fix-build-on-c23.patch'
         'https://archive.mesa3d.org/mesa-25.3.6.tar.xz'
         'https://archive.mesa3d.org/mesa-26.0.8.tar.xz'
         'https://archive.mesa3d.org/mesa-26.1.6.tar.xz'
-        "https://gitlab.freedesktop.org/mesa/mesa/-/archive/${_commits[26.3.0rc2]}/mesa-${_commits[26.3.0rc2]}.tar.gz"
+        'https://archive.mesa3d.org/mesa-26.2.7.tar.xz'
         "https://gitlab.freedesktop.org/mesa/mesa/-/archive/${_commits[27.0.0devel]}/mesa-${_commits[27.0.0devel]}.tar.gz")
 sha256sums=('SKIP'
             '592272df3cf01e85e7db300c449df5061092574d099da275d19e97ef0510f8a6'
@@ -44,7 +46,7 @@ sha256sums=('SKIP'
             '59217efeac3b64e7ced958324b9db7494f1e0741aeb22d780276514cc1b8f206'
             'caf1c0061a68e88dfa74967a7e780c0e85d65b6c4e334cd69095a5dc54ad78bc'
             '5296b88a0f1e012e2cb9ada150a2bbadf728ca81e5a4fb2ab43c83a4d2158606'
-            'SKIP'
+            '04294f75d22e9f61cd1e050206bc48b3d39366e788f1803a3368e3d5a872ce18'
             'SKIP')
 
 # A commit build extracts to mesa-<commit>, a release to mesa-<ver>; RC tarballs keep the hyphen

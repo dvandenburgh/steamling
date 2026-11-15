@@ -4,11 +4,17 @@
 pkgbase=mesa
 pkgname=(mesa vulkan-freedreno)
 epoch=2
-pkgver=26.2.7
-# differs from pkgver only for RCs: the tarball keeps the hyphen makepkg forbids in pkgver
-_srcver=${pkgver}
-pkgrel=4
-pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${_srcver})"
+pkgver=26.3.0
+# The stable branch a few days after the release in pkgver, pinned by commit: the release itself
+# left out about twenty fixes the previous series' last point release already had (Turnip
+# autotune reference counting, ir3 and NIR miscompiles, a swapchain mutex), and this has them.
+# Fetched as GitLab's commit-addressed archive, whose compressed bytes are not stable, so its
+# checksum is SKIP and the commit fixes the tree. Move to the next point release's tarball once
+# it is out (PATCHES.md says which patches it retires).
+_commit=688dee9b0cd847d6b59038d777bb61b4591f1696
+_srcver=${_commit}
+pkgrel=1
+pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${pkgver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
 license=("MIT AND BSD-3-Clause AND SGI-B-2.0")
@@ -22,9 +28,9 @@ makedepends=(
 )
 # upstream considers LTO broken until explicit notice
 options=(!lto)
-# Turnip and freedreno fixes no 26.2 point release has yet. 0001 is still an open merge request
-# and 0002 is on main only, adapted to 26.2; 0004 is a shader compiler crash fix armada carries
-# until upstream has one; 0005-0007 and 0010 are on main only; 0009 is queued for 26.3; 0011/0012
+# Turnip and freedreno fixes the 26.3 branch does not have yet. 0001 is still an open merge request
+# and 0002 is on main only; 0004 is a shader compiler crash fix armada carries
+# until upstream has one; 0005 and 0010 are on main only; 0011/0012
 # fix A8xx GL hangs with no upstream fix yet (PATCHES.md says where each comes from). Each stays
 # until a release has it (gaps in the numbers are patches a release took). 0013 is the other half of steamling-steam's
 # GAMESCOPE_LIMITER_FILE and is kept across Mesa releases. 0014/0015 let freedreno GL time GMEM
@@ -32,14 +38,12 @@ options=(!lto)
 # 0016/0017 fix shader integer division that came out wrong for some large divisors (main only).
 # 0018/0019 keep Turnip images a game may view in a second format tiled and compressed on the
 # A740 and older, where upstream stores them linear; TU_Z_MUTABLE=0 goes back to upstream's layout.
-source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
+# 0020 is the one Turnip fix the previous series had that this branch has not picked up.
+source=("https://gitlab.freedesktop.org/mesa/mesa/-/archive/${_commit}/mesa-${_commit}.tar.gz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
         '0004-ir3-array_to_ssa-follow-trivial-phi-chains.patch'
         '0005-freedreno-Take-only-in-fence-as-a-hint-for-explicit-sync.patch'
-        '0006-ir3-move-is_cat-23-_float-helper-up-in-their-file.patch'
-        '0007-ir3-only-fold-fsat-to-sat-on-cat2-3-float-instructions.patch'
-        '0009-freedreno-update-SP_DBG_ECO_CNTL-magic-reg-value-on-A740.patch'
         '0010-tu-Clear-unused-SP_xS_BASEs.patch'
         '0011-freedreno-a8xx-wait-for-zpass-sample-counts.patch'
         '0012-freedreno-a8xx-rb-done-ts-after-each-draw.patch'
@@ -49,15 +53,13 @@ source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0016-nir-lower-idiv-add-an-fp32-correction-path-for-32-bit-udiv.patch'
         '0017-ir3-use-the-fp32-udiv-correction-path.patch'
         '0018-tu-keep-mutable-format-images-tiled-with-ubwc.patch'
-        '0019-tu-copy-mutable-ubwc-images-through-their-written-format.patch')
-sha256sums=('04294f75d22e9f61cd1e050206bc48b3d39366e788f1803a3368e3d5a872ce18'
-            '9593e966d7b29efa23a547da07d1dae14a9f34a088c7df37214545b4a1bb8313'
-            '1079d658026ea175fddf582cb709f4e3925446b3c1512cecc043861b75aa392e'
+        '0019-tu-copy-mutable-ubwc-images-through-their-written-format.patch'
+        '0020-tu-Skip-zero-sized-inline-uniform-blocks.patch')
+sha256sums=('SKIP'
+            'b302a6716d00d24cb33aaef758cc95a5b78bfc348cd4d103a66b673ae9125e42'
+            '59aacd0c04f838834121822887e9c2218ba7d56012c8433696632d72fb619903'
             '876e395ae200b6ba675889537e4c9e62da3449da7662cf665e7056e711a7c185'
             '6f4813950202a925df5d014a8d4665c1274a710ccd6779350bbc3b36cc5ffff2'
-            'b155fbbd9b3c59c0cd931ba17ce8014b4b0b962a2c0a2f9484b2371d2c5c53ee'
-            '8b078d901fc5b28aca2c20009cfbcd74d52498f653e44cd6d07521ab70bb4d9c'
-            'eab02e64ad38dc4974a0e50b6cde27b65f2268ae6b2a33bfd20836226beded19'
             'a664c683a68911d647c7b6e2437829126e0791ff1f2405f881d8a3c2422ddc34'
             '5f221633956a3dcc18bee93ff24fb55b2be7a4999921bdb3595b8d2f25420110'
             '4cbf76a691177761669610e052f0e9c8f2a20835db1d313ef159f40fbbe72840'
@@ -67,7 +69,8 @@ sha256sums=('04294f75d22e9f61cd1e050206bc48b3d39366e788f1803a3368e3d5a872ce18'
             '58a6a3046ea6f013e364c75a1a51dcdb0570e638adfc4fbe1e360a9d7b372342'
             '0cfa987df3056671ac3480d9ea148f13d222d7232635ff5c767408099d82d8c8'
             '6ae155c176d79bdca0f7d3885a8e44dce4da68210c44d48561c6bfdfd5efffbc'
-            '24c20cd1c8ba6810f8c9eb4bc01ac67755e33b3d2a004567b4b2cf083a9c8662')
+            '24c20cd1c8ba6810f8c9eb4bc01ac67755e33b3d2a004567b4b2cf083a9c8662'
+            '8ac0ae731202cdee5c728e4fe07b1328898bb3285f289cb6f095ca64bcd8aab5')
 
 prepare() {
   cd "mesa-${_srcver}"
@@ -124,7 +127,7 @@ build() {
   local _tu_id
   # Every source's checksum, patches included: a patched driver must not reuse the shader cache
   # an unpatched build of the same tarball filled.
-  _tu_id="$(printf '%s\n' aarch64 "${_rocknix_tune}" "${sha256sums[*]}" "${_meson[*]}" \
+  _tu_id="$(printf '%s\n' aarch64 "${_rocknix_tune}" "${_commit}" "${sha256sums[*]}" "${_meson[*]}" \
     | sha256sum | cut -c1-40)"
   meson setup build "mesa-${_srcver}" "${_meson[@]}" -Dtu-build-id="${_tu_id}"
   meson compile -C build

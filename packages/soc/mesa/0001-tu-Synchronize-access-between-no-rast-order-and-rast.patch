@@ -34,12 +34,12 @@ Upstream-MR: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/43272>
  1 file changed, 14 insertions(+)
 
 diff --git a/src/freedreno/vulkan/tu_cmd_buffer.cc b/src/freedreno/vulkan/tu_cmd_buffer.cc
-index b347a33b76d..3d3b39f63d9 100644
+index b90e4e6..876eec3 100644
 --- a/src/freedreno/vulkan/tu_cmd_buffer.cc
 +++ b/src/freedreno/vulkan/tu_cmd_buffer.cc
 @@ -8674,6 +8674,20 @@ tu6_draw_common(struct tu_cmd_buffer *cmd,
     if (cmd->state.dirty & TU_CMD_DIRTY_FS)
-       tu_flush_dynamic_input_attachments(cmd);
+       tu_flush_dynamic_input_attachments<CHIP>(cmd);
  
 +   if ((cmd->state.dirty & TU_CMD_DIRTY_RAST_ORDER) && cmd->state.raster_order_attachment_access) {
 +      /* Going from no-rast-order to rast-order doesn't automatically synchronize access to attachments
@@ -58,6 +58,3 @@ index b347a33b76d..3d3b39f63d9 100644
     tu_emit_cache_flush_renderpass<CHIP>(cmd);
  
    if (BITSET_TEST(cmd->vk.dynamic_graphics_state.dirty,
--- 
-2.34.1
-

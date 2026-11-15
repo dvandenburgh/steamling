@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Karmjit Mahil <karmjit.mahil@igalia.com>
+Date: Wed, 14 Oct 2026 09:55:53 +0100
+Subject: [PATCH] tu: Skip zero sized inline uniform blocks
+
+This reverts commit 7bdcbe11ac507b0b96d2333aaeab5cf63de9ad10.
+
+This isn't a workaround. See:
+- VkDescriptorSetLayoutBinding:
+  "If descriptorCount is zero this binding entry is reserved and the
+  resource must not be accessed from any stage via this binding within
+  any pipeline using the set layout."
+- "maxPerStageDescriptorInlineUniformBlocks is the maximum number of
+  inline uniform block bindings that can be accessible to a single
+  shader stage in a pipeline layout."
+- VkWriteDescriptorSet: "Consecutive Binding Updates" section.
+
+Fix for: dEQP-VK.binding_model.inline_uniform_blocks.consecutive_copy_descriptor_count_0
+
+Signed-off-by: Karmjit Mahil <karmjit.mahil@igalia.com>
+(cherry picked from commit 6d98187b16c8a64e5b0fe28a5c0d74b736aaa6f3)
+
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46186>
+---
+ .pick_status.json                 | 2 +-
+ src/freedreno/vulkan/tu_shader.cc | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.cc
+index f6059bc50a0..e917057b1ac 100644
+--- a/src/freedreno/vulkan/tu_shader.cc
++++ b/src/freedreno/vulkan/tu_shader.cc
+@@ -1321,6 +1321,9 @@ tu_lower_io(nir_shader *shader, struct tu_device *dev,
+                mesa_to_vk_shader_stage(shader->info.stage)))
+             continue;
+ 
++         if (binding->size == 0)
++            continue;
++
+          /* If we don't know the size at compile time due to a variable
+           * descriptor count, then with descriptor buffers we cannot know
+           * how much space the real inline uniform has. In this case we fall
+-- 
+2.34.1
+
