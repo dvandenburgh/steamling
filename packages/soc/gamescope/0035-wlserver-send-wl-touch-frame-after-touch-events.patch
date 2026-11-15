@@ -1,0 +1,222 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Matthew Schwartz <matthew.schwartz@linux.dev>
+Date: Thu, 12 Nov 2026 11:54:14 -0800
+Subject: [PATCH] wlserver: send wl_touch.frame after touch events
+
+Passthrough touch forwards down, motion and up to the seat but never a
+frame, so Wayland clients that wait for wl_touch.frame, such as Qt apps,
+do not react to taps.
+
+Add wlserver_touchframe and forward the frame from libinput and from the
+parent compositor on the Wayland backend. The SDL and OpenVR backends
+and gamescope's own synthetic touches have no frame of their own, so
+they end one after each event.
+
+Closes: https://github.com/ValveSoftware/gamescope/issues/2552
+---
+ src/Backends/OpenVRBackend.cpp  |  5 +++++
+ src/Backends/SDLBackend.cpp     |  4 ++++
+ src/Backends/WaylandBackend.cpp | 11 ++++++++++-
+ src/steamcompmgr.cpp            |  1 +
+ src/wlserver.cpp                | 16 ++++++++++++++++
+ src/wlserver.hpp                |  2 ++
+ 6 files changed, 38 insertions(+), 1 deletion(-)
+
+diff --git a/src/Backends/OpenVRBackend.cpp b/src/Backends/OpenVRBackend.cpp
+index 52fdac0..691d27d 100644
+--- a/src/Backends/OpenVRBackend.cpp
++++ b/src/Backends/OpenVRBackend.cpp
+@@ -1182,7 +1182,10 @@ namespace gamescope
+ 
+             wlserver_lock();
+             if ( uButton == BTN_LEFT )
++            {
+                 wlserver_touchup( 0, ++m_uFakeTimestamp );
++                wlserver_touchframe();
++            }
+             else
+                 wlserver_mousebutton( uButton, false, ++m_uFakeTimestamp );
+             wlserver_unlock();
+@@ -1481,6 +1484,7 @@ namespace gamescope
+                                         wlserver_touchdown(flX, flY, 0, ++m_uFakeTimestamp);
+                                     else
+                                         wlserver_touchup(0, ++m_uFakeTimestamp);
++                                    wlserver_touchframe();
+                                 }
+                                 else if (vrEvent.data.mouse.button == vr::VRMouseButton_Right)
+                                 {
+@@ -1539,6 +1543,7 @@ namespace gamescope
+ 
+                 wlserver_lock();
+                 wlserver_touchmotion(flTouchMoveX, flTouchMoveY, 0, ++m_uFakeTimestamp, bAlwaysMoveCursor);
++                wlserver_touchframe();
+                 wlserver_unlock();
+             }
+         }
+diff --git a/src/Backends/SDLBackend.cpp b/src/Backends/SDLBackend.cpp
+index d35e218..9f88bee 100644
+--- a/src/Backends/SDLBackend.cpp
++++ b/src/Backends/SDLBackend.cpp
+@@ -691,6 +691,7 @@ namespace gamescope
+ 							event.motion.y / float(g_nOutputHeightPts),
+ 							0,
+ 							fake_timestamp );
++						wlserver_touchframe();
+ 						wlserver_unlock();
+ 					}
+ 				}
+@@ -719,6 +720,7 @@ namespace gamescope
+ 				{
+ 					wlserver_lock();
+ 					wlserver_touchmotion( event.tfinger.x, event.tfinger.y, event.tfinger.fingerId, fake_timestamp );
++					wlserver_touchframe();
+ 					wlserver_unlock();
+ 				}
+ 				break;
+@@ -727,6 +729,7 @@ namespace gamescope
+ 				{
+ 					wlserver_lock();
+ 					wlserver_touchdown( event.tfinger.x, event.tfinger.y, event.tfinger.fingerId, fake_timestamp );
++					wlserver_touchframe();
+ 					wlserver_unlock();
+ 				}
+ 				break;
+@@ -735,6 +738,7 @@ namespace gamescope
+ 				{
+ 					wlserver_lock();
+ 					wlserver_touchup( event.tfinger.fingerId, fake_timestamp );
++					wlserver_touchframe();
+ 					wlserver_unlock();
+ 				}
+ 				break;
+diff --git a/src/Backends/WaylandBackend.cpp b/src/Backends/WaylandBackend.cpp
+index 5063fc6..4b7da65 100644
+--- a/src/Backends/WaylandBackend.cpp
++++ b/src/Backends/WaylandBackend.cpp
+@@ -615,6 +615,7 @@ namespace gamescope
+         void Wayland_Touch_Down( wl_touch *pTouch, uint32_t uSerial, uint32_t uTime, wl_surface *pSurface, int32_t nId, wl_fixed_t fX, wl_fixed_t fY );
+         void Wayland_Touch_Up( wl_touch *pTouch, uint32_t uSerial, uint32_t uTime, int32_t nId );
+         void Wayland_Touch_Motion( wl_touch *pTouch, uint32_t uTime, int32_t nId, wl_fixed_t fX, wl_fixed_t fY );
++        void Wayland_Touch_Frame( wl_touch *pTouch );
+         void Wayland_Touch_Cancel( wl_touch *pTouch );
+         static const wl_touch_listener s_TouchListener;
+     };
+@@ -659,7 +660,7 @@ namespace gamescope
+         .down        = WAYLAND_USERDATA_TO_THIS( CWaylandInputThread, Wayland_Touch_Down ),
+         .up          = WAYLAND_USERDATA_TO_THIS( CWaylandInputThread, Wayland_Touch_Up ),
+         .motion      = WAYLAND_USERDATA_TO_THIS( CWaylandInputThread, Wayland_Touch_Motion ),
+-        .frame       = WAYLAND_NULL(),
++        .frame       = WAYLAND_USERDATA_TO_THIS( CWaylandInputThread, Wayland_Touch_Frame ),
+         .cancel      = WAYLAND_USERDATA_TO_THIS( CWaylandInputThread, Wayland_Touch_Cancel ),
+         .shape       = WAYLAND_NULL(),
+         .orientation = WAYLAND_NULL(),
+@@ -3215,6 +3216,7 @@ namespace gamescope
+ 
+         wlserver_lock();
+         wlserver_touchmotion( flX, flY, 0, ++m_uFakeTimestamp );
++        wlserver_touchframe();
+         wlserver_unlock();
+     }
+     void CWaylandInputThread::Wayland_Pointer_Button( wl_pointer *pPointer, uint32_t uSerial, uint32_t uTime, uint32_t uButton, uint32_t uState )
+@@ -3439,11 +3441,18 @@ namespace gamescope
+         wlserver_touchmotion( flX, flY, nId, ++m_uFakeTimestamp );
+         wlserver_unlock();
+     }
++    void CWaylandInputThread::Wayland_Touch_Frame( wl_touch *pTouch )
++    {
++        wlserver_lock();
++        wlserver_touchframe();
++        wlserver_unlock();
++    }
+     void CWaylandInputThread::Wayland_Touch_Cancel( wl_touch *pTouch )
+     {
+         wlserver_lock();
+         for ( auto &[ nId, state ] : m_TouchPlaneStates )
+             wlserver_touchup( nId, ++m_uFakeTimestamp );
++        wlserver_touchframe();
+         wlserver_unlock();
+ 
+         m_TouchPlaneStates.clear();
+diff --git a/src/steamcompmgr.cpp b/src/steamcompmgr.cpp
+index c168398..76d4cfb 100644
+--- a/src/steamcompmgr.cpp
++++ b/src/steamcompmgr.cpp
+@@ -5720,6 +5720,7 @@ determine_and_apply_focus( global_focus_t *pFocus )
+ 		wlserver_lock();
+ 		wlserver_touchdown( 0.5, 0.5, 0, now );
+ 		wlserver_touchup( 0, now + 1 );
++		wlserver_touchframe();
+ 		wlserver_mousehide();
+ 		wlserver_unlock();
+ 	}
+diff --git a/src/wlserver.cpp b/src/wlserver.cpp
+index dbb2c4d..a6208d6 100644
+--- a/src/wlserver.cpp
++++ b/src/wlserver.cpp
+@@ -515,6 +515,11 @@ static void wlserver_handle_touch_motion(struct wl_listener *listener, void *dat
+ 	wlserver_touchmotion( event->x, event->y, event->touch_id, event->time_msec, false, touch->connector );
+ }
+ 
++static void wlserver_handle_touch_frame(struct wl_listener *listener, void *data)
++{
++	wlserver_touchframe();
++}
++
+ struct wlserver_keyboard {
+ 	struct wlr_keyboard *wlr;
+ 
+@@ -553,6 +558,7 @@ static void wlserver_handle_touch_destroy(struct wl_listener *listener, void *da
+ 	wl_list_remove( &touch->down.link );
+ 	wl_list_remove( &touch->up.link );
+ 	wl_list_remove( &touch->motion.link );
++	wl_list_remove( &touch->frame.link );
+ 	wl_list_remove( &touch->destroy.link );
+ 	free( touch );
+ }
+@@ -618,6 +624,8 @@ static void wlserver_new_input(struct wl_listener *listener, void *data)
+ 			wl_signal_add( &touch->wlr->events.up, &touch->up );
+ 			touch->motion.notify = wlserver_handle_touch_motion;
+ 			wl_signal_add( &touch->wlr->events.motion, &touch->motion );
++			touch->frame.notify = wlserver_handle_touch_frame;
++			wl_signal_add( &touch->wlr->events.frame, &touch->frame );
+ 			touch->destroy.notify = wlserver_handle_touch_destroy;
+ 			wl_signal_add( &device->events.destroy, &touch->destroy);
+ 
+@@ -3584,6 +3592,14 @@ void wlserver_touchup( int touch_id, uint32_t time )
+ 	bump_input_counter();
+ }
+ 
++// Ends a group of touch events. Clients may not act on them until this is sent.
++void wlserver_touchframe()
++{
++	assert( wlserver_is_lock_held() );
++
++	wlr_seat_touch_notify_frame( wlserver.wlr.seat );
++}
++
+ gamescope_xwayland_server_t *wlserver_get_xwayland_server( size_t index )
+ {
+ 	if (index >= wlserver.wlr.xwayland_servers.size() )
+diff --git a/src/wlserver.hpp b/src/wlserver.hpp
+index ec2b968..a4cc09e 100644
+--- a/src/wlserver.hpp
++++ b/src/wlserver.hpp
+@@ -261,6 +261,7 @@ struct wlserver_touch {
+ 	struct wl_listener down;
+ 	struct wl_listener up;
+ 	struct wl_listener motion;
++	struct wl_listener frame;
+ 	struct wl_listener destroy;
+ 
+     gamescope::IBackendConnector* connector;
+@@ -300,6 +301,7 @@ void wlserver_drag_anchor_move( struct wlr_surface *surface, int x, int y, int b
+ void wlserver_touchmotion( double x, double y, int touch_id, uint32_t time, bool bAlwaysWarpCursor = false, gamescope::IBackendConnector* connector = nullptr );
+ void wlserver_touchdown( double x, double y, int touch_id, uint32_t time, gamescope::IBackendConnector* connector = nullptr );
+ void wlserver_touchup( int touch_id, uint32_t time );
++void wlserver_touchframe();
+ 
+ void wlserver_send_frame_done( struct wlr_surface *surf, const struct timespec *when );
+ 
+-- 
+2.34.1
+
