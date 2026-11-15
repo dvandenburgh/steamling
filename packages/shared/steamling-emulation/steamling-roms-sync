@@ -32,9 +32,11 @@ esac
 
 # Sources, highest priority first: the handheld, then each mounted card.
 sources=("${LOCAL}")
+declare -A mounted=()
 for d in "${CARDS}"/*/; do
   d="${d%/}"
   [ -d "${d}" ] && mountpoint -q "${d}" || continue
+  mounted["${d}"]=1
   if mkdir -p "${d}/Emulation/ROMs" 2>/dev/null; then
     sources+=("${d}/Emulation/ROMs")
   elif [ -d "${d}/Emulation/ROMs" ]; then
@@ -55,6 +57,24 @@ done
 
 mkdir -p "${LIB}" || exit 1
 shopt -s nullglob dotglob
+
+# Games whose card is out right now: their links go (ES-DE would list games it cannot start), but
+# steamling-steam-sync keeps a favorite's Steam shortcut while its game is named here. One line
+# per game, "<system>/<name><TAB><where it was on the card>"; a game leaves the list once its
+# card is back in or the handheld has a copy.
+AWAY="${LIB}/.away"
+card_out() {  # $1 = a link's target: true when it is on a card that is not mounted
+  local rest
+  case "$1" in "${CARDS}"/*) ;; *) return 1 ;; esac
+  rest="${1#"${CARDS}"/}"
+  [ -z "${mounted[${CARDS}/${rest%%/*}]+x}" ]
+}
+declare -A away=()
+if [ -r "${AWAY}" ]; then
+  while IFS=$'\t' read -r key target; do
+    [ -n "${key}" ] && card_out "${target}" && away["${key}"]="${target}"
+  done < "${AWAY}"
+fi
 for s in "${!systems[@]}"; do
   mkdir -p "${LIB}/${s}" 2>/dev/null || continue
   declare -A want=()
@@ -70,7 +90,9 @@ for s in "${!systems[@]}"; do
   # per system lists every link with its target: this runs before each ES-DE start, so no
   # process per game.
   while IFS=$'\t' read -r -d '' n target; do
-    [ "${want[${n}]-}" = "${target}" ] || rm -f -- "${LIB}/${s}/${n}"
+    [ "${want[${n}]-}" = "${target}" ] && continue
+    rm -f -- "${LIB}/${s}/${n}"
+    card_out "${target}" && away["${s}/${n}"]="${target}"
   done < <(find "${LIB}/${s}" -mindepth 1 -maxdepth 1 -type l -printf '%f\t%l\0')
   # A link is named after its game, so a whole system's new links are one ln call.
   new=()
@@ -84,4 +106,9 @@ for s in "${!systems[@]}"; do
   [ "${#new[@]}" -eq 0 ] || ln -s -t "${LIB}/${s}" -- "${new[@]}" 2>/dev/null || true
   unset want
 done
+
+for key in "${!away[@]}"; do
+  [ -e "${LIB}/${key}" ] || printf '%s\t%s\n' "${key}" "${away[${key}]}"   # back, or on the handheld now
+done > "${AWAY}.tmp" \
+  && mv -f "${AWAY}.tmp" "${AWAY}"
 exit 0
