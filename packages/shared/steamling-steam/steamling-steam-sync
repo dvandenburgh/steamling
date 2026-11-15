@@ -103,8 +103,19 @@ def make_entry(appname: str, exe: str, launch_options: str = "") -> dict:
     }
 
 
+def away_games() -> set[str]:
+    """Games steamling-roms-sync took out of the library because their microSD card is out, as
+    "<system>/<name>" (its ~/Emulation/Library/.away)."""
+    try:
+        with open(os.path.join(ROMS, ".away"), encoding="utf-8", errors="replace") as f:
+            return {line.split("\t", 1)[0] for line in f if "\t" in line}
+    except OSError:
+        return set()
+
+
 def favorites() -> list[dict]:
     found = []
+    away = away_games()
     for gl in sorted(glob.glob(os.path.join(GAMELISTS, "*", "gamelist.xml"))):
         system = os.path.basename(os.path.dirname(gl))
         try:
@@ -120,10 +131,14 @@ def favorites() -> list[dict]:
                 continue
             if path.startswith("./"):
                 path = os.path.join(ROMS, system, path[2:])
-            # A game on a microSD card that isn't in right now (its link in ~/Emulation/Library
-            # points at the card) keeps its Steam entry: dropping it would take the shortcut, its
-            # artwork and its place in the library away until a later login with the card in.
-            on_card = os.path.islink(path) and os.readlink(path).startswith("/run/media/")
+            # A game on a microSD card that isn't in right now keeps its Steam entry: dropping
+            # it would take the shortcut, its artwork and its place in the library away until a
+            # later login with the card in. Its link in ~/Emulation/Library is gone by now
+            # (steamling-roms-sync removes it and lists the game in .away); a link left in a
+            # system folder roms-sync does not manage still points at the card.
+            rel = os.path.relpath(path, ROMS).split(os.sep)
+            on_card = "/".join(rel[:2]) in away or (
+                os.path.islink(path) and os.readlink(path).startswith("/run/media/"))
             if not os.path.exists(path) and not on_card and not path.startswith("/run/media/"):
                 print(f"[steamling-steam-sync] favorite missing on disk, skipped: {path}", file=sys.stderr)
                 continue
