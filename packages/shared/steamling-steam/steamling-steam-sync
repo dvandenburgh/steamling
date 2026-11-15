@@ -5,6 +5,7 @@
 # Entries carry DevkitGameID="steamling" and each run replaces exactly that owned subset,
 # so a user's own shortcuts survive.
 import os
+import shlex
 import struct
 import sys
 import zlib
@@ -138,7 +139,9 @@ def favorites() -> list[dict]:
     out = []
     for system, name, path in found:
         title = f"{name} ({system})" if counts[name] > 1 else name
-        out.append(make_entry(title, f'"{PLAY}"', f'{LAUNCH} {system} "{path}"'))
+        # Steam hands the launch options to a shell, so the path is quoted for one: inside plain
+        # double quotes a "$" or a backtick in a ROM's name was expanded and the ROM not found.
+        out.append(make_entry(title, f'"{PLAY}"', f'{LAUNCH} {system} {shlex.quote(path)}'))
     return out
 
 
