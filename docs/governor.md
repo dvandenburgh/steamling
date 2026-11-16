@@ -261,6 +261,9 @@ app such as OpenMTP).
 It stays on until you turn it off or restart. While it's on, controllers, hubs and other USB
 devices plugged into that port won't work.
 
+While a computer is connected, the handheld won't go to sleep on its own, so a long copy isn't
+cut off halfway. Unplug the cable (or turn transfer off) and sleep works as usual again.
+
 ### SD card
 
 Formats a microSD card so Steam can use it as game storage.
