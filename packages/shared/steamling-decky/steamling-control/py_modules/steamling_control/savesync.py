@@ -2,9 +2,6 @@ import json
 import os
 import re
 import threading
-import urllib.error
-import urllib.request
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from .system import run_cmd
@@ -40,28 +37,44 @@ def _run(args, timeout):
         raise RuntimeError(f"Save sync answered with something unreadable: {e}") from e
 
 
+# Decky Loader runs plugins on the Python frozen into its own binary, which carries only the
+# standard library modules the loader itself needs: xml.etree is not among them, and importing
+# it at the top of this file kept the whole plugin from starting. So the config is read with a
+# regex, and the HTTP modules are imported where they are used, with steamling-sync (the system
+# Python) as the way out if the loader's Python lacks those too.
+class _NoHttp(Exception):
+    pass
+
+
 def _gui(configs=CONFIGS):
     """(api key, base url) from Syncthing's own config, or (None, None) before its first start."""
     for path in configs:
         try:
-            root = ET.parse(path).getroot()
-        except (OSError, ET.ParseError):
+            text = Path(path).read_text(encoding="utf-8", errors="replace")
+        except OSError:
             continue
-        gui = root.find("gui")
-        if gui is None:
+        gui = re.search(r"<gui\b([^>]*)>(.*?)</gui>", text, re.S)
+        if not gui:
             continue
-        address = (gui.findtext("address") or "127.0.0.1:8384").strip()
-        scheme = "https" if gui.get("tls") == "true" else "http"
-        return gui.findtext("apikey"), f"{scheme}://{address}/rest"
+        attrs, body = gui.groups()
+        address = re.search(r"<address>\s*([^<\s]+)\s*</address>", body)
+        apikey = re.search(r"<apikey>\s*([^<\s]+)\s*</apikey>", body)
+        scheme = "https" if re.search(r'\btls="true"', attrs) else "http"
+        return (apikey.group(1) if apikey else None,
+                f"{scheme}://{address.group(1) if address else '127.0.0.1:8384'}/rest")
     return None, None
 
 
 def _get(base, key, path):
-    ctx = None
-    if base.startswith("https"):
-        # Syncthing's own self-signed certificate, on a connection that never leaves the handheld.
-        import ssl
-        ctx = ssl._create_unverified_context()
+    try:
+        import urllib.request
+        ctx = None
+        if base.startswith("https"):
+            # Syncthing's own self-signed certificate, on a connection that never leaves the handheld.
+            import ssl
+            ctx = ssl._create_unverified_context()
+    except ImportError as e:
+        raise _NoHttp(str(e)) from e
     req = urllib.request.Request(f"{base}/{path}", headers={"X-API-Key": key})
     with urllib.request.urlopen(req, timeout=5, context=ctx) as r:
         return json.loads(r.read().decode() or "null")
@@ -80,7 +93,9 @@ def sync_status(get=_get, gui=_gui):
         config = get(base, key, "config")
         conns = (get(base, key, "system/connections") or {}).get("connections", {})
         pending = get(base, key, "cluster/pending/devices") or {}
-    except (OSError, urllib.error.URLError, ValueError, KeyError, TypeError):
+    except _NoHttp:
+        return _run(["status"], timeout=15)
+    except (OSError, ValueError, KeyError, TypeError):
         return st  # stopped, or still starting
     st["running"] = True
     st["deviceId"] = me

@@ -41,6 +41,36 @@ class SaveSyncTest(unittest.TestCase):
         self.assertTrue(st["on"])
         self.assertFalse(st["running"])
 
+    def test_the_config_is_read_without_an_xml_parser(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".xml") as f:
+            f.write('<configuration version="51">\n  <folder id="x"><address>no</address></folder>\n'
+                    '  <gui enabled="true" tls="true" sendBasicAuthPrompt="false">\n'
+                    '    <address>127.0.0.1:8385</address>\n    <apikey>abcDEF123</apikey>\n  </gui>\n'
+                    '</configuration>\n')
+            f.flush()
+            self.assertEqual(savesync._gui(("/nonexistent/config.xml", f.name)),
+                             ("abcDEF123", "https://127.0.0.1:8385/rest"))
+        self.assertEqual(savesync._gui(("/nonexistent/config.xml",)), (None, None))
+
+    def test_no_http_in_the_loader_falls_back_to_the_tool(self):
+        def no_http(base, key, path):
+            raise savesync._NoHttp("No module named 'urllib.request'")
+        with mock.patch.object(savesync, "_run", return_value={"on": True, "running": True}) as run:
+            st = self._status(no_http)
+        self.assertEqual(run.call_args.args[0], ["status"])
+        self.assertTrue(st["running"])
+
+    def test_nothing_imports_what_the_loader_python_lacks(self):
+        # Decky's frozen Python has no xml.etree; a top-level import of it stops the plugin loading.
+        import pathlib
+        import re
+        root = pathlib.Path(savesync.__file__).resolve().parents[2]
+        for path in [root / "main.py", *sorted((root / "py_modules").rglob("*.py"))]:
+            for line in path.read_text().splitlines():
+                self.assertIsNone(re.match(r"(import|from)\s+(xml|urllib\.request|ssl|http|sqlite3|email)\b", line),
+                                  f"{path.name}: top-level '{line}'")
+
     def test_accept_refuses_anything_but_a_device_id(self):
         for bad in ("", "ABC", GOOD_ID.lower(), GOOD_ID + "-X", "../../etc"):
             with self.assertRaises(ValueError):
