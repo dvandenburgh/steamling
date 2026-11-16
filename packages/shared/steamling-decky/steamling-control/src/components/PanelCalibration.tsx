@@ -4,6 +4,7 @@ import { panelCalibrate, panelReset, panelStatus } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { PanelStatus } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 // Panels leave the factory a touch fast or slow, and emulators that pace to the display drift
 // against their audio. steamling-panel-calibration measures the running refresh rate and trims the
@@ -24,7 +25,7 @@ function PanelModal({ initial, onChange, closeModal }: { initial: PanelStatus; o
       setStatus(next);
       onChange(next);
     } catch (e) {
-      setError(String(e));
+      setError(errorText(e));
     } finally {
       setBusy(false);
     }

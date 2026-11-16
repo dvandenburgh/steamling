@@ -4,6 +4,7 @@ import { setTuning, tuningStatus } from "../backend";
 import { t } from "../i18n";
 import type { StickTuning, TuningStatus } from "../types";
 import { SelectEdit } from "./widgets";
+import { errorText } from "../lib/util";
 
 const deadzones = [50, 75, 100, 150, 200, 300];
 const outers = [100, 95, 90, 85, 80];
@@ -37,7 +38,7 @@ export function StickResponse() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    tuningStatus().then(setStatus).catch((err) => setError(String(err)));
+    tuningStatus().then(setStatus).catch((err) => setError(errorText(err)));
   }, []);
 
   if (!status?.available) return null;
@@ -47,7 +48,7 @@ export function StickResponse() {
     setStatus({ ...status, [stick]: next });
     setTuning(stick, next.deadzone, next.outer)
       .then(setStatus)
-      .catch((err) => setError(String(err)));
+      .catch((err) => setError(errorText(err)));
   };
 
   return (

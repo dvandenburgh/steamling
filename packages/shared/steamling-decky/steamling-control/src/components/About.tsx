@@ -4,6 +4,7 @@ import { deviceInfo, restartGameMode } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { DeviceInfo } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 export function About() {
   const [info, setInfo] = useState<DeviceInfo | null>(null);
@@ -19,7 +20,7 @@ export function About() {
         if (!cancelled) setInfo(next);
       })
       .catch((err) => {
-        if (!cancelled) setError(String(err));
+        if (!cancelled) setError(errorText(err));
       });
     return () => {
       cancelled = true;
@@ -32,7 +33,7 @@ export function About() {
         strTitle={t("Restart Game Mode")}
         strDescription={t("Closes Steam and any running game, then brings game mode back up. Unsaved progress in a running game is lost. Useful when Steam or the screen gets stuck.")}
         strOKButtonText={t("Restart")}
-        onOK={() => restartGameMode().catch((err) => setError(String(err)))}
+        onOK={() => restartGameMode().catch((err) => setError(errorText(err)))}
       />
     );
 

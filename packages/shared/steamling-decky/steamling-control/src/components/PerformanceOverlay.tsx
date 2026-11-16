@@ -5,6 +5,7 @@ import { useQamVisible } from "../hooks/useQamVisible";
 import { t } from "../i18n";
 import type { OverlayStatus } from "../types";
 import { SelectEdit } from "./widgets";
+import { errorText } from "../lib/util";
 
 export function PerformanceOverlay() {
   const [overlay, setOverlayState] = useState<OverlayStatus | null>(null);
@@ -44,7 +45,7 @@ export function PerformanceOverlay() {
     try {
       setOverlayState(await setOverlay(level));
     } catch (err) {
-      setError(String(err));
+      setError(errorText(err));
     } finally {
       busy.current = false;
     }

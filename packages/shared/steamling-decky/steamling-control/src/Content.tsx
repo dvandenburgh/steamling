@@ -16,6 +16,7 @@ import { Performance } from "./tabs/Performance";
 import { System } from "./tabs/System";
 import { ThisGame } from "./tabs/ThisGame";
 import type { Config } from "./types";
+import { errorText } from "./lib/util";
 
 // A loader whose API lacks the hook gets the old behaviour (always treated as open) instead of
 // a crash; the choice is fixed per load, so hook order stays stable.
@@ -37,7 +38,7 @@ export function Content() {
       savedTweaksSnapshot.current = JSON.stringify(next.tweaks);
       setConfig(next);
     } catch (error) {
-      setMessage(String(error));
+      setMessage(errorText(error));
     }
   }, []);
   useEffect(() => {

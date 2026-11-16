@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { cacheInfo, clearCache } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import { t } from "../i18n";
-import { formatBytes } from "../lib/util";
+import { errorText, formatBytes } from "../lib/util";
 import type { CacheInfo } from "../types";
 
 export function ShaderCache({ appid, name, running }: { appid: string; name: string; running: boolean }) {
@@ -24,7 +24,7 @@ export function ShaderCache({ appid, name, running }: { appid: string; name: str
         if (!cancelled) setInfo(next);
       })
       .catch((err) => {
-        if (!cancelled) setError(String(err));
+        if (!cancelled) setError(errorText(err));
       });
     return () => {
       cancelled = true;
@@ -38,7 +38,7 @@ export function ShaderCache({ appid, name, running }: { appid: string; name: str
     try {
       setInfo(await clearCache(appid));
     } catch (err) {
-      setError(String(err));
+      setError(errorText(err));
     } finally {
       setBusy(false);
     }

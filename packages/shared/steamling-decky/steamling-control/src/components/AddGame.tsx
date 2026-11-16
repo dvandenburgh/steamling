@@ -3,6 +3,7 @@ import { ButtonItem, ConfirmModal, PanelSection, PanelSectionRow, TextField, Tog
 import { useState } from "react";
 import { addShortcut, defaultShortcutName, isWindowsExe } from "../lib/shortcuts";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 function AddGameModal({ path, closeModal }: { path: string; closeModal?: () => void }) {
   const [name, setName] = useState(defaultShortcutName(path));
@@ -16,7 +17,7 @@ function AddGameModal({ path, closeModal }: { path: string; closeModal?: () => v
       toaster.toast({ title: t("Added to library"), body: name.trim() });
       closeModal?.();
     } catch (error) {
-      toaster.toast({ title: t("Could not add game"), body: String(error) });
+      toaster.toast({ title: t("Could not add game"), body: errorText(error) });
       setBusy(false);
     }
   };

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { rumbleStatus, setRumble } from "../backend";
 import { t } from "../i18n";
 import type { RumbleStatus } from "../types";
+import { errorText } from "../lib/util";
 
 const STRENGTHS = [25, 50, 75, 100];
 
@@ -12,7 +13,7 @@ export function Rumble() {
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    rumbleStatus().then(setRumbleState).catch((err) => setError(String(err)));
+    rumbleStatus().then(setRumbleState).catch((err) => setError(errorText(err)));
   }, []);
 
   if (!rumble || (!rumble.canSwitch && !rumble.canScale)) return null;
@@ -25,7 +26,7 @@ export function Rumble() {
     timer.current = window.setTimeout(() => {
       setRumble(enabled, strength)
         .then(setRumbleState)
-        .catch((err) => setError(String(err)));
+        .catch((err) => setError(errorText(err)));
     }, 300);
   };
 

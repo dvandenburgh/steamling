@@ -4,6 +4,7 @@ import { detectSdcard, formatSdcard } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { SdcardInfo } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 function cardSummary(card: SdcardInfo | null) {
   if (!card) return "Checking…";
@@ -67,6 +68,7 @@ export function SdCard() {
   const [label, setLabel] = useState("SDCARD");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
+  const [readError, setReadError] = useState("");
   const busyRef = useRef(false);
   busyRef.current = busy;
   const visible = useQamVisible();
@@ -79,9 +81,11 @@ export function SdCard() {
       if (busyRef.current) return;
       try {
         const next = await detectSdcard();
-        if (!cancelled && !busyRef.current) setCard(next);
+        if (cancelled || busyRef.current) return;
+        setCard(next);
+        setReadError("");
       } catch (error) {
-        if (!cancelled) setStatus(String(error));
+        if (!cancelled) setReadError(errorText(error));
       }
     };
     refresh();
@@ -100,7 +104,7 @@ export function SdCard() {
       const next = await formatSdcard(label);
       setCard(next);
     } catch (error) {
-      setStatus(String(error));
+      setStatus(errorText(error));
     } finally {
       setBusy(false);
     }
@@ -109,7 +113,7 @@ export function SdCard() {
 
   return (
     <PanelSection title={t("SD CARD")}>
-      <Field label={t("Card")} description={cardSummary(card)} />
+      <Field label={t("Card")} description={card ? cardSummary(card) : readError || cardSummary(card)} />
       <PanelSectionRow>
         <TextField
           label={t("Label")}

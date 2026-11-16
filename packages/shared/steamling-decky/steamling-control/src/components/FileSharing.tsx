@@ -4,6 +4,7 @@ import { installSamba, setShare, shareStatus } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { ShareStatus } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 // The share is guest-writable and covers the whole home folder, so the trade is spelled out
 // rather than buried: same warning the Steamling Tools menu shows before it flips the switch.
@@ -42,6 +43,7 @@ export function FileSharing() {
   const [share, setShareState] = useState<ShareStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
+  const [readError, setReadError] = useState("");
   const busyRef = useRef(false);
   busyRef.current = busy;
   const visible = useQamVisible();
@@ -54,9 +56,11 @@ export function FileSharing() {
       if (busyRef.current) return;
       try {
         const next = await shareStatus();
-        if (!cancelled && !busyRef.current) setShareState(next);
+        if (cancelled || busyRef.current) return;
+        setShareState(next);
+        setReadError("");
       } catch (error) {
-        if (!cancelled) setStatus(String(error));
+        if (!cancelled) setReadError(errorText(error));
       }
     };
     refresh();
@@ -74,7 +78,7 @@ export function FileSharing() {
     try {
       setShareState(await action());
     } catch (error) {
-      setStatus(String(error));
+      setStatus(errorText(error));
     } finally {
       setBusy(false);
     }
@@ -82,7 +86,7 @@ export function FileSharing() {
 
   const summary = () => {
     if (status) return status;
-    if (!share) return "Checking…";
+    if (!share) return readError || "Checking…";
     if (!share.installed) return "Samba is not installed (7.4 MB download)";
     if (share.on) return "On - open smb://steamling.local and connect as Guest";
     return "Off - your home folder is not shared";

@@ -493,6 +493,22 @@ const styles = `
       }
     `;
 
+function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+// Decimal units, the way Steam and file managers show sizes.
+function formatBytes(bytes) {
+    if (bytes < 1e6)
+        return `${Math.max(0, Math.round(bytes / 1e3))} KB`;
+    if (bytes < 1e9)
+        return `${Math.round(bytes / 1e6)} MB`;
+    return `${(bytes / 1e9).toFixed(1)} GB`;
+}
+// What a failed backend call says, without the "Error: " the runtime puts in front of it.
+function errorText(error) {
+    return String(error?.message ?? error).replace(/^(\w*Error|Exception): /, "");
+}
+
 function options(side) {
     return [
         { data: "", label: side === "left" ? t("Back button L4 (default)") : t("Back button R4 (default)") },
@@ -521,7 +537,7 @@ function BackPaddles() {
         setStatus({ ...status, left, right });
         setPaddles(left, right)
             .then(setStatus)
-            .catch((err) => setError(String(err)));
+            .catch((err) => setError(errorText(err)));
     };
     return (SP_JSX.jsxs(DFL.PanelSection, { title: t("BACK PADDLES"), children: [SP_JSX.jsx(SelectEdit, { label: t("Left paddle"), value: status.left, options: options("left"), onChange: (v) => save(String(v), status.right) }), SP_JSX.jsx(SelectEdit, { label: t("Right paddle"), value: status.right, options: options("right"), onChange: (v) => save(status.left, String(v)) }), SP_JSX.jsx("div", { className: "steamling-note", children: error ||
                     t("Remaps the paddles for everything, desktop mode and emulators included. Leave them as back buttons to map them per game in Steam Input instead.") })] }));
@@ -567,7 +583,7 @@ function CalibrationModal({ closeModal }) {
             }
             catch (error) {
                 if (!cancelled)
-                    setMessage(String(error));
+                    setMessage(errorText(error));
             }
             finally {
                 inFlight = false;
@@ -591,7 +607,7 @@ function CalibrationModal({ closeModal }) {
             setStatus(await action());
         }
         catch (error) {
-            setMessage(String(error));
+            setMessage(errorText(error));
         }
         finally {
             setBusy(false);
@@ -689,7 +705,7 @@ function Rumble() {
     const [error, setError] = SP_REACT.useState("");
     const timer = SP_REACT.useRef(undefined);
     SP_REACT.useEffect(() => {
-        rumbleStatus().then(setRumbleState).catch((err) => setError(String(err)));
+        rumbleStatus().then(setRumbleState).catch((err) => setError(errorText(err)));
     }, []);
     if (!rumble || (!rumble.canSwitch && !rumble.canScale))
         return null;
@@ -701,7 +717,7 @@ function Rumble() {
         timer.current = window.setTimeout(() => {
             setRumble(enabled, strength)
                 .then(setRumbleState)
-                .catch((err) => setError(String(err)));
+                .catch((err) => setError(errorText(err)));
         }, 300);
     };
     const index = Math.max(0, STRENGTHS.indexOf(rumble.strength));
@@ -725,7 +741,7 @@ function StickResponse() {
     const [status, setStatus] = SP_REACT.useState(null);
     const [error, setError] = SP_REACT.useState("");
     SP_REACT.useEffect(() => {
-        tuningStatus().then(setStatus).catch((err) => setError(String(err)));
+        tuningStatus().then(setStatus).catch((err) => setError(errorText(err)));
     }, []);
     if (!status?.available)
         return null;
@@ -734,7 +750,7 @@ function StickResponse() {
         setStatus({ ...status, [stick]: next });
         setTuning(stick, next.deadzone, next.outer)
             .then(setStatus)
-            .catch((err) => setError(String(err)));
+            .catch((err) => setError(errorText(err)));
     };
     return (SP_JSX.jsxs(DFL.PanelSection, { title: t("STICK RESPONSE"), children: [SP_JSX.jsx(Stick, { label: t("Left stick"), stick: "left", value: status.left, save: save }), SP_JSX.jsx(Stick, { label: t("Right stick"), stick: "right", value: status.right, save: save }), SP_JSX.jsx("div", { className: "steamling-note", children: error ||
                     t("Dead zone: how far a stick moves before it registers, relative to calibration. Full tilt: how far you push to reach 100%. Applies everywhere, kept across reboots. Steam Input adds per-game curves on top.") })] }));
@@ -971,7 +987,7 @@ function AddGameModal({ path, closeModal }) {
             closeModal?.();
         }
         catch (error) {
-            toaster.toast({ title: t("Could not add game"), body: String(error) });
+            toaster.toast({ title: t("Could not add game"), body: errorText(error) });
             setBusy(false);
         }
     };
@@ -1016,6 +1032,7 @@ function FileSharing() {
     const [share, setShareState] = SP_REACT.useState(null);
     const [busy, setBusy] = SP_REACT.useState(false);
     const [status, setStatus] = SP_REACT.useState("");
+    const [readError, setReadError] = SP_REACT.useState("");
     const busyRef = SP_REACT.useRef(false);
     busyRef.current = busy;
     const visible = useQamVisible();
@@ -1029,12 +1046,14 @@ function FileSharing() {
                 return;
             try {
                 const next = await shareStatus();
-                if (!cancelled && !busyRef.current)
-                    setShareState(next);
+                if (cancelled || busyRef.current)
+                    return;
+                setShareState(next);
+                setReadError("");
             }
             catch (error) {
                 if (!cancelled)
-                    setStatus(String(error));
+                    setReadError(errorText(error));
             }
         };
         refresh();
@@ -1053,7 +1072,7 @@ function FileSharing() {
             setShareState(await action());
         }
         catch (error) {
-            setStatus(String(error));
+            setStatus(errorText(error));
         }
         finally {
             setBusy(false);
@@ -1063,7 +1082,7 @@ function FileSharing() {
         if (status)
             return status;
         if (!share)
-            return "Checking…";
+            return readError || "Checking…";
         if (!share.installed)
             return "Samba is not installed (7.4 MB download)";
         if (share.on)
@@ -1086,6 +1105,7 @@ function SaveSync() {
     const [sync, setSyncState] = SP_REACT.useState(null);
     const [busy, setBusy] = SP_REACT.useState(false);
     const [status, setStatus] = SP_REACT.useState("");
+    const [readError, setReadError] = SP_REACT.useState("");
     const busyRef = SP_REACT.useRef(false);
     busyRef.current = busy;
     const visible = useQamVisible();
@@ -1099,12 +1119,14 @@ function SaveSync() {
                 return;
             try {
                 const next = await syncStatus();
-                if (!cancelled && !busyRef.current)
-                    setSyncState(next);
+                if (cancelled || busyRef.current)
+                    return;
+                setSyncState(next);
+                setReadError("");
             }
             catch (error) {
                 if (!cancelled)
-                    setStatus(String(error));
+                    setReadError(errorText(error));
             }
         };
         refresh();
@@ -1123,7 +1145,7 @@ function SaveSync() {
             setSyncState(await action());
         }
         catch (error) {
-            setStatus(String(error));
+            setStatus(errorText(error));
         }
         finally {
             setBusy(false);
@@ -1136,14 +1158,16 @@ function SaveSync() {
         if (status)
             return status;
         if (!sync)
-            return "Checking…";
+            return readError || "Checking…";
         if (!sync.on)
             return "Off - saves stay on this handheld";
         if (!sync.running)
             return "Starting…";
         if (!sync.devices.length)
-            return "On - add this handheld in Syncthing on your PC (device ID below)";
-        return `On - ${connected} of ${sync.devices.length} paired device(s) connected`;
+            return "On - in Syncthing on your PC, choose Add Remote Device. On the same network this handheld is listed there to pick; its ID is below. Then accept the PC here.";
+        if (sync.devices.length === 1)
+            return connected ? "On - connected to your paired device" : "On - your paired device is not reachable right now";
+        return `On - ${connected} of ${sync.devices.length} paired devices connected`;
     };
     return (SP_JSX.jsxs(DFL.PanelSection, { title: t("SAVE SYNC"), children: [SP_JSX.jsx(DFL.Field, { label: t("Syncthing"), description: summary() }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ToggleField, { label: t("Sync emulator saves"), description: t("Keeps ~/Emulation/Saves and States in step with your PC"), checked: !!sync?.on, disabled: busy || !sync, onChange: (on) => run(() => setSync(on)) }) }), sync?.on && sync.deviceId ? (SP_JSX.jsx(DFL.Field, { label: t("This handheld's device ID"), description: sync.deviceId })) : null, sync?.pending.map((p) => (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busy, description: `${p.id.slice(0, 7)}… ${p.address}`, onClick: () => run(() => acceptDevice(p.id)), children: t("Accept {name}", { name: p.name }) }) }, p.id)))] }));
 }
@@ -1190,6 +1214,7 @@ function SdCard() {
     const [label, setLabel] = SP_REACT.useState("SDCARD");
     const [busy, setBusy] = SP_REACT.useState(false);
     const [status, setStatus] = SP_REACT.useState("");
+    const [readError, setReadError] = SP_REACT.useState("");
     const busyRef = SP_REACT.useRef(false);
     busyRef.current = busy;
     const visible = useQamVisible();
@@ -1203,12 +1228,14 @@ function SdCard() {
                 return;
             try {
                 const next = await detectSdcard();
-                if (!cancelled && !busyRef.current)
-                    setCard(next);
+                if (cancelled || busyRef.current)
+                    return;
+                setCard(next);
+                setReadError("");
             }
             catch (error) {
                 if (!cancelled)
-                    setStatus(String(error));
+                    setReadError(errorText(error));
             }
         };
         refresh();
@@ -1228,20 +1255,21 @@ function SdCard() {
             setCard(next);
         }
         catch (error) {
-            setStatus(String(error));
+            setStatus(errorText(error));
         }
         finally {
             setBusy(false);
         }
     };
     const confirmFormat = () => DFL.showModal(SP_JSX.jsx(FormatConfirmModal, { summary: cardSummary(card), onConfirm: runFormat }));
-    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("SD CARD"), children: [SP_JSX.jsx(DFL.Field, { label: t("Card"), description: cardSummary(card) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.TextField, { label: t("Label"), value: label, disabled: busy || !!card?.bootDisk, onChange: (event) => setLabel(event.target.value.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 16)) }) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: !card?.present || busy || !!card?.bootDisk, onClick: confirmFormat, children: busy ? "Formatting…" : "Format SD Card" }) }), status ? SP_JSX.jsx(DFL.Field, { label: "", description: status }) : null] }));
+    return (SP_JSX.jsxs(DFL.PanelSection, { title: t("SD CARD"), children: [SP_JSX.jsx(DFL.Field, { label: t("Card"), description: card ? cardSummary(card) : readError || cardSummary(card) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.TextField, { label: t("Label"), value: label, disabled: busy || !!card?.bootDisk, onChange: (event) => setLabel(event.target.value.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 16)) }) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: !card?.present || busy || !!card?.bootDisk, onClick: confirmFormat, children: busy ? "Formatting…" : "Format SD Card" }) }), status ? SP_JSX.jsx(DFL.Field, { label: "", description: status }) : null] }));
 }
 
 function UsbTransfer() {
     const [usb, setUsb] = SP_REACT.useState(null);
     const [busy, setBusy] = SP_REACT.useState(false);
     const [status, setStatus] = SP_REACT.useState("");
+    const [readError, setReadError] = SP_REACT.useState("");
     const busyRef = SP_REACT.useRef(false);
     busyRef.current = busy;
     const visible = useQamVisible();
@@ -1251,12 +1279,14 @@ function UsbTransfer() {
         let cancelled = false;
         usbTransferStatus()
             .then((next) => {
-            if (!cancelled && !busyRef.current)
-                setUsb(next);
+            if (cancelled || busyRef.current)
+                return;
+            setUsb(next);
+            setReadError("");
         })
             .catch((error) => {
             if (!cancelled)
-                setStatus(String(error));
+                setReadError(errorText(error));
         });
         return () => {
             cancelled = true;
@@ -1271,7 +1301,7 @@ function UsbTransfer() {
             setUsb(await setUsbTransfer(on));
         }
         catch (error) {
-            setStatus(String(error));
+            setStatus(errorText(error));
         }
         finally {
             setBusy(false);
@@ -1283,7 +1313,7 @@ function UsbTransfer() {
         if (status)
             return status;
         if (!usb)
-            return "Checking…";
+            return readError || "Checking…";
         if (usb.on)
             return "On - plug into a computer with a USB-C cable and open \"Steamling\" like a phone. Controllers and hubs on the port stop working until you turn this off.";
         return "Off";
@@ -1564,7 +1594,7 @@ function PerformanceOverlay() {
             setOverlayState(await setOverlay(level));
         }
         catch (err) {
-            setError(String(err));
+            setError(errorText(err));
         }
         finally {
             busy.current = false;
@@ -1686,13 +1716,13 @@ function About() {
         })
             .catch((err) => {
             if (!cancelled)
-                setError(String(err));
+                setError(errorText(err));
         });
         return () => {
             cancelled = true;
         };
     }, [visible]);
-    const confirmRestart = () => DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Restart Game Mode"), strDescription: t("Closes Steam and any running game, then brings game mode back up. Unsaved progress in a running game is lost. Useful when Steam or the screen gets stuck."), strOKButtonText: t("Restart"), onOK: () => restartGameMode().catch((err) => setError(String(err))) }));
+    const confirmRestart = () => DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Restart Game Mode"), strDescription: t("Closes Steam and any running game, then brings game mode back up. Unsaved progress in a running game is lost. Useful when Steam or the screen gets stuck."), strOKButtonText: t("Restart"), onOK: () => restartGameMode().catch((err) => setError(errorText(err))) }));
     return (SP_JSX.jsxs(DFL.PanelSection, { title: t("ABOUT"), children: [SP_JSX.jsx(DFL.Field, { label: t("Steamling OS"), description: info?.osVersion ?? "…" }), SP_JSX.jsx(DFL.Field, { label: t("Kernel"), description: info?.kernel ?? "…" }), info?.bootloader ? SP_JSX.jsx(DFL.Field, { label: t("Bootloader"), description: info.bootloader }) : null, SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: confirmRestart, children: t("Restart Game Mode") }) }), error ? SP_JSX.jsx(DFL.Field, { label: t("Error"), description: error }) : null] }));
 }
 
@@ -1716,7 +1746,7 @@ function PanelModal({ initial, onChange, closeModal }) {
             onChange(next);
         }
         catch (e) {
-            setError(String(e));
+            setError(errorText(e));
         }
         finally {
             setBusy(false);
@@ -1769,6 +1799,7 @@ function RemoteAccess() {
     const [ssh, setSshState] = SP_REACT.useState(null);
     const [busy, setBusy] = SP_REACT.useState(false);
     const [status, setStatus] = SP_REACT.useState("");
+    const [readError, setReadError] = SP_REACT.useState("");
     const busyRef = SP_REACT.useRef(false);
     busyRef.current = busy;
     const visible = useQamVisible();
@@ -1779,12 +1810,14 @@ function RemoteAccess() {
         let cancelled = false;
         sshStatus()
             .then((next) => {
-            if (!cancelled && !busyRef.current)
-                setSshState(next);
+            if (cancelled || busyRef.current)
+                return;
+            setSshState(next);
+            setReadError("");
         })
             .catch((error) => {
             if (!cancelled)
-                setStatus(String(error));
+                setReadError(errorText(error));
         });
         return () => {
             cancelled = true;
@@ -1799,7 +1832,7 @@ function RemoteAccess() {
             setSshState(await setSsh(on));
         }
         catch (error) {
-            setStatus(String(error));
+            setStatus(errorText(error));
         }
         finally {
             setBusy(false);
@@ -1811,7 +1844,7 @@ function RemoteAccess() {
         if (status)
             return status;
         if (!ssh)
-            return "Checking…";
+            return readError || "Checking…";
         if (!ssh.on)
             return "Off - the device does not accept SSH logins";
         if (ssh.addresses.length === 0)
@@ -1830,13 +1863,13 @@ function RemoteAccess() {
 
 const SHOWN_UPDATES = 8;
 const gib = (bytes) => (bytes / 1024 ** 3).toFixed(1);
-// snapshot metadata stores ISO-8601 UTC; show local DD/MM/YYYY HH:MM
+// Snapshot metadata stores ISO-8601 UTC; shown in local time, with the month as a word so the
+// day and month can't be read the wrong way round.
 const fmtDate = (iso) => {
     const d = new Date(iso);
     if (isNaN(d.getTime()))
         return iso;
-    const p = (n) => String(n).padStart(2, "0");
-    return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    return d.toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 };
 // Occasional upkeep: updates and rollback, remote access, the set-once screen and menu
 // settings, and what is installed.
@@ -1885,7 +1918,7 @@ function System() {
                 }
             }
             catch (err) {
-                setError(String(err));
+                setError(errorText(err));
             }
         }, 2000);
         return () => window.clearInterval(timer);
@@ -1899,7 +1932,7 @@ function System() {
             setUpdates(await checkUpdates());
         }
         catch (err) {
-            setError(String(err));
+            setError(errorText(err));
         }
         finally {
             setChecking(false);
@@ -1913,7 +1946,7 @@ function System() {
             setStatus(await startUpdate());
         }
         catch (err) {
-            setError(String(err));
+            setError(errorText(err));
         }
     };
     const confirmStart = () => DFL.showModal(SP_JSX.jsx(DFL.ConfirmModal, { strTitle: t("Install Updates"), strDescription: t("Downloads and installs all available system updates. Keep the device powered; a running game may stutter. Restart after it finishes."), strOKButtonText: t("Install"), onOK: start }));
@@ -1931,7 +1964,7 @@ function System() {
             setRollbackDone(true);
         }
         catch (err) {
-            setRollbackError(String(err));
+            setRollbackError(errorText(err));
         }
         finally {
             setRollingBack(false);
@@ -1944,16 +1977,16 @@ function System() {
                 (lastSnapshot.targets ? ` (${lastSnapshot.targets})` : "") +
                 `. Games, saves and settings are kept.` +
                 (lastSnapshot.kernel ? " The previous kernel is restored too." : "") +
-                ` Reboot after it completes.`, strOKButtonText: t("Roll Back"), onOK: rollBack }));
+                ` Restart after it completes.`, strOKButtonText: t("Roll Back"), onOK: rollBack }));
     };
-    const reboot = () => rebootSystem().catch((err) => setError(String(err)));
+    const reboot = () => rebootSystem().catch((err) => setError(errorText(err)));
     const finished = !running && status?.exitCode !== null && status?.exitCode !== undefined;
     const summary = updates === null
         ? "Not checked yet"
         : updates.length === 0
             ? "System is up to date"
             : `${updates.length} update${updates.length === 1 ? "" : "s"} available`;
-    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsxs(DFL.PanelSection, { title: t("SYSTEM UPDATES"), children: [!running ? SP_JSX.jsx(DFL.Field, { label: t("Status"), description: summary }) : null, !running && updates && updates.length > 0 ? (SP_JSX.jsxs("div", { className: "steamling-note", children: [updates.slice(0, SHOWN_UPDATES).map((update) => (SP_JSX.jsx("div", { children: `${update.name} ${update.current} → ${update.latest}` }, update.name))), updates.length > SHOWN_UPDATES ? SP_JSX.jsx("div", { children: `… and ${updates.length - SHOWN_UPDATES} more` }) : null] })) : null, SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: check, children: checking ? "Checking…" : "Check for Updates" }) }), !running && updates && updates.length > 0 ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: confirmStart, children: t("Install Updates") }) })) : null, running ? SP_JSX.jsx(DFL.Field, { label: t("Updating…"), description: t("Safe to close this menu. Do not power off.") }) : null, finished ? (SP_JSX.jsx(DFL.Field, { label: status.exitCode === 0 ? "Update complete" : `Update failed (code ${status.exitCode})`, description: status.exitCode === 0 ? "Restart to finish applying updates." : "See the log below." })) : null, finished && status.exitCode === 0 ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: reboot, children: t("Restart Now") }) })) : null, (running || (finished && status.exitCode !== 0)) && status?.log ? (SP_JSX.jsx("div", { className: "steamling-note steamling-log", children: status.log })) : null, error ? SP_JSX.jsx(DFL.Field, { label: t("Error"), description: error }) : null] }), snap?.supported ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("ROLLBACK"), children: [snap.rolledBack && !rollbackDone ? (SP_JSX.jsx(DFL.Field, { label: t("System was rolled back"), description: `Restored from snapshot ${snap.rolledBack.fromSnapshot} (${fmtDate(snap.rolledBack.ts)}).${onLastSnapshot ? " Rollback will be available again after the next update." : ""}` })) : null, rollbackDone ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("Rolled back"), description: t("Reboot to finish switching to the restored system.") }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: reboot, children: t("Reboot Now") }) })] })) : onLastSnapshot ? null : lastSnapshot ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("Last snapshot"), description: `${fmtDate(lastSnapshot.created)}${lastSnapshot.targets ? ` — ${lastSnapshot.targets}` : ""}` }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: confirmRollback, children: rollingBack ? "Rolling back…" : "Roll Back Last Update" }) })] })) : (SP_JSX.jsx(DFL.Field, { label: t("No snapshots yet"), description: t("A snapshot is taken automatically before every update.") })), rollbackError ? SP_JSX.jsx(DFL.Field, { label: t("Rollback error"), description: rollbackError }) : null, SP_JSX.jsx(DFL.Field, { label: t("Storage"), description: `${gib(snap.freeBytes)} GB free${snap.lowSpace ? " — LOW: snapshots may be skipped" : ""}` })] })) : null, SP_JSX.jsx(RemoteAccess, {}), SP_JSX.jsx(PanelCalibration, {}), SP_JSX.jsx(MenuWidthSetting, {}), SP_JSX.jsx(About, {})] }));
+    return (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsxs(DFL.PanelSection, { title: t("SYSTEM UPDATES"), children: [!running ? SP_JSX.jsx(DFL.Field, { label: t("Status"), description: summary }) : null, !running && updates && updates.length > 0 ? (SP_JSX.jsxs("div", { className: "steamling-note", children: [updates.slice(0, SHOWN_UPDATES).map((update) => (SP_JSX.jsx("div", { children: `${update.name} ${update.current} → ${update.latest}` }, update.name))), updates.length > SHOWN_UPDATES ? SP_JSX.jsx("div", { children: `… and ${updates.length - SHOWN_UPDATES} more` }) : null] })) : null, SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: check, children: checking ? "Checking…" : "Check for Updates" }) }), !running && updates && updates.length > 0 ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: confirmStart, children: t("Install Updates") }) })) : null, running ? SP_JSX.jsx(DFL.Field, { label: t("Updating…"), description: t("Safe to close this menu. Do not power off.") }) : null, finished ? (SP_JSX.jsx(DFL.Field, { label: status.exitCode === 0 ? "Update complete" : `Update failed (code ${status.exitCode})`, description: status.exitCode === 0 ? "Restart to finish applying updates." : "See the log below." })) : null, finished && status.exitCode === 0 ? (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: reboot, children: t("Restart Now") }) })) : null, (running || (finished && status.exitCode !== 0)) && status?.log ? (SP_JSX.jsx("div", { className: "steamling-note steamling-log", children: status.log })) : null, error ? SP_JSX.jsx(DFL.Field, { label: t("Error"), description: error }) : null] }), snap?.supported ? (SP_JSX.jsxs(DFL.PanelSection, { title: t("ROLLBACK"), children: [snap.rolledBack && !rollbackDone ? (SP_JSX.jsx(DFL.Field, { label: t("System was rolled back"), description: `Restored from snapshot ${snap.rolledBack.fromSnapshot} (${fmtDate(snap.rolledBack.ts)}).${onLastSnapshot ? " Rollback will be available again after the next update." : ""}` })) : null, rollbackDone ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("Rolled back"), description: t("Restart to finish switching to the restored system.") }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: reboot, children: t("Restart Now") }) })] })) : onLastSnapshot ? null : lastSnapshot ? (SP_JSX.jsxs(SP_JSX.Fragment, { children: [SP_JSX.jsx(DFL.Field, { label: t("Last snapshot"), description: `${fmtDate(lastSnapshot.created)}${lastSnapshot.targets ? ` — ${lastSnapshot.targets}` : ""}` }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", disabled: busyRef.current, onClick: confirmRollback, children: rollingBack ? "Rolling back…" : "Roll Back Last Update" }) })] })) : (SP_JSX.jsx(DFL.Field, { label: t("No snapshots yet"), description: t("A snapshot is taken automatically before every update.") })), rollbackError ? SP_JSX.jsx(DFL.Field, { label: t("Rollback error"), description: rollbackError }) : null, SP_JSX.jsx(DFL.Field, { label: t("Storage"), description: `${gib(snap.freeBytes)} GB free${snap.lowSpace ? " — LOW: snapshots may be skipped" : ""}` })] })) : null, SP_JSX.jsx(RemoteAccess, {}), SP_JSX.jsx(PanelCalibration, {}), SP_JSX.jsx(MenuWidthSetting, {}), SP_JSX.jsx(About, {})] }));
 }
 
 function ExportNameModal({ game, base, onDone, closeModal }) {
@@ -1969,7 +2002,7 @@ function ExportNameModal({ game, base, onDone, closeModal }) {
             onDone(result.path);
         }
         catch (error) {
-            toaster.toast({ title: t("Export failed"), body: String(error) });
+            toaster.toast({ title: t("Export failed"), body: errorText(error) });
         }
         closeModal?.();
     };
@@ -2003,7 +2036,7 @@ function ImportModal({ path, preview, game, onDone, closeModal }) {
             toaster.toast({ title: t("Config applied"), body: game.name || game.appid });
         }
         catch (error) {
-            toaster.toast({ title: t("Import failed"), body: String(error) });
+            toaster.toast({ title: t("Import failed"), body: errorText(error) });
         }
         closeModal?.();
         onDone();
@@ -2022,7 +2055,7 @@ function ConfigSection({ game, reload }) {
             toaster.toast({ title: t("Game config exported"), body: result.path });
         }
         catch (error) {
-            toaster.toast({ title: t("Export failed"), body: String(error) });
+            toaster.toast({ title: t("Export failed"), body: errorText(error) });
         }
     };
     const doImport = async () => {
@@ -2043,22 +2076,10 @@ function ConfigSection({ game, reload }) {
             DFL.showModal(SP_JSX.jsx(ImportModal, { path: path, preview: preview, game: game, onDone: reload }));
         }
         catch (error) {
-            toaster.toast({ title: t("Import failed"), body: String(error) });
+            toaster.toast({ title: t("Import failed"), body: errorText(error) });
         }
     };
     return (SP_JSX.jsxs(DFL.PanelSection, { title: t("CONFIG"), children: [SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: doExport, children: t("Export Game Config") }) }), SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: doImport, children: t("Import Game Config") }) }), SP_JSX.jsx("div", { className: "steamling-note", children: t("Per-game tweaks and Proton pick; fan settings and defaults stay local") })] }));
-}
-
-function clone(obj) {
-    return JSON.parse(JSON.stringify(obj));
-}
-// Decimal units, the way Steam and file managers show sizes.
-function formatBytes(bytes) {
-    if (bytes < 1e6)
-        return `${Math.max(0, Math.round(bytes / 1e3))} KB`;
-    if (bytes < 1e9)
-        return `${Math.round(bytes / 1e6)} MB`;
-    return `${(bytes / 1e9).toFixed(1)} GB`;
 }
 
 function ShaderCache({ appid, name, running }) {
@@ -2081,7 +2102,7 @@ function ShaderCache({ appid, name, running }) {
         })
             .catch((err) => {
             if (!cancelled)
-                setError(String(err));
+                setError(errorText(err));
         });
         return () => {
             cancelled = true;
@@ -2096,7 +2117,7 @@ function ShaderCache({ appid, name, running }) {
             setInfo(await clearCache(appid));
         }
         catch (err) {
-            setError(String(err));
+            setError(errorText(err));
         }
         finally {
             setBusy(false);
@@ -2273,7 +2294,7 @@ function Content() {
             setConfig(next);
         }
         catch (error) {
-            setMessage(String(error));
+            setMessage(errorText(error));
         }
     }, []);
     SP_REACT.useEffect(() => {

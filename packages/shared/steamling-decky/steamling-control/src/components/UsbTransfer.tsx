@@ -4,11 +4,13 @@ import { setUsbTransfer, usbTransferStatus } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { UsbTransferStatus } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 export function UsbTransfer() {
   const [usb, setUsb] = useState<UsbTransferStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
+  const [readError, setReadError] = useState("");
   const busyRef = useRef(false);
   busyRef.current = busy;
   const visible = useQamVisible();
@@ -18,10 +20,12 @@ export function UsbTransfer() {
     let cancelled = false;
     usbTransferStatus()
       .then((next) => {
-        if (!cancelled && !busyRef.current) setUsb(next);
+        if (cancelled || busyRef.current) return;
+        setUsb(next);
+        setReadError("");
       })
       .catch((error) => {
-        if (!cancelled) setStatus(String(error));
+        if (!cancelled) setReadError(errorText(error));
       });
     return () => {
       cancelled = true;
@@ -35,7 +39,7 @@ export function UsbTransfer() {
     try {
       setUsb(await setUsbTransfer(on));
     } catch (error) {
-      setStatus(String(error));
+      setStatus(errorText(error));
     } finally {
       setBusy(false);
     }
@@ -45,7 +49,7 @@ export function UsbTransfer() {
 
   const summary = () => {
     if (status) return status;
-    if (!usb) return "Checking…";
+    if (!usb) return readError || "Checking…";
     if (usb.on) return "On - plug into a computer with a USB-C cable and open \"Steamling\" like a phone. Controllers and hubs on the port stop working until you turn this off.";
     return "Off";
   };

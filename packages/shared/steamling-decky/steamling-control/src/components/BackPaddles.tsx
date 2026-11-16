@@ -4,6 +4,7 @@ import { paddleStatus, setPaddles } from "../backend";
 import { t } from "../i18n";
 import type { PaddleStatus } from "../types";
 import { SelectEdit } from "./widgets";
+import { errorText } from "../lib/util";
 
 function options(side: "left" | "right") {
   return [
@@ -36,7 +37,7 @@ export function BackPaddles() {
     setStatus({ ...status, left, right });
     setPaddles(left, right)
       .then(setStatus)
-      .catch((err) => setError(String(err)));
+      .catch((err) => setError(errorText(err)));
   };
 
   return (

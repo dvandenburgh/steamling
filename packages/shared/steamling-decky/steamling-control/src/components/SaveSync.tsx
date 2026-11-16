@@ -4,6 +4,7 @@ import { acceptDevice, setSync, syncStatus } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { SyncStatus } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 // Syncthing pairing from a handheld: typing a 63-character device id with a gamepad is no fun,
 // so the id is shown here for the PC side, and the PC's request shows up here to accept.
@@ -11,6 +12,7 @@ export function SaveSync() {
   const [sync, setSyncState] = useState<SyncStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
+  const [readError, setReadError] = useState("");
   const busyRef = useRef(false);
   busyRef.current = busy;
   const visible = useQamVisible();
@@ -23,9 +25,11 @@ export function SaveSync() {
       if (busyRef.current) return;
       try {
         const next = await syncStatus();
-        if (!cancelled && !busyRef.current) setSyncState(next);
+        if (cancelled || busyRef.current) return;
+        setSyncState(next);
+        setReadError("");
       } catch (error) {
-        if (!cancelled) setStatus(String(error));
+        if (!cancelled) setReadError(errorText(error));
       }
     };
     refresh();
@@ -43,7 +47,7 @@ export function SaveSync() {
     try {
       setSyncState(await action());
     } catch (error) {
-      setStatus(String(error));
+      setStatus(errorText(error));
     } finally {
       setBusy(false);
     }
@@ -54,11 +58,12 @@ export function SaveSync() {
   const connected = sync?.devices.filter((d) => d.connected).length ?? 0;
   const summary = () => {
     if (status) return status;
-    if (!sync) return "Checking…";
+    if (!sync) return readError || "Checking…";
     if (!sync.on) return "Off - saves stay on this handheld";
     if (!sync.running) return "Starting…";
-    if (!sync.devices.length) return "On - add this handheld in Syncthing on your PC (device ID below)";
-    return `On - ${connected} of ${sync.devices.length} paired device(s) connected`;
+    if (!sync.devices.length) return "On - in Syncthing on your PC, choose Add Remote Device. On the same network this handheld is listed there to pick; its ID is below. Then accept the PC here.";
+    if (sync.devices.length === 1) return connected ? "On - connected to your paired device" : "On - your paired device is not reachable right now";
+    return `On - ${connected} of ${sync.devices.length} paired devices connected`;
   };
 
   return (

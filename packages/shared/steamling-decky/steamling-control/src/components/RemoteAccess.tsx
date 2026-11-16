@@ -4,6 +4,7 @@ import { setSsh, sshStatus } from "../backend";
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { SshStatus } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 // Same warning the Steamling Tools menu shows: every image ships the same default password.
 function SshConfirmModal({ onConfirm, closeModal }: { onConfirm: () => Promise<void>; closeModal?: () => void }) {
@@ -41,6 +42,7 @@ export function RemoteAccess() {
   const [ssh, setSshState] = useState<SshStatus | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
+  const [readError, setReadError] = useState("");
   const busyRef = useRef(false);
   busyRef.current = busy;
   const visible = useQamVisible();
@@ -51,10 +53,12 @@ export function RemoteAccess() {
     let cancelled = false;
     sshStatus()
       .then((next) => {
-        if (!cancelled && !busyRef.current) setSshState(next);
+        if (cancelled || busyRef.current) return;
+        setSshState(next);
+        setReadError("");
       })
       .catch((error) => {
-        if (!cancelled) setStatus(String(error));
+        if (!cancelled) setReadError(errorText(error));
       });
     return () => {
       cancelled = true;
@@ -68,7 +72,7 @@ export function RemoteAccess() {
     try {
       setSshState(await setSsh(on));
     } catch (error) {
-      setStatus(String(error));
+      setStatus(errorText(error));
     } finally {
       setBusy(false);
     }
@@ -78,7 +82,7 @@ export function RemoteAccess() {
 
   const summary = () => {
     if (status) return status;
-    if (!ssh) return "Checking…";
+    if (!ssh) return readError || "Checking…";
     if (!ssh.on) return "Off - the device does not accept SSH logins";
     if (ssh.addresses.length === 0) return "On - connect to Wi-Fi to reach it";
     return `On - ${ssh.addresses.map((a) => `ssh deck@${a}`).join(" or ")}`;

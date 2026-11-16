@@ -8,17 +8,18 @@ import { checkUpdates, rebootSystem, snapshotStatus, startRollback, startUpdate,
 import { useQamVisible } from "../hooks/useQamVisible";
 import type { SnapshotStatus, UpdateInfo, UpdateStatus } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 const SHOWN_UPDATES = 8;
 
 const gib = (bytes: number) => (bytes / 1024 ** 3).toFixed(1);
 
-// snapshot metadata stores ISO-8601 UTC; show local DD/MM/YYYY HH:MM
+// Snapshot metadata stores ISO-8601 UTC; shown in local time, with the month as a word so the
+// day and month can't be read the wrong way round.
 const fmtDate = (iso: string) => {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  return d.toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 };
 
 // Occasional upkeep: updates and rollback, remote access, the set-once screen and menu
@@ -66,7 +67,7 @@ export function System() {
           refreshSnap(); // a finished transaction changes snapshots + reboot-required
         }
       } catch (err) {
-        setError(String(err));
+        setError(errorText(err));
       }
     }, 2000);
     return () => window.clearInterval(timer);
@@ -79,7 +80,7 @@ export function System() {
     try {
       setUpdates(await checkUpdates());
     } catch (err) {
-      setError(String(err));
+      setError(errorText(err));
     } finally {
       setChecking(false);
     }
@@ -91,7 +92,7 @@ export function System() {
     try {
       setStatus(await startUpdate());
     } catch (err) {
-      setError(String(err));
+      setError(errorText(err));
     }
   };
   const confirmStart = () =>
@@ -117,7 +118,7 @@ export function System() {
       setSnap(await startRollback(lastSnapshot.id));
       setRollbackDone(true);
     } catch (err) {
-      setRollbackError(String(err));
+      setRollbackError(errorText(err));
     } finally {
       setRollingBack(false);
     }
@@ -132,14 +133,14 @@ export function System() {
           (lastSnapshot.targets ? ` (${lastSnapshot.targets})` : "") +
           `. Games, saves and settings are kept.` +
           (lastSnapshot.kernel ? " The previous kernel is restored too." : "") +
-          ` Reboot after it completes.`
+          ` Restart after it completes.`
         }
         strOKButtonText={t("Roll Back")}
         onOK={rollBack}
       />
     );
   };
-  const reboot = () => rebootSystem().catch((err) => setError(String(err)));
+  const reboot = () => rebootSystem().catch((err) => setError(errorText(err)));
 
   const finished = !running && status?.exitCode !== null && status?.exitCode !== undefined;
   const summary = updates === null
@@ -197,9 +198,9 @@ export function System() {
           ) : null}
           {rollbackDone ? (
             <>
-              <Field label={t("Rolled back")} description={t("Reboot to finish switching to the restored system.")} />
+              <Field label={t("Rolled back")} description={t("Restart to finish switching to the restored system.")} />
               <PanelSectionRow>
-                <ButtonItem layout="below" onClick={reboot}>{t("Reboot Now")}</ButtonItem>
+                <ButtonItem layout="below" onClick={reboot}>{t("Restart Now")}</ButtonItem>
               </PanelSectionRow>
             </>
           ) : onLastSnapshot ? null : lastSnapshot ? (

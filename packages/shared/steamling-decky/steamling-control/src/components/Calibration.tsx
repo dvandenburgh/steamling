@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { calibrationCancel, calibrationReset, calibrationSave, calibrationStart, calibrationStatus } from "../backend";
 import type { CalibrationLive, CalibrationStatus } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 function instruction(s: CalibrationStatus) {
   if (s.kind === "trigger") {
@@ -62,7 +63,7 @@ function CalibrationModal({ closeModal }: { closeModal?: () => void }) {
         const next = await calibrationStatus();
         if (!cancelled) setStatus(next);
       } catch (error) {
-        if (!cancelled) setMessage(String(error));
+        if (!cancelled) setMessage(errorText(error));
       } finally {
         inFlight = false;
       }
@@ -83,7 +84,7 @@ function CalibrationModal({ closeModal }: { closeModal?: () => void }) {
     try {
       setStatus(await action());
     } catch (error) {
-      setMessage(String(error));
+      setMessage(errorText(error));
     } finally {
       setBusy(false);
     }

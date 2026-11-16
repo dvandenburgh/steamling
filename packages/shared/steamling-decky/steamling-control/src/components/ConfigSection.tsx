@@ -6,6 +6,7 @@ import { availableCompatTools, resolveCompatTool, setCompatTool } from "../lib/c
 import { SelectEdit } from "./widgets";
 import type { ConfigPreview } from "../types";
 import { t } from "../i18n";
+import { errorText } from "../lib/util";
 
 function ExportNameModal({ game, base, onDone, closeModal }: {
   game: { appid: string; name: string };
@@ -23,7 +24,7 @@ function ExportNameModal({ game, base, onDone, closeModal }: {
       const result = await exportConfig(game.appid, game.name, value.trim(), true);
       onDone(result.path);
     } catch (error) {
-      toaster.toast({ title: t("Export failed"), body: String(error) });
+      toaster.toast({ title: t("Export failed"), body: errorText(error) });
     }
     closeModal?.();
   };
@@ -72,7 +73,7 @@ function ImportModal({ path, preview, game, onDone, closeModal }: {
       }
       toaster.toast({ title: t("Config applied"), body: game.name || game.appid });
     } catch (error) {
-      toaster.toast({ title: t("Import failed"), body: String(error) });
+      toaster.toast({ title: t("Import failed"), body: errorText(error) });
     }
     closeModal?.();
     onDone();
@@ -115,7 +116,7 @@ export function ConfigSection({ game, reload }: {
       }
       toaster.toast({ title: t("Game config exported"), body: result.path });
     } catch (error) {
-      toaster.toast({ title: t("Export failed"), body: String(error) });
+      toaster.toast({ title: t("Export failed"), body: errorText(error) });
     }
   };
   const doImport = async () => {
@@ -133,7 +134,7 @@ export function ConfigSection({ game, reload }: {
       const preview = await readConfig(path);
       showModal(<ImportModal path={path} preview={preview} game={game} onDone={reload} />);
     } catch (error) {
-      toaster.toast({ title: t("Import failed"), body: String(error) });
+      toaster.toast({ title: t("Import failed"), body: errorText(error) });
     }
   };
   return (
