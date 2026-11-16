@@ -3,6 +3,8 @@
 [Unit]
 Description=Steamling USB file transfer (MTP)
 After=local-fs.target systemd-modules-load.service
+# No sleep while a computer is connected: a suspend drops the link and the copy with it.
+Wants=steamling-mtp-awake.service
 RequiresMountsFor=/home/deck
 
 [Service]

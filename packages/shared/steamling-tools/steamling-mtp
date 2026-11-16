@@ -3,7 +3,8 @@
 # phone (home folder, plus the microSD card when booted from internal storage) until shutdown or
 # "off"; it never persists, since while it's on the port can't host a controller or a hub.
 # status is unprivileged; on/off need root (Governor runs as root).
-# setup/bind/unbind/teardown are steamling-mtp.service's own steps.
+# setup/bind/unbind/teardown are steamling-mtp.service's own steps; awake is
+# steamling-mtp-awake.service, which keeps the handheld from sleeping while a computer is connected.
 set -euo pipefail
 
 UNIT=steamling-mtp.service
@@ -154,6 +155,34 @@ case "${1:-status}" in
   unbind)
     need_root
     unbind
+    ;;
+  awake)
+    # A suspend cuts the USB link, and a copy dies with it. Steam's idle sleep and the power button
+    # both go through logind, so a block inhibitor stops them, for as long as a computer has the
+    # device configured (the UDC says "configured" from enumeration until unplug). Read every 2s;
+    # the inhibitor is a child, so it ends with this loop when the service stops.
+    need_root
+    shopt -s nullglob
+    hold=""
+    trap '[ -n "${hold}" ] && kill "${hold}" 2>/dev/null; exit 0' TERM INT
+    while :; do
+      connected=0
+      for s in /sys/class/udc/*/state; do
+        [ "$(cat "${s}" 2>/dev/null)" = configured ] && connected=1
+      done
+      if [ "${connected}" = 1 ] && { [ -z "${hold}" ] || ! kill -0 "${hold}" 2>/dev/null; }; then
+        systemd-inhibit --what=sleep:idle --mode=block --who="USB file transfer" \
+          --why="A computer is connected over USB" sleep infinity &
+        hold=$!
+        echo "steamling-mtp: computer connected, sleep held off"
+      elif [ "${connected}" = 0 ] && [ -n "${hold}" ]; then
+        kill "${hold}" 2>/dev/null || :
+        wait "${hold}" 2>/dev/null || :
+        hold=""
+        echo "steamling-mtp: computer gone, sleep allowed again"
+      fi
+      sleep 2 & wait $!
+    done
     ;;
   teardown)
     need_root

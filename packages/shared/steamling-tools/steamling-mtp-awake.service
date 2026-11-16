@@ -1,0 +1,11 @@
+# Keeps the handheld awake while a computer is connected for USB file transfer
+# (steamling-mtp awake). Comes and goes with steamling-mtp.service.
+[Unit]
+Description=Keep awake while a computer is connected for USB file transfer
+BindsTo=steamling-mtp.service
+After=steamling-mtp.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/steamling-mtp awake
+KillMode=control-group

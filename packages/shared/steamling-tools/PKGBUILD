@@ -2,7 +2,7 @@
 # which live here rather than in the image overlay so fixes reach fielded SDs on -Syu (#34).
 pkgname=steamling-tools
 pkgver=0.1.1
-pkgrel=1.13
+pkgrel=1.14
 pkgdesc="Steamling maintenance app: snapshot rollback, base mode switch, internal install, SSH, file sharing and USB file transfer toggles, emulation layer, desktop picker, first-boot diagnostics and root expansion"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -18,8 +18,8 @@ source=('steamling-tools' 'steamling-tools.desktop' 'steamling-installer-gui'
         'steamling-share' '55-steamling-share.rules' 'smb.conf' 'steamling-smb.service'
         'steamling-layer' '56-steamling-layer.rules'
         'steamling-diag' 'steamling-diag.service' 'steamling-expand-root' 'steamling-expand-root.service'
-        'steamling-mtp' 'steamling-mtp.service' 'steamling-bench')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
+        'steamling-mtp' 'steamling-mtp.service' 'steamling-mtp-awake.service' 'steamling-bench')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
             'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
             'SKIP')
 backup=('etc/ssh/sshd_config.d/10-steamling-no-root-login.conf'
@@ -62,6 +62,8 @@ package() {
   install -Dm755 "${srcdir}/steamling-mtp" "${pkgdir}/usr/bin/steamling-mtp"
   install -Dm644 "${srcdir}/steamling-mtp.service" \
     "${pkgdir}/usr/lib/systemd/system/steamling-mtp.service"
+  install -Dm644 "${srcdir}/steamling-mtp-awake.service" \
+    "${pkgdir}/usr/lib/systemd/system/steamling-mtp-awake.service"
 
   install -Dm755 "${srcdir}/steamling-layer" "${pkgdir}/usr/bin/steamling-layer"
   install -Dm644 "${srcdir}/56-steamling-layer.rules" \
