@@ -1,6 +1,6 @@
 #!/bin/bash
-# steamling-steam-splash <WxH> -- <steam command...>: gamescope's child for game mode. Maps the
-# boot logo until Big Picture is up, then execs Steam so gamescope's child pid is still Steam.
+# steamling-steam-splash <WxH> -- <steam command...>: gamescope's child for game mode. Plays the
+# boot animation until Big Picture is up, then execs Steam so gamescope's child pid is still Steam.
 #
 # Under gamescope -e only windows with a Steam app id can take focus, and nothing is focused until
 # GAMESCOPECTRL_BASELAYER_APPID names one. So the window is tagged STEAM_GAME=769 (Steam's own id)
@@ -24,7 +24,8 @@ fi
 T0="${STEAMLING_STEAM_T0:-$(date +%s%3N)}"
 
 # two-step draws the watermark DeviceScale-times its size, placed by truncated logical-pixel maths,
-# on its BackgroundStartColor; read all of it back so boot -> game mode stays one still screen.
+# on its BackgroundStartColor, and its throbber frames centred on the animation alignment; read
+# all of it back so the boot animation carries on in the same place once gamescope has the panel.
 # Unset alignments take two-step's defaults; a missing DeviceScale falls back to 1 (never off-screen).
 ply_key() {  # <key> <file>: plymouth allows spaces around the "=", so this does too
   sed -n "s/^[[:space:]]*$1[[:space:]]*=[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*$/\1/p" "$2" 2>/dev/null \
@@ -35,6 +36,8 @@ SCALE="$(ply_key DeviceScale /etc/plymouth/plymouthd.conf)"
 [[ "${SCALE}" =~ ^[1-9]$ ]] || SCALE=1
 HALIGN="$(num_or "$(ply_key WatermarkHorizontalAlignment "${THEME}/steamling.plymouth")" 1.0)"
 VALIGN="$(num_or "$(ply_key WatermarkVerticalAlignment "${THEME}/steamling.plymouth")" 0.5)"
+THALIGN="$(num_or "$(ply_key HorizontalAlignment "${THEME}/steamling.plymouth")" 0.5)"
+TVALIGN="$(num_or "$(ply_key VerticalAlignment "${THEME}/steamling.plymouth")" 0.5)"
 BG="$(ply_key BackgroundStartColor "${THEME}/steamling.plymouth")"
 [[ "${BG}" =~ ^0x[0-9A-Fa-f]{6}$ ]] || BG=0x202126
 
@@ -58,10 +61,20 @@ if [ -r "${WATERMARK}" ] && command -v ffplay >/dev/null 2>&1 && command -v xpro
   # The still ends after one frame; overlay's default eof_action=repeat keeps it on screen.
   # SDL_VIDEODRIVER=x11: the app-id tag is an X property. -fs, not -x/-y: gamescope fits it.
   # format=rgb: the default yuv420 path shifts the ground colour and smears thin lines.
-  graph="color=c=${BG}:s=${SIZE}:r=1,format=rgb24[bg];"
+  # Plymouth stops drawing the moment the session takes the panel, and Steam needs a good while
+  # after that to show anything, so the theme's own frames keep playing here: the same 30 a
+  # second plymouth draws them at, looped, over the still. A theme without frames shows the still.
+  rate=1
+  [ -r "${THEME}/throbber-0001.png" ] && rate=30
+  graph="color=c=${BG}:s=${SIZE}:r=${rate},format=rgb24[bg];"
   graph+="movie=${WATERMARK},scale=iw*${SCALE}:ih*${SCALE}:flags=bilinear[wm];"
   graph+="[bg][wm]overlay=format=rgb"
   graph+=":x=${SCALE}*trunc((W-w)/${SCALE}*${HALIGN}):y=${SCALE}*trunc((H-h)/${SCALE}*${VALIGN})"
+  if [ "${rate}" = 30 ]; then
+    graph+="[still];movie=filename=${THEME}/throbber-%04d.png:f=image2:loop=0,setpts=N/${rate}/TB,"
+    graph+="scale=iw*${SCALE}:ih*${SCALE}:flags=bilinear[frames];[still][frames]overlay=format=rgb"
+    graph+=":x=${SCALE}*trunc(W/${SCALE}*${THALIGN}-w/${SCALE}/2):y=${SCALE}*trunc(H/${SCALE}*${TVALIGN}-h/${SCALE}/2)"
+  fi
 
   # Double fork: Steam (exec'd below) never reaps inherited children, so orphan these to
   # gamescopereaper rather than leave zombies under Steam.
