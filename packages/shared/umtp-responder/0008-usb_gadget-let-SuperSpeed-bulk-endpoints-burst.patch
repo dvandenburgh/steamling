@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "David J. Vandenburgh" <david@vandenburgh.co>
+Date: Mon, 16 Nov 2026 13:00:00 -0500
+Subject: [PATCH] usb_gadget: let SuperSpeed bulk endpoints burst
+
+The SuperSpeed endpoint companion descriptors were left all zero, so
+bMaxBurst was 0: one 1024 byte packet per burst, each waiting for its
+own handshake before the next may go. A SuperSpeed link moves most of
+its data in bursts of up to 16 packets, and without them a copy runs at
+a fraction of what the link can carry. The kernel's own mass storage
+and network functions ask for the full 16.
+
+Set bMaxBurst to 15 (16 packets) on the two bulk endpoints. The
+interrupt endpoint keeps 0, and nothing changes at high or full speed,
+which have no companion descriptor.
+---
+diff --git a/src/usb_gadget.c b/src/usb_gadget.c
+index f44df9b..bb920a8 100644
+--- a/src/usb_gadget.c
++++ b/src/usb_gadget.c
+@@ -251,6 +251,12 @@ void fill_ep_descriptor(mtp_ctx * ctx, usb_gadget * usbctx,struct usb_endpoint_d
+ 
+ 		ss_descriptor->ep_desc_comp.bLength = sizeof(struct usb_ss_ep_comp_descriptor);
+ 		ss_descriptor->ep_desc_comp.bDescriptorType = USB_DT_SS_ENDPOINT_COMP;
++
++		// Let the host send or take up to 16 packets per burst on the bulk endpoints. With 0
++		// every 1024 byte packet is its own burst and waits for its own handshake, which
++		// keeps a SuperSpeed link far below what it can carry.
++		if(desc->bmAttributes == USB_ENDPOINT_XFER_BULK)
++			ss_descriptor->ep_desc_comp.bMaxBurst = 15;
+ 	}
+ #endif
+ 
