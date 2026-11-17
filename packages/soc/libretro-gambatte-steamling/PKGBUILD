@@ -1,0 +1,31 @@
+# libretro-gambatte-steamling — the gambatte libretro core (Game Boy and Game Boy Color), built from source and tuned to the SoC
+# like packages/soc/mesa. Opt-in: ./build.sh --cores (STEAMLING_CORES=on) builds it, and then it
+# takes over from the prebuilt copy in libretro-cores-steamling, which it replaces on update.
+# Bump = move _commit, pkgver <commit date>.<short sha>.
+pkgname=libretro-gambatte-steamling
+pkgver=20261030.77f2567
+pkgrel=1
+_commit=77f2567d718b8973d02caa2daa8dce4953faf811
+pkgdesc="gambatte libretro core: Game Boy and Game Boy Color (built from source, SoC-tuned)"
+arch=('aarch64')
+url="https://github.com/libretro/gambatte-libretro"
+license=('GPL-2.0-only')
+depends=('glibc' 'gcc-libs')
+makedepends=('git' 'make')
+provides=('steamling-libretro-gambatte')
+conflicts=('steamling-libretro-gambatte')
+replaces=('libretro-cores-steamling-gambatte')
+source=("gambatte-libretro::git+https://github.com/libretro/gambatte-libretro.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
+  local _rocknix_tune="${STEAMLING_TUNE_CFLAGS:--march=armv9-a+fp16+crypto+i8mm+bf16+memtag+sm4+sha3+nosve+nosve2 -mtune=cortex-x3 -mno-outline-atomics}"
+  export CFLAGS+=" ${_rocknix_tune}" CXXFLAGS+=" ${_rocknix_tune}"
+  make -C gambatte-libretro -f Makefile.libretro platform=unix
+}
+
+package() {
+  install -Dm644 gambatte-libretro/gambatte_libretro.so "${pkgdir}/usr/lib/libretro/gambatte_libretro.so"
+  install -Dm644 gambatte-libretro/COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
