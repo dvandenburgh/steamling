@@ -15,17 +15,37 @@ ES-DE show up in your Steam library automatically.
 | Nintendo 64 | RetroArch (Mupen64Plus-Next) |
 | Game Boy / Game Boy Color | RetroArch (Gambatte) |
 | Game Boy Advance | RetroArch (mGBA) |
+| Virtual Boy | RetroArch (Beetle VB) |
 | Nintendo DS | RetroArch (melonDS) |
 | Nintendo 3DS | Azahar |
 | GameCube / Wii | Dolphin |
+| Wii U | Cemu |
 | Nintendo Switch | Eden or Ryujinx (bring your own build, see [below](#using-your-own-emulator-build)) |
 | Sega Master System / Genesis / Game Gear / Sega CD | RetroArch (Genesis Plus GX) |
+| Sega 32X | RetroArch (PicoDrive) |
 | Sega Saturn | RetroArch (YabaSanshiro) |
 | Sega Dreamcast | RetroArch (Flycast) |
 | PlayStation | RetroArch (SwanStation) |
 | PlayStation 2 | ARMSX2 |
+| PlayStation 3 | RPCS3 |
 | PlayStation Portable | PPSSPP |
+| PlayStation Vita | Vita3K |
+| Xbox | xemu |
+| TurboGrafx-16 / TurboGrafx-CD | RetroArch (Beetle PCE FAST) |
 | Arcade / Neo Geo | RetroArch (FBNeo) |
+| Neo Geo Pocket / Pocket Color | RetroArch (Beetle NeoPop) |
+| Atari 2600 | RetroArch (Stella) |
+| Atari 7800 | RetroArch (ProSystem) |
+| Atari Lynx | RetroArch (Handy) |
+| Atari Jaguar | RetroArch (Virtual Jaguar) |
+| WonderSwan / WonderSwan Color | RetroArch (Beetle Cygne) |
+
+The RetroArch cores come prebuilt, except N64, Dreamcast and PlayStation, which are always built
+from source. Building with `./build.sh --cores` builds the NES, SNES, Game Boy, GBA, Genesis, 32X,
+Saturn, TurboGrafx-16, Neo Geo Pocket and Arcade cores from source too, tuned for your handheld's
+chip (see [advanced build options](building/advanced.md)). The first update after a `--cores`
+build asks which package should provide each of those cores: press Enter to take the first
+answer, which is the one you just built.
 
 ## Installing it
 
@@ -105,6 +125,11 @@ Some systems need BIOS or firmware files that Steamling cannot ship. Put them in
 | Dreamcast | `dc/dc_boot.bin`, `dc/dc_flash.bin` | Note the `dc/` subfolder. |
 | Sega CD | `bios_CD_U.bin`, `bios_CD_E.bin`, `bios_CD_J.bin` | One per region. |
 | Game Boy Advance | `gba_bios.bin` | Optional; improves accuracy. |
+| TurboGrafx-CD | `syscard3.pce` | Only for CD games. |
+| Neo Geo | `neogeo.zip` | In `BIOS/`, or next to the games in `ROMs/neogeo/`. |
+| Atari Lynx | `lynxboot.img` | |
+| **PlayStation 3** | Sony's `PS3UPDAT.PUP` firmware | Not in `BIOS/`. Open RPCS3 in desktop mode and use **File → Install Firmware**. |
+| **PlayStation Vita** | Sony's firmware files | Not in `BIOS/`. Open Vita3K in desktop mode; its first-run setup asks for them. |
 | **Nintendo Switch** | `prod.keys`, `title.keys` + firmware | Not in `BIOS/`. Eden: keys in `~/.local/share/eden/keys/`, firmware `.nca` files in `~/.local/share/eden/nand/system/Contents/registered/`. Ryujinx: keys in `~/.config/Ryujinx/system/`, firmware installed from its own menu. |
 
 If a game will not boot, the emulator's error message usually names the exact file it is missing.
