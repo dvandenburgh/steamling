@@ -294,7 +294,13 @@ const tabIcons = {
 /** Governor's own icon: a flyball governor, the spinning regulator that holds a steam engine's speed.
  * Sized to fill the height of its row in Decky's plugin list; the view box is cropped to the
  * drawing, so none of that size goes on empty margin. */
-const pluginIcon = (SP_JSX.jsxs("svg", { style: { display: "block" }, width: "1.75em", height: "1.75em", viewBox: "1.5 1 21 21", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [SP_JSX.jsx("line", { x1: "12", x2: "12", y1: "2", y2: "21" }), SP_JSX.jsx("path", { d: "M12 4 7.6 9.4M12 4l4.4 5.4" }), SP_JSX.jsx("circle", { cx: "6.5", cy: "11", r: "1.9", fill: "currentColor" }), SP_JSX.jsx("circle", { cx: "17.5", cy: "11", r: "1.9", fill: "currentColor" }), SP_JSX.jsx("path", { d: "M7.6 12.6 10.5 15.5M16.4 12.6 13.5 15.5" }), SP_JSX.jsx("rect", { x: "10", y: "15", width: "4", height: "2.5", rx: "0.5" }), SP_JSX.jsx("line", { x1: "7", x2: "17", y1: "21", y2: "21" })] }));
+function governorMark(size) {
+    return (SP_JSX.jsxs("svg", { style: { display: "block" }, width: size, height: size, viewBox: "1.5 1 21 21", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [SP_JSX.jsx("line", { x1: "12", x2: "12", y1: "2", y2: "21" }), SP_JSX.jsx("path", { d: "M12 4 7.6 9.4M12 4l4.4 5.4" }), SP_JSX.jsx("circle", { cx: "6.5", cy: "11", r: "1.9", fill: "currentColor" }), SP_JSX.jsx("circle", { cx: "17.5", cy: "11", r: "1.9", fill: "currentColor" }), SP_JSX.jsx("path", { d: "M7.6 12.6 10.5 15.5M16.4 12.6 13.5 15.5" }), SP_JSX.jsx("rect", { x: "10", y: "15", width: "4", height: "2.5", rx: "0.5" }), SP_JSX.jsx("line", { x1: "7", x2: "17", y1: "21", y2: "21" })] }));
+}
+const pluginIcon = governorMark("1.75em");
+/** Decky's own two pages, drawn for the big buttons under the plugin list (lib/deckyChrome). */
+const storeIcon = (SP_JSX.jsxs("svg", { style: { display: "block" }, width: "1.75em", height: "1.75em", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [SP_JSX.jsx("path", { d: "M3 9 4.5 4h15L21 9" }), SP_JSX.jsx("path", { d: "M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0" }), SP_JSX.jsx("path", { d: "M5 11.5V20h14v-8.5" }), SP_JSX.jsx("path", { d: "M10 20v-5h4v5" })] }));
+const settingsIcon = (SP_JSX.jsxs("svg", { style: { display: "block" }, width: "1.75em", height: "1.75em", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", children: [SP_JSX.jsx("circle", { cx: "12", cy: "12", r: "3" }), SP_JSX.jsx("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" })] }));
 
 function gameDisplayName(game) {
     if (!game?.appid)
@@ -2451,10 +2457,64 @@ function patchLibraryContextMenu() {
     }
 }
 
+const HOME_CLASS = "steamling-decky-home";
+function onDecky(path) {
+    DFL.Navigation.Navigate(path);
+    DFL.Navigation.CloseSideMenus();
+}
+function Row({ icon, label, onClick }) {
+    return (SP_JSX.jsx(DFL.PanelSectionRow, { children: SP_JSX.jsx(DFL.ButtonItem, { layout: "below", onClick: onClick, children: SP_JSX.jsxs("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between" }, children: [icon, SP_JSX.jsx("div", { children: label })] }) }) }));
+}
+// Shown only on Decky's plugin list, not while a plugin's page is open.
+function DeckyLinks({ state }) {
+    const [listShown, setListShown] = SP_REACT.useState(!state._activePlugin);
+    SP_REACT.useEffect(() => {
+        const update = () => setListShown(!state._activePlugin);
+        state.eventBus?.addEventListener("update", update);
+        return () => state.eventBus?.removeEventListener("update", update);
+    }, [state]);
+    if (!listShown)
+        return null;
+    return (SP_JSX.jsxs(DFL.PanelSection, { children: [SP_JSX.jsx(Row, { icon: storeIcon, label: t("Decky Store"), onClick: () => onDecky("/decky/store") }), SP_JSX.jsx(Row, { icon: settingsIcon, label: t("Decky Settings"), onClick: () => onDecky("/decky/settings") })] }));
+}
+// The title row's two small buttons go: on the plugin list Decky's TitleView is a direct child of
+// the content (a plugin's page nests it one level down, so its back button stays).
+function homeCss() {
+    return `.${HOME_CLASS} > .${DFL.staticClasses.Title} > :not(:first-child) { display: none !important; }`;
+}
+function patchDeckyChrome() {
+    try {
+        const hook = window.__TABS_HOOK_INSTANCE;
+        const tab = hook?.tabs?.find((candidate) => candidate?.id === DFL.QuickAccessTab.Decky);
+        const icon = tab?.icon;
+        const content = tab?.content;
+        const state = content?.props?.deckyState;
+        const iconKids = icon?.props?.children;
+        if (!state || !Array.isArray(iconKids) || iconKids.length < 1 || !content?.props?.children)
+            return () => { };
+        if (Object.isFrozen(icon.props) || Object.isFrozen(iconKids) || Object.isFrozen(content.props))
+            return () => { };
+        const plug = iconKids[0];
+        const panel = content.props.children;
+        iconKids[0] = governorMark("1em");
+        content.props.children = (SP_JSX.jsxs("div", { className: HOME_CLASS, children: [SP_JSX.jsx("style", { children: homeCss() }), panel, SP_JSX.jsx(DeckyLinks, { state: state })] }));
+        state.notifyUpdate?.();
+        return () => {
+            iconKids[0] = plug;
+            content.props.children = panel;
+            state.notifyUpdate?.();
+        };
+    }
+    catch (error) {
+        return () => { };
+    }
+}
+
 var index = definePlugin(() => {
     const unpatchContextMenu = patchLibraryContextMenu();
     const unregisterTouch = registerTouchLifetime();
     const unregisterDownloads = registerDownloadWrapper((appid) => isGame(appid));
+    const unpatchDeckyChrome = patchDeckyChrome();
     // Wider from the first time the menu opens, not only once this plugin's page has been shown.
     applyToSteamWindow(getMenuWidth());
     getConfig()
@@ -2470,6 +2530,7 @@ var index = definePlugin(() => {
             unpatchContextMenu();
             unregisterTouch();
             unregisterDownloads();
+            unpatchDeckyChrome();
             applyToSteamWindow(null);
         },
     };

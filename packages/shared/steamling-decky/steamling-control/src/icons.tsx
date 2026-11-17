@@ -85,24 +85,47 @@ export const tabIcons = {
 /** Governor's own icon: a flyball governor, the spinning regulator that holds a steam engine's speed.
  * Sized to fill the height of its row in Decky's plugin list; the view box is cropped to the
  * drawing, so none of that size goes on empty margin. */
-export const pluginIcon = (
-  <svg
-    style={{ display: "block" }}
-    width="1.75em"
-    height="1.75em"
-    viewBox="1.5 1 21 21"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="12" x2="12" y1="2" y2="21" />
-    <path d="M12 4 7.6 9.4M12 4l4.4 5.4" />
-    <circle cx="6.5" cy="11" r="1.9" fill="currentColor" />
-    <circle cx="17.5" cy="11" r="1.9" fill="currentColor" />
-    <path d="M7.6 12.6 10.5 15.5M16.4 12.6 13.5 15.5" />
-    <rect x="10" y="15" width="4" height="2.5" rx="0.5" />
-    <line x1="7" x2="17" y1="21" y2="21" />
+export function governorMark(size: string) {
+  return (
+    <svg
+      style={{ display: "block" }}
+      width={size}
+      height={size}
+      viewBox="1.5 1 21 21"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="12" x2="12" y1="2" y2="21" />
+      <path d="M12 4 7.6 9.4M12 4l4.4 5.4" />
+      <circle cx="6.5" cy="11" r="1.9" fill="currentColor" />
+      <circle cx="17.5" cy="11" r="1.9" fill="currentColor" />
+      <path d="M7.6 12.6 10.5 15.5M16.4 12.6 13.5 15.5" />
+      <rect x="10" y="15" width="4" height="2.5" rx="0.5" />
+      <line x1="7" x2="17" y1="21" y2="21" />
+    </svg>
+  );
+}
+
+export const pluginIcon = governorMark("1.75em");
+
+/** Decky's own two pages, drawn for the big buttons under the plugin list (lib/deckyChrome). */
+export const storeIcon = (
+  <svg style={{ display: "block" }} width="1.75em" height="1.75em" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9 4.5 4h15L21 9" />
+    <path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0" />
+    <path d="M5 11.5V20h14v-8.5" />
+    <path d="M10 20v-5h4v5" />
+  </svg>
+);
+
+export const settingsIcon = (
+  <svg style={{ display: "block" }} width="1.75em" height="1.75em" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
 );
