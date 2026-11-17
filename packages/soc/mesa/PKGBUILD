@@ -11,9 +11,9 @@ pkgver=26.3.0
 # Fetched as GitLab's commit-addressed archive, whose compressed bytes are not stable, so its
 # checksum is SKIP and the commit fixes the tree. Move to the next point release's tarball once
 # it is out (PATCHES.md says which patches it retires).
-_commit=688dee9b0cd847d6b59038d777bb61b4591f1696
+_commit=71daf48d1ddbad086d424e61075dcbe6a09c1525
 _srcver=${_commit}
-pkgrel=1
+pkgrel=2
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${pkgver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -39,6 +39,7 @@ options=(!lto)
 # 0018/0019 keep Turnip images a game may view in a second format tiled and compressed on the
 # A740 and older, where upstream stores them linear; TU_Z_MUTABLE=0 goes back to upstream's layout.
 # 0020 is the one Turnip fix the previous series had that this branch has not picked up.
+# 0021 keeps array registers out of alias.tex, which failed shader validation in Enshrouded (main).
 source=("https://gitlab.freedesktop.org/mesa/mesa/-/archive/${_commit}/mesa-${_commit}.tar.gz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
@@ -54,7 +55,8 @@ source=("https://gitlab.freedesktop.org/mesa/mesa/-/archive/${_commit}/mesa-${_c
         '0017-ir3-use-the-fp32-udiv-correction-path.patch'
         '0018-tu-keep-mutable-format-images-tiled-with-ubwc.patch'
         '0019-tu-copy-mutable-ubwc-images-through-their-written-format.patch'
-        '0020-tu-Skip-zero-sized-inline-uniform-blocks.patch')
+        '0020-tu-Skip-zero-sized-inline-uniform-blocks.patch'
+        '0021-ir3-dont-alias-array-or-relative-sources-of-collects.patch')
 sha256sums=('SKIP'
             'b302a6716d00d24cb33aaef758cc95a5b78bfc348cd4d103a66b673ae9125e42'
             '59aacd0c04f838834121822887e9c2218ba7d56012c8433696632d72fb619903'
@@ -70,7 +72,8 @@ sha256sums=('SKIP'
             '0cfa987df3056671ac3480d9ea148f13d222d7232635ff5c767408099d82d8c8'
             '6ae155c176d79bdca0f7d3885a8e44dce4da68210c44d48561c6bfdfd5efffbc'
             '24c20cd1c8ba6810f8c9eb4bc01ac67755e33b3d2a004567b4b2cf083a9c8662'
-            '8ac0ae731202cdee5c728e4fe07b1328898bb3285f289cb6f095ca64bcd8aab5')
+            '8ac0ae731202cdee5c728e4fe07b1328898bb3285f289cb6f095ca64bcd8aab5'
+            '6b16c1182997a27e1e2697353bd65026c898d74ea7b87a056c0e32b6ab8275dc')
 
 prepare() {
   cd "mesa-${_srcver}"
