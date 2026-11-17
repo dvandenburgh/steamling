@@ -39,7 +39,7 @@ esde_alt_emulator() {  # $1 system -> prints the label, or nothing
 }
 
 case "${system}" in
-  nes|famicom)                          run_core fceumm ;;
+  nes|famicom|fds)                      run_core fceumm ;;
   snes|sfc)                             run_core snes9x ;;
   n64)                                  run_core mupen64plus_next ;;
   gb|gbc)                               run_core gambatte ;;
@@ -55,7 +55,7 @@ case "${system}" in
       *PCSX*) run_core pcsx_rearmed ;;
       *)      run_core swanstation ;;
     esac ;;
-  tg16|pcengine)                        run_core mednafen_pce_fast ;;
+  tg16|pcengine|tg-cd|pcenginecd)       run_core mednafen_pce_fast ;;
   supergrafx|sgfx)                      run_core mednafen_supergrafx ;;
   neogeo|fbneo)                         run_core fbneo ;;
   cps1|cps2|cps3|arcade|mame)

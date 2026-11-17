@@ -5,7 +5,9 @@
   FULL definition, not a delta. Each one exists because the bundled default command names a core or
   standalone we do not ship: ps2 offers only the LRPS2 core, psx names a DuckStation standalone
   (ours is the SwanStation libretro core), gc/wii default to the RetroArch dolphin
-  core; cps1/cps2/cps3/arcade/mame all default to mame_libretro, which we do not ship.
+  core; cps1/cps2/cps3/arcade/mame all default to mame_libretro, which we do not ship; nes, famicom
+  and fds default to Mesen, nds to melonDS DS and the PC Engine and TurboGrafx systems to Beetle
+  PCE, none of which we ship either, so those come up with the core we do ship first.
   All commands go through the /usr/lib/steamling/es-* wrappers: the big-core pin for the
   standalones, the frame-pacing pin (es-retroarch) for the libretro cores (psx and the
   arcade systems). n64, dreamcast and saturn are here only for that pin: the bundled entries
@@ -255,5 +257,158 @@
         <command label="Shortcut or script">%ENABLESHORTCUTS% %EMULATOR_OS-SHELL% %ROM%</command>
         <platform>saturn</platform>
         <theme>saturn</theme>
+    </system>
+    <system>
+        <name>nes</name>
+        <fullname>Nintendo Entertainment System</fullname>
+        <path>%ROMPATH%/nes</path>
+        <extension>.3dsen .3DSEN .fds .FDS .nes .NES .unf .UNF .unif .UNIF .7z .7Z .zip .ZIP</extension>
+        <command label="FCEUmm">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fceumm_libretro.so %ROM%</command>
+        <command label="Mesen">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen_libretro.so %ROM%</command>
+        <command label="Mesen (Standalone)">%EMULATOR_MESEN% --fullscreen %ROM%</command>
+        <command label="MesenCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen2_libretro.so %ROM%</command>
+        <command label="Nestopia UE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/nestopia_libretro.so %ROM%</command>
+        <command label="Nestopia UE (Standalone)">%EMULATOR_NESTOPIA-UE% --fullscreen %ROM%</command>
+        <command label="QuickNES">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/quicknes_libretro.so %ROM%</command>
+        <command label="RustyNES">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/rustynes_libretro.so %ROM%</command>
+        <command label="puNES (Standalone)">%EMULATOR_PUNES% -u yes %ROM%</command>
+        <command label="Mednafen (Standalone)">%EMULATOR_MEDNAFEN% -force_module nes %ROM%</command>
+        <command label="ares (Standalone)">%EMULATOR_ARES% --fullscreen --system "Famicom" %ROM%</command>
+        <command label="ares FDS (Standalone)">%EMULATOR_ARES% --fullscreen --system "Famicom Disk System" %ROM%</command>
+        <command label="jgenesis (Standalone)">%EMULATOR_JGENESIS% --file-path %ROM%</command>
+        <command label="Plastic (Standalone)">%EMULATOR_PLASTIC% %ROM%</command>
+        <command label="3dSen (Standalone)">%EMULATOR_3DSEN% -id=%INJECT%=%BASENAME%.3dsen</command>
+        <command label="3dSen (Wine)">%STARTDIR%=%EMUDIR% %PRECOMMAND_WINE% %EMULATOR_3DSEN-WINDOWS% -id=%INJECT%=%BASENAME%.3dsen</command>
+        <command label="3dSen (Proton)">%STARTDIR%=%EMUDIR% %PRECOMMAND_PROTON% %EMULATOR_3DSEN-WINDOWS% -id=%INJECT%=%BASENAME%.3dsen</command>
+        <platform>nes</platform>
+        <theme>nes</theme>
+    </system>
+    <system>
+        <name>famicom</name>
+        <fullname>Nintendo Family Computer</fullname>
+        <path>%ROMPATH%/famicom</path>
+        <extension>.3dsen .3DSEN .fds .FDS .nes .NES .unf .UNF .unif .UNIF .7z .7Z .zip .ZIP</extension>
+        <command label="FCEUmm">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fceumm_libretro.so %ROM%</command>
+        <command label="Mesen">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen_libretro.so %ROM%</command>
+        <command label="Mesen (Standalone)">%EMULATOR_MESEN% --fullscreen %ROM%</command>
+        <command label="MesenCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen2_libretro.so %ROM%</command>
+        <command label="Nestopia UE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/nestopia_libretro.so %ROM%</command>
+        <command label="Nestopia UE (Standalone)">%EMULATOR_NESTOPIA-UE% --fullscreen %ROM%</command>
+        <command label="QuickNES">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/quicknes_libretro.so %ROM%</command>
+        <command label="RustyNES">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/rustynes_libretro.so %ROM%</command>
+        <command label="puNES (Standalone)">%EMULATOR_PUNES% -u yes %ROM%</command>
+        <command label="Mednafen (Standalone)">%EMULATOR_MEDNAFEN% -force_module nes %ROM%</command>
+        <command label="ares (Standalone)">%EMULATOR_ARES% --fullscreen --system "Famicom" %ROM%</command>
+        <command label="ares FDS (Standalone)">%EMULATOR_ARES% --fullscreen --system "Famicom Disk System" %ROM%</command>
+        <command label="jgenesis (Standalone)">%EMULATOR_JGENESIS% --file-path %ROM%</command>
+        <command label="Plastic (Standalone)">%EMULATOR_PLASTIC% %ROM%</command>
+        <command label="3dSen (Standalone)">%EMULATOR_3DSEN% -id=%INJECT%=%BASENAME%.3dsen</command>
+        <command label="3dSen (Wine)">%STARTDIR%=%EMUDIR% %PRECOMMAND_WINE% %EMULATOR_3DSEN-WINDOWS% -id=%INJECT%=%BASENAME%.3dsen</command>
+        <command label="3dSen (Proton)">%STARTDIR%=%EMUDIR% %PRECOMMAND_PROTON% %EMULATOR_3DSEN-WINDOWS% -id=%INJECT%=%BASENAME%.3dsen</command>
+        <platform>famicom</platform>
+        <theme>famicom</theme>
+    </system>
+    <system>
+        <name>fds</name>
+        <fullname>Nintendo Famicom Disk System</fullname>
+        <path>%ROMPATH%/fds</path>
+        <extension>.nes .NES .fds .FDS .unf .UNF .UNIF .UNIF .7z .7Z .zip .ZIP</extension>
+        <command label="FCEUmm">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/fceumm_libretro.so %ROM%</command>
+        <command label="Mesen">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen_libretro.so %ROM%</command>
+        <command label="Mesen (Standalone)">%EMULATOR_MESEN% --fullscreen %ROM%</command>
+        <command label="MesenCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen2_libretro.so %ROM%</command>
+        <command label="Nestopia UE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/nestopia_libretro.so %ROM%</command>
+        <command label="Nestopia UE (Standalone)">%EMULATOR_NESTOPIA-UE% --fullscreen %ROM%</command>
+        <command label="RustyNES">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/rustynes_libretro.so %ROM%</command>
+        <command label="Mednafen (Standalone)">%EMULATOR_MEDNAFEN% -force_module nes %ROM%</command>
+        <command label="ares (Standalone)">%EMULATOR_ARES% --fullscreen --system "Famicom Disk System" %ROM%</command>
+        <platform>fds</platform>
+        <theme>fds</theme>
+    </system>
+    <system>
+        <name>nds</name>
+        <fullname>Nintendo DS</fullname>
+        <path>%ROMPATH%/nds</path>
+        <extension>.app .APP .bin .BIN .dsi .DSI .ids .IDS .nds .NDS .7z .7Z .zip .ZIP</extension>
+        <command label="melonDS">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/melonds_libretro.so %ROM%</command>
+        <command label="melonDS DS">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/melondsds_libretro.so %ROM%</command>
+        <command label="melonDS (Standalone)">%EMULATOR_MELONDS% -f %ROM%</command>
+        <command label="DeSmuME">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/desmume_libretro.so %ROM%</command>
+        <command label="DeSmuME 2015">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/desmume2015_libretro.so %ROM%</command>
+        <command label="DeSmuME (Standalone)">%EMULATOR_DESMUME% %ROM%</command>
+        <command label="NooDS">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/noods_libretro.so %ROM%</command>
+        <command label="NooDS (Standalone)">%EMULATOR_NOODS% %ROM%</command>
+        <command label="SkyEmu">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/skyemu_libretro.so %ROM%</command>
+        <command label="SkyEmu (Standalone)">%EMULATOR_SKYEMU% %ROM%</command>
+        <platform>nds</platform>
+        <theme>nds</theme>
+    </system>
+    <system>
+        <name>pcengine</name>
+        <fullname>NEC PC Engine</fullname>
+        <path>%ROMPATH%/pcengine</path>
+        <extension>.ccd .CCD .chd .CHD .cue .CUE .img .IMG .iso .ISO .m3u .M3U .pce .PCE .rom .ROM .sgx .SGX .toc .TOC .7z .7Z .zip .ZIP</extension>
+        <command label="Beetle PCE FAST">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_pce_fast_libretro.so %ROM%</command>
+        <command label="Beetle PCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+        <command label="Beetle SuperGrafx">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_supergrafx_libretro.so %ROM%</command>
+        <command label="Geargrafx">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/geargrafx_libretro.so %ROM%</command>
+        <command label="Geargrafx (Standalone)">%EMULATOR_GEARGRAFX% %ROM%</command>
+        <command label="Mednafen (Standalone)">%EMULATOR_MEDNAFEN% -force_module pce %ROM%</command>
+        <command label="Mesen (Standalone)">%EMULATOR_MESEN% --fullscreen %ROM%</command>
+        <command label="MesenCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen2_libretro.so %ROM%</command>
+        <command label="ares (Standalone)">%EMULATOR_ARES% --fullscreen --system "PC Engine" %ROM%</command>
+        <platform>pcengine</platform>
+        <theme>pcengine</theme>
+    </system>
+    <system>
+        <name>pcenginecd</name>
+        <fullname>NEC PC Engine CD</fullname>
+        <path>%ROMPATH%/pcenginecd</path>
+        <extension>.ccd .CCD .chd .CHD .cue .CUE .img .IMG .iso .ISO .m3u .M3U .pce .PCE .sgx .SGX .toc .TOC .7z .7Z .zip .ZIP</extension>
+        <command label="Beetle PCE FAST">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_pce_fast_libretro.so %ROM%</command>
+        <command label="Beetle PCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+        <command label="Beetle SuperGrafx">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_supergrafx_libretro.so %ROM%</command>
+        <command label="Geargrafx">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/geargrafx_libretro.so %ROM%</command>
+        <command label="Geargrafx (Standalone)">%EMULATOR_GEARGRAFX% %ROM%</command>
+        <command label="Mednafen (Standalone)">%EMULATOR_MEDNAFEN% -force_module pce %ROM%</command>
+        <command label="Mesen (Standalone)">%EMULATOR_MESEN% --fullscreen %ROM%</command>
+        <command label="MesenCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen2_libretro.so %ROM%</command>
+        <command label="ares (Standalone)">%EMULATOR_ARES% --fullscreen --system "PC Engine CD" %ROM%</command>
+        <platform>pcenginecd</platform>
+        <theme>pcenginecd</theme>
+    </system>
+    <system>
+        <name>tg16</name>
+        <fullname>NEC TurboGrafx-16</fullname>
+        <path>%ROMPATH%/tg16</path>
+        <extension>.ccd .CCD .chd .CHD .cue .CUE .img .IMG .iso .ISO .m3u .M3U .pce .PCE .rom .ROM .sgx .SGX .toc .TOC .7z .7Z .zip .ZIP</extension>
+        <command label="Beetle PCE FAST">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_pce_fast_libretro.so %ROM%</command>
+        <command label="Beetle PCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+        <command label="Beetle SuperGrafx">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_supergrafx_libretro.so %ROM%</command>
+        <command label="Geargrafx">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/geargrafx_libretro.so %ROM%</command>
+        <command label="Geargrafx (Standalone)">%EMULATOR_GEARGRAFX% %ROM%</command>
+        <command label="Mednafen (Standalone)">%EMULATOR_MEDNAFEN% -force_module pce %ROM%</command>
+        <command label="Mesen (Standalone)">%EMULATOR_MESEN% --fullscreen %ROM%</command>
+        <command label="MesenCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen2_libretro.so %ROM%</command>
+        <command label="ares (Standalone)">%EMULATOR_ARES% --fullscreen --system "PC Engine" %ROM%</command>
+        <platform>pcengine</platform>
+        <theme>tg16</theme>
+    </system>
+    <system>
+        <name>tg-cd</name>
+        <fullname>NEC TurboGrafx-CD</fullname>
+        <path>%ROMPATH%/tg-cd</path>
+        <extension>.ccd .CCD .chd .CHD .cue .CUE .img .IMG .iso .ISO .m3u .M3U .pce .PCE .sgx .SGX .toc .TOC .7z .7Z .zip .ZIP</extension>
+        <command label="Beetle PCE FAST">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_pce_fast_libretro.so %ROM%</command>
+        <command label="Beetle PCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_pce_libretro.so %ROM%</command>
+        <command label="Beetle SuperGrafx">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mednafen_supergrafx_libretro.so %ROM%</command>
+        <command label="Geargrafx">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/geargrafx_libretro.so %ROM%</command>
+        <command label="Geargrafx (Standalone)">%EMULATOR_GEARGRAFX% %ROM%</command>
+        <command label="Mednafen (Standalone)">%EMULATOR_MEDNAFEN% -force_module pce %ROM%</command>
+        <command label="Mesen (Standalone)">%EMULATOR_MESEN% --fullscreen %ROM%</command>
+        <command label="MesenCE">/usr/lib/steamling/es-retroarch -L %CORE_RETROARCH%/mesen2_libretro.so %ROM%</command>
+        <command label="ares (Standalone)">%EMULATOR_ARES% --fullscreen --system "PC Engine CD" %ROM%</command>
+        <platform>pcenginecd</platform>
+        <theme>tg-cd</theme>
     </system>
 </systemList>
