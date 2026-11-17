@@ -16,9 +16,11 @@ SCHEMA_VERSION = 1
 MAX_IMPORT_BYTES = 512 * 1024
 MAX_FIELD_LEN = 4096
 
-GAME_KEYS = ("fexProfile", "audioLatency", "mesaVersion", "envVars", "lavdMode")
+GAME_KEYS = ("fexProfile", "audioLatency", "mesaVersion", "envVars", "lavdMode", "gamepadType")
 # Booleans travel as-is: the string filter below would drop an explicit False.
-GAME_BOOL_KEYS = ("disableXalia",)
+GAME_BOOL_KEYS = ("disableXalia", "touchDisabled")
+# What an import leaves as it was on this handheld: the fan curve belongs to the hardware.
+LOCAL_KEYS = ("fanMode",)
 
 
 def _device_model():
@@ -168,6 +170,10 @@ def apply_config(path, source_appid, target_appid, target_name):
     entry = dict(entry)
     entry["name"] = _clean_str(target_name) or entry.get("name", "")
     tweaks = load_tweaks()
-    tweaks.setdefault("games", {})[target_appid] = entry
+    games = tweaks.setdefault("games", {})
+    old = games.get(target_appid)
+    if isinstance(old, dict):
+        entry.update({key: old[key] for key in LOCAL_KEYS if key in old})
+    games[target_appid] = entry
     save_tweaks(tweaks)
     return {"protonTool": tool, "fexProfile": entry.get("fexProfile", ""), "enabled": entry.get("enabled") is True}
