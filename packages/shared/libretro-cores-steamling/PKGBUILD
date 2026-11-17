@@ -10,7 +10,7 @@ _split=(fceumm snes9x gambatte mgba
         genesis_plus_gx picodrive yabasanshiro mednafen_pce_fast fbneo mednafen_ngp)
 pkgname=(libretro-cores-steamling "${_split[@]/#/libretro-cores-steamling-}")
 pkgver=0.1.1
-pkgrel=3
+pkgrel=4
 pkgdesc="Curated prebuilt aarch64 libretro cores for the RP6 (vendored, ArkOS/TheRA set)"
 arch=('aarch64')
 url="https://github.com/christianhaitian/retroarch-cores"
@@ -25,9 +25,8 @@ _base="https://raw.githubusercontent.com/christianhaitian/retroarch-cores/${_com
 # N64 (mupen64plus_next), Dreamcast (flycast) and PlayStation (swanstation, replacing
 # duckstation) are built from source in packages/soc/libretro-*, with Vulkan.
 _cores=(
-  fceumm nestopia snes9x gambatte mgba melonds
+  fceumm snes9x gambatte mgba melonds
   genesis_plus_gx picodrive yabasanshiro
-  pcsx_rearmed ppsspp
   mednafen_pce_fast mednafen_supergrafx fbneo mame2003_plus
   stella prosystem handy virtualjaguar
   mednafen_wswan mednafen_ngp mednafen_vb
