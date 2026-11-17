@@ -1,0 +1,33 @@
+# libretro-fbneo-steamling — the fbneo libretro core (Neo Geo and arcade), built from source and
+# tuned to the SoC like packages/soc/mesa. Opt-in: ./build.sh --cores (STEAMLING_CORES=on) builds
+# it, and then it takes over from the prebuilt copy in libretro-cores-steamling, which it replaces
+# on update.
+# Pinned to the commit ROCKNIX builds for its SM8550 handhelds.
+# Bump = move _commit, pkgver <commit date>.<short sha>.
+pkgname=libretro-fbneo-steamling
+pkgver=20261101.e5d2293
+pkgrel=1
+_commit=e5d22930f772b8baff514ec57e5786ea50c1c72e
+pkgdesc="fbneo libretro core: Neo Geo and arcade (built from source, SoC-tuned)"
+arch=('aarch64')
+url="https://github.com/libretro/FBNeo"
+license=('LicenseRef-FBNeo')
+depends=('glibc' 'gcc-libs')
+makedepends=('git' 'make')
+provides=('steamling-libretro-fbneo')
+conflicts=('steamling-libretro-fbneo')
+replaces=('libretro-cores-steamling-fbneo')
+source=("FBNeo::git+https://github.com/libretro/FBNeo.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
+  local _rocknix_tune="${STEAMLING_TUNE_CFLAGS:--march=armv9-a+fp16+crypto+i8mm+bf16+memtag+sm4+sha3+nosve+nosve2 -mtune=cortex-x3 -mno-outline-atomics}"
+  export CFLAGS+=" ${_rocknix_tune}" CXXFLAGS+=" ${_rocknix_tune}"
+  make -C FBNeo/src/burner/libretro platform=unix USE_CYCLONE=0 profile=performance
+}
+
+package() {
+  install -Dm644 FBNeo/src/burner/libretro/fbneo_libretro.so "${pkgdir}/usr/lib/libretro/fbneo_libretro.so"
+  install -Dm644 FBNeo/src/license.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
