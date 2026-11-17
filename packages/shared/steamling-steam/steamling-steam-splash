@@ -1,6 +1,7 @@
 #!/bin/bash
 # steamling-steam-splash <WxH> -- <steam command...>: gamescope's child for game mode. Plays the
-# boot animation until Big Picture is up, then execs Steam so gamescope's child pid is still Steam.
+# boot animation until Big Picture is up, runs Steam, and once Steam exits stops whatever it left
+# running, so gamescope can close and the session bring Steam back.
 #
 # Under gamescope -e only windows with a Steam app id can take focus, and nothing is focused until
 # GAMESCOPECTRL_BASELAYER_APPID names one. So the window is tagged STEAM_GAME=769 (Steam's own id)
@@ -110,4 +111,30 @@ else
   mark "splash skipped (need ${WATERMARK}, ffplay, xprop)"
 fi
 
-exec "$@"
+# gamescopereaper (our parent) is a subreaper and only exits once every process under it has, so
+# anything Steam leaves behind when it quits (Wine's winedevice.exe and wineserver from a Proton
+# game, say) is reparented to it and holds gamescope open: a Steam restart for a client update or
+# a channel switch then sat on "Shutting down" for good. So Steam runs as our child, and when it
+# is gone the reaper's other children get TERM, then KILL after 3 s.
+"$@" &
+steam_pid=$!
+trap 'kill -TERM "${steam_pid}" 2>/dev/null' TERM INT HUP
+while :; do
+  wait "${steam_pid}"; rc=$?
+  kill -0 "${steam_pid}" 2>/dev/null || break   # still running: a signal cut the wait short
+done
+reaper="${PPID}"
+# Zombies are already dead; the reaper collects them.
+leftovers() { ps -o pid=,stat= --ppid "${reaper}" | awk -v me="$$" '$2 !~ /^Z/ && $1 != me { print $1 }'; }
+left="$(leftovers)"
+if [ -n "${left}" ]; then
+  mark "Steam exited (${rc}); stopping what it left running: $(echo ${left})"
+  # Orphans of what dies here land on the reaper too, so each pass catches the next level.
+  for i in $(seq 1 30); do
+    left="$(leftovers)"
+    [ -n "${left}" ] || break
+    if [ "${i}" -lt 30 ]; then kill -TERM ${left} 2>/dev/null; else kill -KILL ${left} 2>/dev/null; fi
+    sleep 0.1
+  done
+fi
+exit "${rc}"
