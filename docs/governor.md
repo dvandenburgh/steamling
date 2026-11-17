@@ -6,7 +6,8 @@ a terminal). It's named after the spinning regulator that keeps a steam engine a
 speed, and it used to be called Steamling Control.
 
 Open the **Quick Access menu** in the Steam session, then pick **Governor** under the
-plug icon. The plugin is split into five tabs - switch between them with **L1/R1** or by
+Governor icon (the steam-engine governor; plain Decky shows a plug there). The **Decky Store** and
+**Decky Settings** rows sit under the plugin list. The plugin is split into five tabs - switch between them with **L1/R1** or by
 tapping the icons:
 
 | Tab (icon) | What it does |
