@@ -58,4 +58,11 @@ if [ "${vsync}" = false ]; then
   printf 'video_black_frame_insertion = "0"\nvideo_shader_subframes = "1"\n' >> "${frag}"
 fi
 
+# The game cores, as the standalone emulators get (emu-resolve.sh): on a little core RetroArch
+# misses its frame deadline and the audio runs dry. A board without the key gets the guess.
+. /usr/lib/steamling/cores.sh
+big="$(steamling_big_cores guess)"
+if [ -n "${big}" ] && command -v taskset >/dev/null 2>&1; then
+  exec taskset -c "${big}" retroarch -f --appendconfig "${frag}" "$@"
+fi
 exec retroarch -f --appendconfig "${frag}" "$@"
