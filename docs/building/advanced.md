@@ -110,7 +110,7 @@ environment (for example `make image SSH=1`, `export SSH=1` to make it the defau
 | `--password PW` | `SD_ROOT_PASSWORD=PW` | the root and `deck` password baked into the image |
 | `--wifi SSID --wifi-psk PSK --wifi-country US` | `SD_WIFI_SSID= SD_WIFI_PSK= SD_WIFI_COUNTRY=` | pre-configure Wi-Fi in the image |
 | `--emulation` | `STEAMLING_EMULATION=1` | bake the emulation layer (ES-DE and emulators) into the image |
-| `--cores` | `STEAMLING_CORES=1` | build the NES (FCEUmm), SNES (Snes9x), Game Boy / Game Boy Color (Gambatte) and Game Boy Advance (mGBA) RetroArch cores from source, tuned for your handheld's chip, instead of using the prebuilt ones. Works with `--update`: the handheld swaps them in on its next update |
+| `--cores` | `STEAMLING_CORES=1` | build the NES (FCEUmm), SNES (Snes9x), Game Boy / Game Boy Color (Gambatte), Game Boy Advance (mGBA), Genesis / Master System / Game Gear / Sega CD (Genesis Plus GX), 32X (PicoDrive), Saturn (YabaSanshiro), TurboGrafx-16 (Beetle PCE FAST), Neo Geo Pocket (Beetle NeoPop) and Arcade / Neo Geo (FBNeo) RetroArch cores from source, tuned for your handheld's chip, instead of using the prebuilt ones. Works with `--update`: the handheld swaps them in on its next update |
 | (none) | `STEAMLING_IMAGE_PKG_CACHE=1` | keep a copy of every installed package in the image's `/var/cache/pacman/pkg` (several GB; handy on test devices for rolling a package back offline) |
 | (none) | `STEAMLING_NOEXTRACT=` | keep package documentation in the image (left out by default; the value is pacman's `NoExtract` list) |
 | (none) | `STEAMLING_FIRMWARE_SKIP=` | keep every Qualcomm platform's firmware in the image (by default the folders for platforms no Steamling board uses, about 430 MB, are left out, now and on updates) |
