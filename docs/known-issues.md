@@ -20,6 +20,10 @@ Open an [issue on GitHub](https://github.com/dvandenburgh/steamling/issues).
 - **No battery charge limit on the Retroid Pocket 6.** Its battery firmware refuses a charge
   limit (the request times out), so Steam doesn't offer the setting and the battery always charges
   to 100%. Other handhelds that support one, like the Odin 3, get the setting in Steam.
+- **USB file transfer runs at USB 2 speed on the Retroid Pocket 6.** The port connects to a
+  computer at USB 2 speed even with a USB 3 cable and port, so big copies take a while. Copying
+  [over the network](emulation-setup.md#copying-files-over-the-network) or with the microSD card
+  in a card reader can be quicker.
 - **Docking is new.** Moving game mode to a TV over a USB-C dock, and sound following it, are built
   for the Retroid Pocket 6 but haven't been tried on many docks and TVs yet. If yours doesn't show
   a picture, or the sound stays on the handheld, please say which dock or adapter you used.
