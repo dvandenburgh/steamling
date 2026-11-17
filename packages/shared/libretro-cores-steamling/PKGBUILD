@@ -4,12 +4,13 @@
 # image time cannot be fetched on device. They install to /usr/lib/libretro, the same path
 # ALARM's libretro-* packages use, so a vendored core can be replaced transparently.
 pkgbase=libretro-cores-steamling
-# The NES, SNES, Game Boy and GBA cores ship as their own packages, so the source-built ones
-# (packages/soc/libretro-*-steamling, ./build.sh --cores) can replace just those.
-_split=(fceumm snes9x gambatte mgba)
+# Every core that ./build.sh --cores can build from source (packages/soc/libretro-*-steamling)
+# ships as its own package here, so a source-built one replaces just that core.
+_split=(fceumm snes9x gambatte mgba
+        genesis_plus_gx picodrive yabasanshiro mednafen_pce_fast fbneo mednafen_ngp)
 pkgname=(libretro-cores-steamling "${_split[@]/#/libretro-cores-steamling-}")
 pkgver=0.1.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Curated prebuilt aarch64 libretro cores for the RP6 (vendored, ArkOS/TheRA set)"
 arch=('aarch64')
 url="https://github.com/christianhaitian/retroarch-cores"
@@ -65,3 +66,9 @@ package_libretro-cores-steamling-fceumm()   { _split_package fceumm; }
 package_libretro-cores-steamling-snes9x()   { _split_package snes9x; }
 package_libretro-cores-steamling-gambatte() { _split_package gambatte; }
 package_libretro-cores-steamling-mgba()     { _split_package mgba; }
+package_libretro-cores-steamling-genesis_plus_gx()   { _split_package genesis_plus_gx; }
+package_libretro-cores-steamling-picodrive()         { _split_package picodrive; }
+package_libretro-cores-steamling-yabasanshiro()      { _split_package yabasanshiro; }
+package_libretro-cores-steamling-mednafen_pce_fast() { _split_package mednafen_pce_fast; }
+package_libretro-cores-steamling-fbneo()             { _split_package fbneo; }
+package_libretro-cores-steamling-mednafen_ngp()      { _split_package mednafen_ngp; }
