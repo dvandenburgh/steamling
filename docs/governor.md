@@ -7,8 +7,11 @@ speed, and it used to be called Steamling Control.
 
 Open the **Quick Access menu** in the Steam session, then pick **Governor** under the
 Governor icon (the steam-engine governor; plain Decky shows a plug there). The **Decky Store** and
-**Decky Settings** rows sit under the plugin list. The plugin is split into five tabs - switch between them with **L1/R1** or by
-tapping the icons:
+**Decky Settings** rows sit under the plugin list.
+
+![The Decky tab with the Governor icon: Governor at the top, then Decky Store and Decky Settings](images/governor-decky-tab.jpeg)
+
+The plugin is split into five tabs - switch between them with **L1/R1** or by tapping the icons:
 
 | Tab (icon) | What it does |
 |---|---|
