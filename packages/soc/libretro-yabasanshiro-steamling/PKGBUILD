@@ -1,0 +1,34 @@
+# libretro-yabasanshiro-steamling — the yabasanshiro libretro core (Sega Saturn), built from
+# source and tuned to the SoC like packages/soc/mesa. Opt-in: ./build.sh --cores
+# (STEAMLING_CORES=on) builds it, and then it takes over from the prebuilt copy in
+# libretro-cores-steamling, which it replaces on update.
+# Pinned to the commit ROCKNIX builds for its SM8550 handhelds.
+# Bump = move _commit, pkgver <commit date>.<short sha>.
+# platform=arm64 turns on its aarch64 recompiler and renders with desktop GL.
+pkgname=libretro-yabasanshiro-steamling
+pkgver=20240522.39535a6
+pkgrel=1
+_commit=39535a6abcad5abf9f71c8b2a7975f005ee12ed6
+pkgdesc="yabasanshiro libretro core: Sega Saturn (built from source, SoC-tuned)"
+arch=('aarch64')
+url="https://github.com/libretro/yabause"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc-libs' 'libglvnd')
+makedepends=('git' 'make')
+provides=('steamling-libretro-yabasanshiro')
+conflicts=('steamling-libretro-yabasanshiro')
+replaces=('libretro-cores-steamling-yabasanshiro')
+source=("yabause::git+https://github.com/libretro/yabause.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
+  local _rocknix_tune="${STEAMLING_TUNE_CFLAGS:--march=armv9-a+fp16+crypto+i8mm+bf16+memtag+sm4+sha3+nosve+nosve2 -mtune=cortex-x3 -mno-outline-atomics}"
+  export CFLAGS+=" ${_rocknix_tune}" CXXFLAGS+=" ${_rocknix_tune}"
+  make -C yabause/yabause/src/libretro platform=arm64
+}
+
+package() {
+  install -Dm644 yabause/yabause/src/libretro/yabasanshiro_libretro.so "${pkgdir}/usr/lib/libretro/yabasanshiro_libretro.so"
+  install -Dm644 yabause/LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
