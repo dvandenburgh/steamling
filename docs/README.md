@@ -13,8 +13,8 @@ User guides for Steamling. New here? Start with the [project README](../README.m
   modes, full clocks on a charger, adding non-Steam games, file sharing over the network or USB,
   syncing emulator saves with a PC, SSH, SD card formatting,
   controller calibration, stick lights, display calibration, and system updates
-- [emulation-setup.md](emulation-setup.md) - where to put ROMs, BIOS, and firmware, how to launch
-  games, and how to tweak emulator settings
+- [emulation-setup.md](emulation-setup.md) - which systems are supported, where to put ROMs, BIOS,
+  and firmware, how to launch games, and how to tweak emulator settings
 - [heroic.md](heroic.md) - Epic, GOG and Amazon games with the Heroic Games Launcher
 - [waydroid.md](waydroid.md) - running Android apps: setup, installing apps, and app shortcuts
 - [desktop-controls.md](desktop-controls.md) - using the controller in desktop mode: moving
