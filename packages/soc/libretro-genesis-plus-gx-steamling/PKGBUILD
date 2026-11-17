@@ -1,0 +1,33 @@
+# libretro-genesis-plus-gx-steamling — the genesis_plus_gx libretro core (Master System, Genesis,
+# Game Gear and Sega CD), built from source and tuned to the SoC like packages/soc/mesa. Opt-in:
+# ./build.sh --cores (STEAMLING_CORES=on) builds it, and then it takes over from the prebuilt copy
+# in libretro-cores-steamling, which it replaces on update.
+# Pinned to the commit ROCKNIX builds for its SM8550 handhelds.
+# Bump = move _commit, pkgver <commit date>.<short sha>.
+pkgname=libretro-genesis-plus-gx-steamling
+pkgver=20261030.f27655b
+pkgrel=1
+_commit=f27655b592ef43f317272d79883bcaa10d3ac8ad
+pkgdesc="genesis_plus_gx libretro core: Master System, Genesis, Game Gear and Sega CD (built from source, SoC-tuned)"
+arch=('aarch64')
+url="https://github.com/libretro/Genesis-Plus-GX"
+license=('LicenseRef-GenesisPlusGX')
+depends=('glibc' 'gcc-libs')
+makedepends=('git' 'make')
+provides=('steamling-libretro-genesis_plus_gx')
+conflicts=('steamling-libretro-genesis_plus_gx')
+replaces=('libretro-cores-steamling-genesis_plus_gx')
+source=("Genesis-Plus-GX::git+https://github.com/libretro/Genesis-Plus-GX.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
+  local _rocknix_tune="${STEAMLING_TUNE_CFLAGS:--march=armv9-a+fp16+crypto+i8mm+bf16+memtag+sm4+sha3+nosve+nosve2 -mtune=cortex-x3 -mno-outline-atomics}"
+  export CFLAGS+=" ${_rocknix_tune}" CXXFLAGS+=" ${_rocknix_tune}"
+  make -C Genesis-Plus-GX -f Makefile.libretro platform=unix
+}
+
+package() {
+  install -Dm644 Genesis-Plus-GX/genesis_plus_gx_libretro.so "${pkgdir}/usr/lib/libretro/genesis_plus_gx_libretro.so"
+  install -Dm644 Genesis-Plus-GX/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
