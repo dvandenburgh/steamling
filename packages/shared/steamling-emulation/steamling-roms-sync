@@ -19,9 +19,9 @@ CARDS="/run/media/${USER:-deck}"
 # shows a system once it has one.
 SYSTEMS=(
   nes snes n64 gb gbc gba nds n3ds
-  genesis megadrive mastersystem gamegear segacd saturn dreamcast
-  tg16 pcengine neogeo cps1 cps2 cps3 arcade mame
-  atari2600 atari7800 atarilynx atarijaguar wonderswan
+  genesis megadrive mastersystem gamegear segacd sega32x saturn dreamcast
+  tg16 tg-cd pcengine neogeo ngp ngpc cps1 cps2 cps3 arcade mame
+  atari2600 atari7800 atarilynx atarijaguar wonderswan wonderswancolor virtualboy
   psx ps2 ps3 psp psvita
   gc wii wiiu switch xbox
 )
