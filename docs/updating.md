@@ -130,3 +130,14 @@ On a fresh image that means the Arch Linux ARM side only, never Steamling's own 
 
 Once your handheld points at your PC as above, they install your new build too. The **Roll Back Last Update** button there undoes the last update, whichever way
 you ran it.
+
+## Steam's update channel
+
+Steam's **Settings → System → Beta Participation** has two drop-downs:
+
+- **Steam Client Update Channel** switches the Steam client between **Steam Stable** and
+  **Steam Beta**. Steam restarts onto the channel you pick, and it stays on it across reboots.
+- **OS Update Channel** always reads **stable** and has nothing else to pick. Steamling has no
+  update server behind it; your system updates come from your own builds, as above.
+
+![Steam's Beta Participation settings: OS Update Channel on stable and Steam Client Update Channel on Steam Stable](images/steam-settings-update-channel.jpeg)
