@@ -1,0 +1,31 @@
+# libretro-snes9x-steamling — the snes9x libretro core (SNES), built from source and tuned to the SoC
+# like packages/soc/mesa. Opt-in: ./build.sh --cores (STEAMLING_CORES=on) builds it, and then it
+# takes over from the prebuilt copy in libretro-cores-steamling, which it replaces on update.
+# Bump = move _commit, pkgver <commit date>.<short sha>.
+pkgname=libretro-snes9x-steamling
+pkgver=20261117.204ea1c
+pkgrel=1
+_commit=204ea1c0b851f960cbf223075eb1c25641cb483c
+pkgdesc="snes9x libretro core: SNES (built from source, SoC-tuned)"
+arch=('aarch64')
+url="https://github.com/libretro/snes9x"
+license=('custom:snes9x')
+depends=('glibc' 'gcc-libs')
+makedepends=('git' 'make')
+provides=('steamling-libretro-snes9x')
+conflicts=('steamling-libretro-snes9x')
+replaces=('libretro-cores-steamling-snes9x')
+source=("snes9x::git+https://github.com/libretro/snes9x.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
+  local _rocknix_tune="${STEAMLING_TUNE_CFLAGS:--march=armv9-a+fp16+crypto+i8mm+bf16+memtag+sm4+sha3+nosve+nosve2 -mtune=cortex-x3 -mno-outline-atomics}"
+  export CFLAGS+=" ${_rocknix_tune}" CXXFLAGS+=" ${_rocknix_tune}"
+  make -C snes9x/libretro platform=unix
+}
+
+package() {
+  install -Dm644 snes9x/libretro/snes9x_libretro.so "${pkgdir}/usr/lib/libretro/snes9x_libretro.so"
+  install -Dm644 snes9x/LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
