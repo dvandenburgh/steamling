@@ -1,0 +1,39 @@
+# libretro-mgba-steamling — the mgba libretro core (Game Boy Advance), built from source and tuned to the SoC
+# like packages/soc/mesa. Opt-in: ./build.sh --cores (STEAMLING_CORES=on) builds it, and then it
+# takes over from the prebuilt copy in libretro-cores-steamling, which it replaces on update.
+# Bump = move _commit, pkgver <commit date>.<short sha>.
+pkgname=libretro-mgba-steamling
+pkgver=20260917.7a12d6d
+pkgrel=1
+_commit=7a12d6d4b9acb14c0ae62c9166b6a2f3d08007f6
+pkgdesc="mgba libretro core: Game Boy Advance (built from source, SoC-tuned)"
+arch=('aarch64')
+url="https://github.com/libretro/mgba"
+license=('MPL-2.0')
+depends=('glibc')
+makedepends=('git' 'cmake' 'ninja')
+provides=('steamling-libretro-mgba')
+conflicts=('steamling-libretro-mgba')
+replaces=('libretro-cores-steamling-mgba')
+source=("mgba::git+https://github.com/libretro/mgba.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
+  local _rocknix_tune="${STEAMLING_TUNE_CFLAGS:--march=armv9-a+fp16+crypto+i8mm+bf16+memtag+sm4+sha3+nosve+nosve2 -mtune=cortex-x3 -mno-outline-atomics}"
+  export CFLAGS+=" ${_rocknix_tune}" CXXFLAGS+=" ${_rocknix_tune}"
+  # The libretro core alone: no frontends, and every optional library off, so the .so needs
+  # nothing past libc.
+  cmake -S mgba -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_LIBRETRO=ON -DBUILD_QT=OFF -DBUILD_SDL=OFF -DSKIP_LIBRARY=ON \
+    -DBUILD_GL=OFF -DBUILD_GLES2=OFF -DBUILD_GLES3=OFF -DENABLE_SCRIPTING=OFF \
+    -DUSE_DISCORD_RPC=OFF -DUSE_EPOXY=OFF -DUSE_FFMPEG=OFF -DUSE_LIBZIP=OFF -DUSE_LZMA=OFF \
+    -DUSE_MINIZIP=OFF -DUSE_PNG=OFF -DUSE_SQLITE3=OFF -DUSE_ZLIB=OFF -DUSE_ELF=OFF \
+    -DUSE_EDITLINE=OFF -DUSE_LUA=OFF -DUSE_JSON_C=OFF
+  ninja -C build
+}
+
+package() {
+  install -Dm644 build/mgba_libretro.so "${pkgdir}/usr/lib/libretro/mgba_libretro.so"
+  install -Dm644 mgba/LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
