@@ -1,0 +1,33 @@
+# libretro-beetle-ngp-steamling — the mednafen_ngp libretro core (Neo Geo Pocket and Pocket
+# Color), built from source and tuned to the SoC like packages/soc/mesa. Opt-in: ./build.sh
+# --cores (STEAMLING_CORES=on) builds it, and then it takes over from the prebuilt copy in
+# libretro-cores-steamling, which it replaces on update.
+# Pinned to the commit ROCKNIX builds for its SM8550 handhelds.
+# Bump = move _commit, pkgver <commit date>.<short sha>.
+pkgname=libretro-beetle-ngp-steamling
+pkgver=20260614.a50d5ac
+pkgrel=1
+_commit=a50d5ac288a81f2104ddf43195a4efdd15c72227
+pkgdesc="mednafen_ngp libretro core: Neo Geo Pocket and Pocket Color (built from source, SoC-tuned)"
+arch=('aarch64')
+url="https://github.com/libretro/beetle-ngp-libretro"
+license=('GPL-2.0-only')
+depends=('glibc' 'gcc-libs')
+makedepends=('git' 'make')
+provides=('steamling-libretro-mednafen_ngp')
+conflicts=('steamling-libretro-mednafen_ngp')
+replaces=('libretro-cores-steamling-mednafen_ngp')
+source=("beetle-ngp-libretro::git+https://github.com/libretro/beetle-ngp-libretro.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
+  local _rocknix_tune="${STEAMLING_TUNE_CFLAGS:--march=armv9-a+fp16+crypto+i8mm+bf16+memtag+sm4+sha3+nosve+nosve2 -mtune=cortex-x3 -mno-outline-atomics}"
+  export CFLAGS+=" ${_rocknix_tune}" CXXFLAGS+=" ${_rocknix_tune}"
+  make -C beetle-ngp-libretro platform=unix
+}
+
+package() {
+  install -Dm644 beetle-ngp-libretro/mednafen_ngp_libretro.so "${pkgdir}/usr/lib/libretro/mednafen_ngp_libretro.so"
+  install -Dm644 beetle-ngp-libretro/COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
