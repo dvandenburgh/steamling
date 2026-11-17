@@ -98,7 +98,9 @@ sudo pacman -Syu
 sudo reboot
 ```
 
-Answer `Y` to the list, and to any question about replacing a package. Every update takes a
+Answer `Y` to the list, and to any question about replacing a package. If it asks which of
+several packages should provide something (it does this once after building with `--cores`),
+press Enter: the first answer is the one from your build. Every update takes a
 [snapshot](snapshots.md) first, so if something breaks, `sudo steamling-rollback` puts the system
 back the way it was. If you rebuilt the kernel, the boot image is redone for you during the update.
 
