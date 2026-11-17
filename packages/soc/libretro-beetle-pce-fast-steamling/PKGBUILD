@@ -1,0 +1,33 @@
+# libretro-beetle-pce-fast-steamling — the mednafen_pce_fast libretro core (TurboGrafx-16 and
+# TurboGrafx-CD), built from source and tuned to the SoC like packages/soc/mesa. Opt-in:
+# ./build.sh --cores (STEAMLING_CORES=on) builds it, and then it takes over from the prebuilt copy
+# in libretro-cores-steamling, which it replaces on update.
+# Pinned to the commit ROCKNIX builds for its SM8550 handhelds.
+# Bump = move _commit, pkgver <commit date>.<short sha>.
+pkgname=libretro-beetle-pce-fast-steamling
+pkgver=20261030.2de1ce1
+pkgrel=1
+_commit=2de1ce1c3f237b161c126c54ba407990bb86d1e9
+pkgdesc="mednafen_pce_fast libretro core: TurboGrafx-16 and TurboGrafx-CD (built from source, SoC-tuned)"
+arch=('aarch64')
+url="https://github.com/libretro/beetle-pce-fast-libretro"
+license=('GPL-2.0-only')
+depends=('glibc' 'gcc-libs')
+makedepends=('git' 'make')
+provides=('steamling-libretro-mednafen_pce_fast')
+conflicts=('steamling-libretro-mednafen_pce_fast')
+replaces=('libretro-cores-steamling-mednafen_pce_fast')
+source=("beetle-pce-fast-libretro::git+https://github.com/libretro/beetle-pce-fast-libretro.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  # Tuned to the SoC like packages/soc/mesa (sm8550 fallback for a standalone makepkg).
+  local _rocknix_tune="${STEAMLING_TUNE_CFLAGS:--march=armv9-a+fp16+crypto+i8mm+bf16+memtag+sm4+sha3+nosve+nosve2 -mtune=cortex-x3 -mno-outline-atomics}"
+  export CFLAGS+=" ${_rocknix_tune}" CXXFLAGS+=" ${_rocknix_tune}"
+  make -C beetle-pce-fast-libretro platform=unix
+}
+
+package() {
+  install -Dm644 beetle-pce-fast-libretro/mednafen_pce_fast_libretro.so "${pkgdir}/usr/lib/libretro/mednafen_pce_fast_libretro.so"
+  install -Dm644 beetle-pce-fast-libretro/COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
