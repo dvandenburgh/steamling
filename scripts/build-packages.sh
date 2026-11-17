@@ -416,6 +416,10 @@ main() {
   for pkgdir in "${PACKAGES_DIR}"/shared/*/ "${PACKAGES_DIR}"/soc/*/ "${STEAMLING_ROOT}"/devices/*/packages/*/; do
     [ -f "${pkgdir}/PKGBUILD" ] || continue
     name="$(pkg_name "${pkgdir}")"
+    # Opt-in packages (lib.sh pkg_opted_out) build when their switch is on or PKG= names them.
+    if pkg_opted_out "${pkgdir}"; then
+      case " ${want[*]} " in *" ${name} "*) ;; *) continue ;; esac
+    fi
     case "${pkgdir}" in */devices/*/packages/*)
       devdir="$(dirname "$(dirname "${pkgdir%/}")")"
       devsoc="$(profile_get "${devdir}" SOC)"

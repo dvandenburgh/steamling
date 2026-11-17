@@ -382,6 +382,18 @@ pkg_env() {  # $1 = package dir
     STEAMLING_KERNEL_LEGACY_NAMES "${KERNEL_LEGACY_NAMES:-}"
 }
 
+# A package dir with an optin file is built only when its switch is on. The file holds one word:
+#   cores   ./build.sh --cores (STEAMLING_CORES=on): the source-built RetroArch cores
+pkg_opted_out() {  # $1 = package dir
+  local word=""
+  [ -f "${1%/}/optin" ] || return 1
+  read -r word < "${1%/}/optin" || true
+  case "${word}" in
+    cores) [ "$(onoff STEAMLING_CORES "${STEAMLING_CORES:-off}")" != on ] ;;
+    *) return 0 ;;
+  esac
+}
+
 # Every artifact `make build` wants for this SOC, one "repo-dir|pkg-dir|pkgname|version|arch"
 # line each: build-packages.sh's dirs, socs gating and makepkg --packagelist naming, read from
 # the PKGBUILDs alone so pending.sh and seed-localrepo.sh need no build chroot.
@@ -389,6 +401,7 @@ local_artifacts() {
   local d devsoc socs repo
   for d in "${PACKAGES_DIR}"/shared/*/ "${PACKAGES_DIR}"/soc/*/ "${STEAMLING_ROOT}"/devices/*/packages/*/; do
     [ -f "${d}PKGBUILD" ] || continue
+    ! pkg_opted_out "${d}" || continue
     case "${d}" in */devices/*/packages/*)
       devsoc="$(unset SOC; . "${d%/packages/*}/profile.conf" >/dev/null 2>&1; printf '%s' "${SOC}")"
       [ "${devsoc}" = "${SOC}" ] || continue

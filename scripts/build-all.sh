@@ -23,6 +23,8 @@ Image options
   --wifi-psk PSK        its passphrase
   --wifi-country CC     2-letter regulatory country, needed for 5 GHz (e.g. US)
   --emulation           bake in the emulation layer (ES-DE and the emulators)
+  --cores               build the NES, SNES, Game Boy and GBA RetroArch cores from source, tuned
+                        for this SoC, in place of the prebuilt ones (works with --update too)
 
 Build options
   -d, --device NAME     image target, a family under devices/ (listed below)
@@ -41,7 +43,7 @@ Build options
 Every option has an environment / make variable form, e.g. `make image SSH=1 SD_IMAGE=off`,
 or `export SSH=1` to turn SSH on for every build:
   SSH=1 (or SD_SSH=on)  SD_ROOT_PASSWORD=  SD_WIFI_SSID=  SD_WIFI_PSK=  SD_WIFI_COUNTRY=
-  STEAMLING_EMULATION=1  DEVICE=  JOBS=  STEAMLING_UPDATE=1  SD_IMAGE=off  STEAMLING_SEED=off  STEAMLING_HOST_SETUP=off
+  STEAMLING_EMULATION=1  STEAMLING_CORES=1  DEVICE=  JOBS=  STEAMLING_UPDATE=1  SD_IMAGE=off  STEAMLING_SEED=off  STEAMLING_HOST_SETUP=off
   STEAMLING_STATUS_BAR=off   (switches take on/off, 1/0, yes/no or true/false)
 
 From another shell: make status shows how far it is and the time left; make watch follows it.
@@ -76,6 +78,7 @@ while [ "$#" -gt 0 ]; do
     --wifi-psk) export SD_WIFI_PSK="${val}" ;;
     --wifi-country) export SD_WIFI_COUNTRY="${val^^}" ;;
     --emulation) export STEAMLING_EMULATION=1 ;;
+    --cores) export STEAMLING_CORES=on ;;
     -d|--device) export DEVICE="${val}" ;;
     -j|--jobs) [[ "${val}" =~ ^[1-9][0-9]*$ ]] || bad "--jobs takes a number, not '${val}'"
                export JOBS="${val}" ;;
@@ -110,9 +113,10 @@ STEAMLING_SEED="$(onoff STEAMLING_SEED "${STEAMLING_SEED:-on}")"
 STEAMLING_HOST_SETUP="$(onoff STEAMLING_HOST_SETUP "${STEAMLING_HOST_SETUP:-on}")"
 STEAMLING_STATUS_BAR="$(onoff STEAMLING_STATUS_BAR "${STEAMLING_STATUS_BAR:-on}")"
 STEAMLING_UPDATE="$(onoff STEAMLING_UPDATE "${STEAMLING_UPDATE:-off}")"
+STEAMLING_CORES="$(onoff STEAMLING_CORES "${STEAMLING_CORES:-off}")"
 emu="$(onoff STEAMLING_EMULATION "${STEAMLING_EMULATION:-0}")"
 if [ "${emu}" = on ]; then STEAMLING_EMULATION=1; else STEAMLING_EMULATION=0; fi
-export SD_SSH SD_IMAGE STEAMLING_SEED STEAMLING_HOST_SETUP STEAMLING_STATUS_BAR STEAMLING_EMULATION STEAMLING_UPDATE
+export SD_SSH SD_IMAGE STEAMLING_SEED STEAMLING_HOST_SETUP STEAMLING_STATUS_BAR STEAMLING_EMULATION STEAMLING_UPDATE STEAMLING_CORES
 
 # --- the plan ----------------------------------------------------------------------------------
 STEPS=(host)
@@ -338,6 +342,7 @@ total=0; for e in "${EST_ARR[@]}"; do total=$((total + e)); done
 log "steamling image build for ${DEVICE} (${DEVICE_PRETTY:-${SOC}}): ${plan}"
 if [ "${STEAMLING_UPDATE}" = on ]; then
   echo "    update build: only what changed since the last build, no rootfs or SD image"
+  [ "${STEAMLING_CORES}" = off ] || echo "    with the source-built RetroArch cores (--cores)"
   if [ "${SD_SSH}" = on ] || [ -n "${SD_WIFI_SSID}" ] || [ "${SD_ROOT_PASSWORD}" != root ] || [ "${STEAMLING_EMULATION}" = 1 ]; then
     warn "SSH, Wi-Fi, the password and the emulation layer only go into an image, so --update ignores them"
   fi
