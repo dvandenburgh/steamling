@@ -1,0 +1,54 @@
+From b11825029bcfc8cf4d58bb47d57452e6967eb11b Mon Sep 17 00:00:00 2001
+From: Jonathan Bastari Thamrin <thamrinjonathan@gmail.com>
+Date: Thu, 5 Nov 2026 18:25:25 +0700
+Subject: [PATCH] scx_lavd: Don't drop a performance level extended to the same
+ capacity
+
+When the next performance level picks a subset of CPUs from the
+previous one, gen_perf_pds_table() extends the previous level instead.
+It inserts the extended level and then removes the old one by its
+performance. When both have the same performance, the removal drops
+the level that was just inserted.
+
+This happens when the last two levels pick the same CPUs and so the
+same performance, for example with CPUs offline or with identical CPUs
+that have a single performance state. The top level with all the CPUs
+is then lost, so some CPUs are left out of the CPU order.
+
+Remove the old level before inserting the extended one.
+
+Signed-off-by: Jonathan Bastari Thamrin <thamrinjonathan@gmail.com>
+---
+ scheds/rust/scx_lavd/src/cpu_order.rs | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/scheds/rust/scx_lavd/src/cpu_order.rs b/scheds/rust/scx_lavd/src/cpu_order.rs
+index 8e9ff381..49cce7fc 100644
+--- a/scheds/rust/scx_lavd/src/cpu_order.rs
++++ b/scheds/rust/scx_lavd/src/cpu_order.rs
+@@ -825,15 +825,18 @@ impl<'a> EnergyModelOptimizer<'a> {
+                 }
+             };
+ 
++            // Remove the old base before inserting its extension since both
++            // can have the same performance value and removing after
++            // inserting would drop the extension.
++            if let Some(del_pdsi) = del_pdsi {
++                self.perf_pdsi.borrow_mut().remove(&del_pdsi.performance);
++            }
++
+             if let Some(best_pdsi) = best_pdsi {
+                 self.perf_pdsi
+                     .borrow_mut()
+                     .insert(best_pdsi.performance, best_pdsi);
+             }
+-
+-            if let Some(del_pdsi) = del_pdsi {
+-                self.perf_pdsi.borrow_mut().remove(&del_pdsi.performance);
+-            }
+         }
+ 
+         // Debug print of the generated table
+-- 
+2.34.1
+
