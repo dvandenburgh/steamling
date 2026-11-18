@@ -195,7 +195,7 @@ For numbers on top of the game itself, use the performance overlay above.
   sticks one colour, **Side Lights** to match the side lighting to the sticks, then colour and
   brightness per stick.
 
-  ![Rumble on at 50% strength, and the stick lights switched on](images/governor-rumble.jpeg)
+  ![Rumble on at 50% strength, then Stick Lights, still switched off](images/governor-rumble.jpeg)
 
   ![The left stick's hue, saturation and brightness](images/governor-stick-lights.jpeg)
 
@@ -235,6 +235,8 @@ The same toggle is in **Steamling Tools** on the desktop side.
 [Syncthing](https://syncthing.net). Save on one, carry on from the same spot on the other. It
 works over your home network, and over the internet when the two aren't on the same one.
 Nothing leaves the handheld until you pair it with a device yourself.
+
+![Save Sync with Syncthing off, then USB File Transfer](images/governor-save-sync.jpeg)
 
 To pair it with your PC:
 
