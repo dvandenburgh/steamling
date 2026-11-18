@@ -52,8 +52,9 @@ source=("gamescope::git+https://github.com/ValveSoftware/gamescope.git#commit=${
         '0031-steamcompmgr-clock-anchored-fps-limiter.patch'
         # Steam's refresh slider gets the rate it asked for, not its highest multiple (armada 0032)
         '0032-steamcompmgr-use-the-exact-rate-for-refresh-only-requests.patch'
-        '0034-drm-apply-the-preferred-mode-to-internal-screens-only.patch')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        '0034-drm-apply-the-preferred-mode-to-internal-screens-only.patch'
+        '0038-steamcompmgr-take-the-cursor-repaint-flag-before-deciding-to-paint.patch')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
   cd gamescope

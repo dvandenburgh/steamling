@@ -1,0 +1,92 @@
+From 32b2b7a65fd48bef2770786503ad1d0928aef58c Mon Sep 17 00:00:00 2001
+From: Matthew Schwartz <matthew.schwartz@linux.dev>
+Date: Tue, 17 Nov 2026 21:21:56 -0800
+Subject: [PATCH] steamcompmgr: take the cursor repaint flag before deciding to
+ paint
+
+The cursor repaint flag is cleared after every paint, so a cursor move
+that lands between the position sample and the end of the paint asks
+for nothing. While the Steam UI holds the refresh rate with adaptive
+sync, the next frame then repeats the last composite with the old
+cursor, and a pointer reporting close to the refresh rate keeps landing
+in that window. At 125 events per second on a 120 Hz panel the cursor
+moves for about 8 frames and then freezes for 13, so only 50 of 120
+frames per second show a new position.
+
+Take the flag before the position is sampled and hand it back if
+nothing was painted, so a move during the paint asks for the next
+frame.
+---
+ src/steamcompmgr.cpp | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/src/steamcompmgr.cpp b/src/steamcompmgr.cpp
+index 76d4cfb..bf35b63 100644
+--- a/src/steamcompmgr.cpp
++++ b/src/steamcompmgr.cpp
+@@ -11071,6 +11071,9 @@ steamcompmgr_main(int argc, char **argv)
+ 		static int nIgnoredOverlayRepaints = 0;
+ 		static uint64_t s_ulLastContentPaintTime = 0;
+ 
++		// Taken before the position is sampled, so a move during the paint asks for the next frame.
++		const bool bCursorRepaint = hasCursorRepaint.exchange( false );
++
+ 		if ( !hasRepaintNonBasePlane )
+ 			nIgnoredOverlayRepaints = 0;
+ 
+@@ -11171,13 +11174,13 @@ steamcompmgr_main(int argc, char **argv)
+ 				{
+ 					case FlipType::Normal:
+ 					{
+-						bShouldPaint = vblank && ( hasRepaint || hasRepaintNonBasePlane || hasCursorRepaint || bForceSyncFlip );
++						bShouldPaint = vblank && ( hasRepaint || hasRepaintNonBasePlane || bCursorRepaint || bForceSyncFlip );
+ 						break;
+ 					}
+ 
+ 					case FlipType::Async:
+ 					{
+-						bShouldPaint = hasRepaint || hasCursorRepaint;
++						bShouldPaint = hasRepaint || bCursorRepaint;
+ 
+ 						if ( vblank && !bShouldPaint && hasRepaintNonBasePlane )
+ 							nIgnoredOverlayRepaints++;
+@@ -11190,7 +11193,7 @@ steamcompmgr_main(int argc, char **argv)
+ 						bShouldPaint = hasRepaint && bVRRCanFlip;
+ 
+ 						// Content at or above adaptive_sync_cursor_min_fps carries the cursor with its own frames.
+-						if ( !bShouldPaint && hasCursorRepaint && bVRRCanFlip )
++						if ( !bShouldPaint && bCursorRepaint && bVRRCanFlip )
+ 						{
+ 							const int nCursorMinFPS = cv_adaptive_sync_cursor_min_fps;
+ 							if ( nCursorMinFPS <= 0 ||
+@@ -11205,7 +11208,7 @@ steamcompmgr_main(int argc, char **argv)
+ 						     cv_adaptive_sync_idle_hold )
+ 						{
+ 							bShouldPaint = true;
+-							bRepeatFrame = !hasCursorRepaint && !hasRepaintNonBasePlane;
++							bRepeatFrame = !bCursorRepaint && !hasRepaintNonBasePlane;
+ 						}
+ 
+ 						if ( bIsVBlankFromTimer )
+@@ -11269,7 +11272,6 @@ steamcompmgr_main(int argc, char **argv)
+ 
+ 			hasRepaint = false;
+ 			hasRepaintNonBasePlane = false;
+-			hasCursorRepaint = false;
+ 			nIgnoredOverlayRepaints = 0;
+ 
+ 			{
+@@ -11277,6 +11279,10 @@ steamcompmgr_main(int argc, char **argv)
+ 				script.Manager().CallHook( "OnPostPaint" );
+ 			}
+ 		}
++		else if ( bCursorRepaint )
++		{
++			hasCursorRepaint = true;
++		}
+ 
+ 		publish_mangoapp_snapshot();
+ 		publish_mangoapp_connector_snapshots();
+-- 
+2.34.1
+
