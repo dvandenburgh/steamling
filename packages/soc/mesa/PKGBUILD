@@ -70,8 +70,7 @@ sha256sums=('SKIP'
             '0cfa987df3056671ac3480d9ea148f13d222d7232635ff5c767408099d82d8c8'
             '6ae155c176d79bdca0f7d3885a8e44dce4da68210c44d48561c6bfdfd5efffbc'
             '24c20cd1c8ba6810f8c9eb4bc01ac67755e33b3d2a004567b4b2cf083a9c8662'
-            '8ac0ae731202cdee5c728e4fe07b1328898bb3285f289cb6f095ca64bcd8aab5'
-            '6b16c1182997a27e1e2697353bd65026c898d74ea7b87a056c0e32b6ab8275dc')
+            '8ac0ae731202cdee5c728e4fe07b1328898bb3285f289cb6f095ca64bcd8aab5')
 
 prepare() {
   cd "mesa-${_srcver}"
