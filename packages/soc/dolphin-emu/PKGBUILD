@@ -1,8 +1,8 @@
 # dolphin-emu — GameCube/Wii emulator, built from source because ALARM carries no aarch64
 # build and upstream's Linux binaries are x86_64-only.
 pkgname=dolphin-emu
-pkgver=2609a
-pkgrel=1.3
+pkgver=2609b
+pkgrel=1
 pkgdesc="GameCube / Wii emulator (native aarch64 build)"
 arch=('aarch64')
 url="https://dolphin-emu.org"
