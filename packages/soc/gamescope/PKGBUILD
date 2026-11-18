@@ -5,9 +5,9 @@
 # on every bump, hence commit date then sha — a bare sha is non-monotonic.
 pkgname=gamescope
 epoch=1
-pkgver=3.17.0.rocknix.20261031.309eee7
-pkgrel=6
-_commit=309eee74f967d458cf71836619132010f88ee796
+pkgver=3.17.0.rocknix.20261116.9fda8d1
+pkgrel=1
+_commit=9fda8d1d43154b250d883697e72dcf698178000c
 install=gamescope.install
 pkgdesc="SteamOS session compositing WM — patched (for msm handhelds)"
 arch=('aarch64')
@@ -52,12 +52,8 @@ source=("gamescope::git+https://github.com/ValveSoftware/gamescope.git#commit=${
         '0031-steamcompmgr-clock-anchored-fps-limiter.patch'
         # Steam's refresh slider gets the rate it asked for, not its highest multiple (armada 0032)
         '0032-steamcompmgr-use-the-exact-rate-for-refresh-only-requests.patch'
-        '0033-steamcompmgr-read-the-client-s-size-hint-flags.patch'
-        '0034-drm-apply-the-preferred-mode-to-internal-screens-only.patch'
-        '0035-wlserver-send-wl-touch-frame-after-touch-events.patch'
-        '0036-layer-retire-a-swapchain-that-can-no-longer-bypass-xwayland.patch'
-        '0037-layer-dont-bypass-xwayland-in-a-toplevel-the-client-has-other-surfaces-in.patch')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        '0034-drm-apply-the-preferred-mode-to-internal-screens-only.patch')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
   cd gamescope
