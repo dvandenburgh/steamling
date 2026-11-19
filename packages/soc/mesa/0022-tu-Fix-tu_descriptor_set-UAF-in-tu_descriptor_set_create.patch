@@ -1,0 +1,32 @@
+From 09a0d20517e486eac504020ca1483f9c5e35f7e5 Mon Sep 17 00:00:00 2001
+From: Danylo Piliaiev <dpiliaiev@igalia.com>
+Date: Thu, 19 Nov 2026 13:16:13 +0100
+Subject: [PATCH] tu: Fix tu_descriptor_set UAF in tu_descriptor_set_create
+
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16938
+Fixes: 4a2b930d2df ("tu: Properly distinguish pool fragmentation from pool exhaustion.")
+Assisted-by: LLM
+Signed-off-by: Danylo Piliaiev <dpiliaiev@igalia.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46494>
+---
+ src/freedreno/vulkan/tu_descriptor_set.cc | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/freedreno/vulkan/tu_descriptor_set.cc b/src/freedreno/vulkan/tu_descriptor_set.cc
+index 8843f7bf48f..48f176fcd2d 100644
+--- a/src/freedreno/vulkan/tu_descriptor_set.cc
++++ b/src/freedreno/vulkan/tu_descriptor_set.cc
+@@ -655,8 +655,9 @@ tu_descriptor_set_create(struct tu_device *device,
+          uint64_t pool_vma_offset =
+             util_vma_heap_alloc(&pool->bo_heap, set->size, 1);
+          if (!pool_vma_offset) {
++            uint32_t size = set->size;
+             vk_object_free(&device->vk, NULL, set);
+-            if (pool->bo_heap.free_size >= set->size)
++            if (pool->bo_heap.free_size >= size)
+                return VK_ERROR_FRAGMENTED_POOL;
+             else
+                return VK_ERROR_OUT_OF_POOL_MEMORY;
+-- 
+2.34.1
+
