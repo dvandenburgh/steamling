@@ -7,7 +7,7 @@
 # Raspberry Pi Imager all write a .img.xz straight to the card, no unpacking first. The name is
 # date-stamped because a public file must never change bytes under the same name.
 #
-# Where it goes (config/steamling.conf, config/local.conf or env):
+# Where it goes (config/steamling.conf, your own local.conf next to it, or env):
 #   STEAMLING_IMAGE_SOURCEFORGE    a SourceForge project: the image and its .sha256 go to the
 #                                  <version> folder there, over rsync and SSH as
 #                                  STEAMLING_IMAGE_SOURCEFORGE_USER. Needed for any image over 2 GiB.
