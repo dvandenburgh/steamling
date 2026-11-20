@@ -15,15 +15,35 @@ only moves when you move it.
 - **The machine you already build on.** These steps were written for an x86_64 CachyOS laptop,
   but any Arch-based Linux works. It needs to be set up for building already (see
   [Building on a Linux host](linux-host.md)).
-- **Somewhere public to put files.** Anything [rclone](https://rclone.org) can upload to, with a
-  public web address in front of it. Cloudflare R2 is what the scripts default to: its free tier
-  covers 10 GB and doesn't charge for downloads. A base is a few GB.
+- **Somewhere public to put the files.** A base is a few GB. Steamling's own goes on GitHub, as
+  releases of a `Steamling/base` repo, which costs nothing.
+  Anything [rclone](https://rclone.org) can upload to works too, as long as it has a public web
+  address, for example Cloudflare R2.
 - **Time.** The script builds everything twice. On an x86_64 machine every Arm program runs through
   qemu, so the first build takes hours.
 
 ## 1. Set up the storage
 
-With Cloudflare R2:
+### On GitHub
+
+1. Create a public repo for the base (Steamling's is `Steamling/base`). Tick **Add a README**:
+   releases hang off a commit, so the repo can't be empty.
+2. Install the GitHub command line tool and log in with an account that can write to that repo:
+
+   ```fish
+   sudo pacman -S --needed github-cli
+   gh auth login
+   ```
+
+That's all. You don't make any releases yourself; the script does.
+
+A GitHub release holds at most 1000 files and a base has over 2000 (every package comes with its
+signature), so the base is spread over a few releases: `base`, `base-2`, `base-3`. pacman gets told
+about all of them and finds each package wherever it is. Some file names get a `_` where Arch Linux
+ARM's have a `:` or `+`, because GitHub won't keep those characters. The packages and their
+signatures are untouched.
+
+### On Cloudflare R2 (or other rclone storage)
 
 1. Create a bucket (say `steamling`) in the Cloudflare dashboard and allow public access to it,
    either with the `r2.dev` address Cloudflare offers or a domain of your own. Note the public
@@ -43,7 +63,13 @@ Steamling's defaults. Start from the example:
 cp config/local.conf.example config/local.conf
 ```
 
-Open it and fill in at least the two base lines, with your bucket's address from step 1:
+Open it and fill in where the base goes. For GitHub, one line with your repo:
+
+```sh
+STEAMLING_BASE_GITHUB=Steamling/base
+```
+
+For R2, the two lines with your bucket's address from step 1:
 
 ```sh
 STEAMLING_BASE_RCLONE_REMOTE=r2:steamling/repo/base
@@ -68,7 +94,8 @@ Or let `./build.sh` start it, with any of its usual options, which then apply to
 ```
 
 A plain `./build.sh` never touches the base; only `--build-base` does. (You can also skip
-`local.conf` and pass `--remote` and `--url` to `scripts/own-base.fish` instead.)
+`local.conf` and pass `--github Steamling/base`, or `--remote` and `--url`, to
+`scripts/own-base.fish` instead.)
 
 The script:
 
@@ -76,7 +103,8 @@ The script:
 2. Points `config/steamling.conf` at your storage.
 3. Builds everything against live Arch Linux ARM (`make image`).
 4. Freezes exactly what that build installed, uploads it, and pins the config to it
-   (`make snapshot`).
+   (`make snapshot`). On GitHub the new base goes up as `base-next` first and only takes over
+   once every file is there, so a build or a handheld never sees half a base.
 5. Checks your public address serves the new base.
 6. Builds everything again, this time from your frozen base.
 
@@ -91,7 +119,8 @@ git commit -m "base: our own snapshot"
 
 Every build after that, `make image` or `./build.sh`, uses your base. To move it forward later, say for a newer Plasma or Mesa,
 run the script again; it labels each base with the date. The previous base is kept next to the new
-one (as `base-prev`), so the last release can still be rebuilt.
+one (as `base-prev`), so the last release can still be rebuilt. If the upload stops partway, a
+dropped connection say, run the script again and it carries on from where it got to.
 
 **ccache and android-tools.** A build against live Arch Linux ARM installs ccache in the package
 build environment, and the snapshot takes everything a build installed, so your base carries ccache

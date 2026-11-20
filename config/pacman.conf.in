@@ -1,5 +1,5 @@
 # steamling pacman.conf template: the Arch Linux ARM base, valid on its own.
-# lib.sh render_base_pacman_conf renders it, swapping the live repos for [pocknix-base]
+# lib.sh render_base_pacman_conf renders it, swapping the live repos for the frozen base
 # when a snapshot is pinned; build-image.sh inserts [steamling] + [steamling-shared] ABOVE
 # the first base repo so unqualified names resolve to ours before ALARM's.
 

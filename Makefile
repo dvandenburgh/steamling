@@ -58,7 +58,7 @@ pending: ## List the packages 'make build' would compile (missing or stale in bu
 sd-image: ## Build a flashable SD boot-test image (needs build + kernel) (root, Linux)
 	@$(SCRIPTS)/build-sd-image.sh
 
-snapshot: ## Freeze the ALARM base a fresh build used -> [pocknix-base] on R2 + lockfile + pins (user, no sudo)
+snapshot: ## Freeze the ALARM base a fresh build used -> [steamling-base] on GitHub or R2 + lockfile + pins (user, no sudo)
 	@$(SCRIPTS)/snapshot-base.sh
 
 base-diff: ## Vet a snapshot dry run: watchlist moves + open upstream issues, fresh upstream bumps (auto after a dry run)
