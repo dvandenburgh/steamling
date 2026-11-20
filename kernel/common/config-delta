@@ -61,3 +61,9 @@
 # over; without this the second algorithm and the timer silently do nothing. The SM8550 config
 # had it, the shared tree's did not.
 --enable ZRAM_MULTI_COMP
+
+# ADIOS, CachyOS's adaptive deadline I/O scheduler (1184/1185), built in so it can be picked on a
+# handheld without a module. It isn't the default anything gets: steamling-storage chooses the
+# scheduler per disk, and `steamling-storage scheduler adios` tries it.
+--enable MQ_IOSCHED_ADIOS
+--disable MQ_IOSCHED_DEFAULT_ADIOS
