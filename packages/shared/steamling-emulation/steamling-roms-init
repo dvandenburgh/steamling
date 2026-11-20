@@ -52,7 +52,8 @@ have_dolphin()   { emu_path dolphin >/dev/null 2>&1; }
 have_cemu()      { emu_path cemu >/dev/null 2>&1; }
 have_ppsspp()    { emu_path ppsspp >/dev/null 2>&1; }
 have_ryujinx()   { emu_path ryujinx >/dev/null 2>&1; }
-EMULATORS=(esde retroarch armsx2 eden ryujinx dolphin cemu ppsspp)
+have_azahar()    { emu_path azahar >/dev/null 2>&1; }
+EMULATORS=(esde retroarch armsx2 eden ryujinx dolphin cemu ppsspp azahar)
 
 TMP="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/steamling-seed.XXXXXX")" || exit 0
 trap 'rm -rf "${TMP}"' EXIT
@@ -74,6 +75,7 @@ render_all() {  # $1 template dir, $2 out dir
   local vs=2; [ "${REFRESH}" -ge 120 ] 2>/dev/null && vs=1
   [ -f "${src}/eden-qt-config.ini.in" ] && sed "s/^use_vsync=.*/use_vsync=${vs}/" "${src}/eden-qt-config.ini.in" > "${out}/qt-config.ini"
   [ -f "${src}/ryujinx-Config.json.in" ] && sed "s|__ROMS__|${ROMS}|g" "${src}/ryujinx-Config.json.in" > "${out}/Config.json"
+  [ -f "${src}/azahar-qt-config.ini.in" ] && cp "${src}/azahar-qt-config.ini.in" "${out}/azahar-qt-config.ini"
   [ -f "${src}/dolphin-Dolphin.ini.in" ] && cp "${src}/dolphin-Dolphin.ini.in" "${out}/Dolphin.ini"
   [ -f "${src}/dolphin-GFX.ini.in" ] && cp "${src}/dolphin-GFX.ini.in" "${out}/GFX.ini"
   [ -f "${src}/cemu-settings.xml.in" ] && sed "s|__ROMS__|${ROMS}|g" "${src}/cemu-settings.xml.in" > "${out}/settings.xml"
@@ -160,6 +162,9 @@ seed_cemu() {
 
 seed_ppsspp() { seed_b ini ppsspp.ini "${HOME}/.config/ppsspp/PSP/SYSTEM/ppsspp.ini"; }
 
+# Azahar's own defaults are keyboard keys; the policy turns them into the pad binding.
+seed_azahar() { seed_b ini azahar-qt-config.ini "${HOME}/.config/azahar-emu/qt-config.ini" azahar-qt-config; }
+
 # ROMS was read before any reset, so restoring ES-DE defaults keeps the user's ROM location
 label() {
   local l own=""
@@ -168,6 +173,7 @@ label() {
     armsx2) l="ARMSX2 (PS2)" ;;          eden) l="Eden (Switch)" ;;
     dolphin) l="Dolphin (GameCube/Wii)" ;; cemu) l="Cemu (Wii U)" ;;
     ppsspp) l="PPSSPP (PSP)" ;;          ryujinx) l="Ryujinx (Switch)" ;;
+    azahar) l="Azahar (3DS)" ;;
   esac
   case "$(emu_path "$1" 2>/dev/null)" in "${EMU_DROP}"/*) own=" - your own build" ;; esac
   echo "${l}${own}"
@@ -194,6 +200,7 @@ reset_ryujinx()   { reset_target "${HOME}/.config/Ryujinx/Config.json"; }
 reset_dolphin()   { local f; for f in Dolphin.ini GFX.ini GCPadNew.ini WiimoteNew.ini; do reset_target "${HOME}/.config/dolphin-emu/${f}"; done; }
 reset_cemu()      { reset_target "${HOME}/.config/Cemu/settings.xml"; }
 reset_ppsspp()    { reset_target "${HOME}/.config/ppsspp/PSP/SYSTEM/ppsspp.ini"; }
+reset_azahar()    { reset_target "${HOME}/.config/azahar-emu/qt-config.ini"; }
 
 present=()
 for e in "${EMULATORS[@]}"; do "have_${e}" && present+=("${e}"); done

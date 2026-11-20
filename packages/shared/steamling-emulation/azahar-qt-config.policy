@@ -1,0 +1,48 @@
+# read by steamling-seed-merge; the pad bindings stay three-way on purpose
+# The seed itself (azahar-qt-config.ini.in) can't carry comments, so it is described here:
+# Azahar seed (-> ~/.config/azahar-emu/qt-config.ini). Azahar's defaults are keyboard keys, so
+# 3DS games had no controls in game mode. One input profile on SDL's controller API with
+# maptype:all, which takes whichever pad is connected, so no device GUID is needed. The 3DS lays
+# its buttons out like the RP6's Nintendo-style ones (A right, B bottom), and SDL numbers them
+# by position (0 bottom, 1 right, 2 left, 3 top), so each button does the 3DS button with its
+# letter. ZL and ZR are L2 and R2, Home is R3 (the guide button belongs to Steam), the circle
+# pad is the left stick and the C-stick the right.
+# Azahar's own keyboard bindings. A device where Azahar ran before we seeded it has these with
+# no baseline to compare against; matching them means nobody changed them, so the pad wins.
+was Controls/profiles\1\button_a "code:65,engine:keyboard"
+was Controls/profiles\1\button_b "code:83,engine:keyboard"
+was Controls/profiles\1\button_x "code:90,engine:keyboard"
+was Controls/profiles\1\button_y "code:88,engine:keyboard"
+was Controls/profiles\1\button_up "code:84,engine:keyboard"
+was Controls/profiles\1\button_down "code:71,engine:keyboard"
+was Controls/profiles\1\button_left "code:70,engine:keyboard"
+was Controls/profiles\1\button_right "code:72,engine:keyboard"
+was Controls/profiles\1\button_l "code:81,engine:keyboard"
+was Controls/profiles\1\button_r "code:87,engine:keyboard"
+was Controls/profiles\1\button_start "code:77,engine:keyboard"
+was Controls/profiles\1\button_select "code:78,engine:keyboard"
+was Controls/profiles\1\button_zl "code:49,engine:keyboard"
+was Controls/profiles\1\button_zr "code:50,engine:keyboard"
+was Controls/profiles\1\button_home "code:66,engine:keyboard"
+was Controls/profiles\1\circle_pad "down:code$016777237$1engine$0keyboard,engine:analog_from_button,left:code$016777234$1engine$0keyboard,modifier:code$068$1engine$0keyboard,modifier_scale:0.500000,right:code$016777236$1engine$0keyboard,up:code$016777235$1engine$0keyboard"
+was Controls/profiles\1\c_stick "down:code$075$1engine$0keyboard,engine:analog_from_button,left:code$074$1engine$0keyboard,modifier:code$068$1engine$0keyboard,modifier_scale:0.500000,right:code$076$1engine$0keyboard,up:code$073$1engine$0keyboard"
+was Controls/profiles\1\input_maptype 2
+# Azahar writes \default=true beside every binding it never changed, and reads the default
+# instead of the value while that flag is set, so the flag has to follow the pad binding.
+was Controls/profiles\1\button_a\default true
+was Controls/profiles\1\button_b\default true
+was Controls/profiles\1\button_x\default true
+was Controls/profiles\1\button_y\default true
+was Controls/profiles\1\button_up\default true
+was Controls/profiles\1\button_down\default true
+was Controls/profiles\1\button_left\default true
+was Controls/profiles\1\button_right\default true
+was Controls/profiles\1\button_l\default true
+was Controls/profiles\1\button_r\default true
+was Controls/profiles\1\button_start\default true
+was Controls/profiles\1\button_select\default true
+was Controls/profiles\1\button_zl\default true
+was Controls/profiles\1\button_zr\default true
+was Controls/profiles\1\button_home\default true
+was Controls/profiles\1\circle_pad\default true
+was Controls/profiles\1\c_stick\default true

@@ -2,7 +2,7 @@
 # configs, shipped as an arch=any data/scripts package.
 pkgname=steamling-emulation
 pkgver=0.1.1
-pkgrel=18
+pkgrel=19
 pkgdesc="ES-DE + preconfigured emulators: drop ROMs into ~/Emulation and play; star -> Steam"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -18,6 +18,7 @@ source=('steamling-roms-init' 'steamling-roms-init.service' 'steamling-seed-merg
         'es-azahar' 'es-rpcs3' 'es-cemu' 'es-vita3k'
         'es_find_rules.xml' 'es_systems.xml' 'retroarch.cfg' 'ROMS-README.txt' 'armsx2-PCSX2.ini.in'
         'eden-qt-config.ini.in' 'ppsspp.ini.in' 'ryujinx-Config.json.in'
+        'azahar-qt-config.ini.in' 'azahar-qt-config.policy'
         'cemu-settings.policy' 'armsx2-PCSX2.policy' 'eden-qt-config.policy' 'retroarch.policy' 'es_settings.policy'
         'ryujinx-Config.policy'
         'steamling-cemu-profile' 'cemu-settings.xml.in' 'cemu-controller0.xml.in'
@@ -26,7 +27,7 @@ source=('steamling-roms-init' 'steamling-roms-init.service' 'steamling-seed-merg
         # FLAT names: makepkg cannot retrieve local sources from subdirectory paths, so
         # package() maps retroarch-<Core>-<file> back into the retroarch-config/<Core>/ tree.
         'retroarch-mGBA-gba.cfg' 'retroarch-mGBA-gba.slangp')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   install -Dm755 "${srcdir}/steamling-roms-init" "${pkgdir}/usr/bin/steamling-roms-init"
@@ -73,8 +74,11 @@ package() {
     "${pkgdir}/usr/share/steamling-emulation/ppsspp.ini.in"
   install -Dm644 "${srcdir}/ryujinx-Config.json.in" \
     "${pkgdir}/usr/share/steamling-emulation/ryujinx-Config.json.in"
+  install -Dm644 "${srcdir}/azahar-qt-config.ini.in" \
+    "${pkgdir}/usr/share/steamling-emulation/azahar-qt-config.ini.in"
   local pol
-  for pol in cemu-settings armsx2-PCSX2 eden-qt-config retroarch es_settings ryujinx-Config; do
+  for pol in cemu-settings armsx2-PCSX2 eden-qt-config retroarch es_settings ryujinx-Config \
+             azahar-qt-config; do
     install -Dm644 "${srcdir}/${pol}.policy" "${pkgdir}/usr/share/steamling-emulation/${pol}.policy"
   done
   install -Dm755 "${srcdir}/steamling-cemu-profile" "${pkgdir}/usr/lib/steamling/steamling-cemu-profile"
