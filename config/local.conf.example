@@ -54,8 +54,11 @@ STEAMLING_CCACHE_SIZE=20G
 #STEAMLING_REPO_URL=https://pub-REPLACE-ME.r2.dev/repo
 #STEAMLING_REPO_GPG_KEY=you@example.com
 #STEAMLING_REPO_PUBKEY=config/steamling-repo.asc
-# SD images go to a draft release on Steamling/steamling; to send them to rclone storage instead,
-# blank the GitHub line and fill in the two after it.
+# SD images go to SourceForge, uploaded as your SourceForge user (add an SSH key to your account
+# there first), with a draft release on Steamling/steamling linking to them. For rclone storage
+# instead, blank the SourceForge and GitHub lines and fill in the two after them.
+#STEAMLING_IMAGE_SOURCEFORGE_USER=your-sourceforge-username
+#STEAMLING_IMAGE_SOURCEFORGE=
 #STEAMLING_IMAGE_GITHUB=
 #STEAMLING_IMAGE_RCLONE_REMOTE=r2:steamling/images
 #STEAMLING_IMAGE_URL=https://pub-REPLACE-ME.r2.dev/images
