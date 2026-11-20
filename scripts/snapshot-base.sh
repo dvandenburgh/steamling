@@ -281,20 +281,23 @@ curlcfg="${tmp}/curl.cfg"; shafile="${tmp}/sha.check"
 todl=0 cached=0
 for name in "${!want[@]}"; do
   key="${name} ${want[${name}]}"
-  fn="${f_file[${key}]}"; repo="${f_repo[${key}]}"
-  printf '%s  %s\n' "${f_sha[${key}]}" "${OUT}/${fn}" >> "${shafile}"
+  fn="${f_file[${key}]}"; repo="${f_repo[${key}]}"; sfn="$(base_file_name "${fn}")"
+  printf '%s  %s\n' "${f_sha[${key}]}" "${OUT}/${sfn}" >> "${shafile}"
+  # a cache filled from an earlier cut of our own base holds the renamed copy
   for cdir in "${cachedirs[@]}"; do
-    if [ ! -s "${OUT}/${fn}" ] && [ -f "${cdir}/${fn}" ]; then
-      cp "${cdir}/${fn}" "${OUT}/"; cached=$((cached+1))
-    fi
-    if [ ! -s "${OUT}/${fn}.sig" ] && [ -f "${cdir}/${fn}.sig" ]; then
-      cp "${cdir}/${fn}.sig" "${OUT}/"
-    fi
+    for cfn in "${fn}" "${sfn}"; do
+      if [ ! -s "${OUT}/${sfn}" ] && [ -f "${cdir}/${cfn}" ]; then
+        cp "${cdir}/${cfn}" "${OUT}/${sfn}"; cached=$((cached+1))
+      fi
+      if [ ! -s "${OUT}/${sfn}.sig" ] && [ -f "${cdir}/${cfn}.sig" ]; then
+        cp "${cdir}/${cfn}.sig" "${OUT}/${sfn}.sig"
+      fi
+    done
   done
   for suffix in "" ".sig"; do
-    [ -s "${OUT}/${fn}${suffix}" ] && continue   # resumable: keep cache-copied/prior files
+    [ -s "${OUT}/${sfn}${suffix}" ] && continue   # resumable: keep cache-copied/prior files
     printf 'url = "%s/%s/%s%s"\noutput = "%s/%s%s"\n' \
-      "${STEAMLING_ALARM_PKG_MIRROR}" "${repo}" "${fn}" "${suffix}" "${OUT}" "${fn}" "${suffix}" >> "${curlcfg}"
+      "${STEAMLING_ALARM_PKG_MIRROR}" "${repo}" "${fn}" "${suffix}" "${OUT}" "${sfn}" "${suffix}" >> "${curlcfg}"
     todl=$((todl+1))
   done
 done
@@ -309,7 +312,7 @@ fi
 log "verifying ${#want[@]} package checksums against the sync dbs"
 sha256sum --quiet -c "${shafile}" || die "checksum failures above — mirror moved mid-run? delete the bad files in ${OUT} and re-run"
 for name in "${!want[@]}"; do
-  fn="${f_file[${name} ${want[${name}]}]}"
+  fn="$(base_file_name "${f_file[${name} ${want[${name}]}]}")"
   [ -s "${OUT}/${fn}.sig" ] || die "missing signature ${fn}.sig — re-run (mirror should serve it)"
 done
 
@@ -317,7 +320,8 @@ done
 # longer wants; repo-add and the closing rclone sync would publish them anyway.
 declare -A keepfile
 for name in "${!want[@]}"; do
-  fn="${f_file[${name} ${want[${name}]}]}"
+  fn="$(base_file_name "${f_file[${name} ${want[${name}]}]}")"
+  [ -z "${keepfile[${fn}]:-}" ] || die "two base packages share the hosted file name ${fn}"
   keepfile["${fn}"]=1; keepfile["${fn}.sig"]=1
 done
 for f in "${OUT}"/*.pkg.tar.*; do

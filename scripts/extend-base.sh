@@ -114,14 +114,14 @@ Name them in PKG= too if they are dep-light themselves; anything heavier waits f
 
 # --- fetch + verify + repo-add ------------------------------------------------
 for x in "$@"; do
-  fn="${x_file[${x}]}"
+  fn="${x_file[${x}]}"; sfn="$(base_file_name "${fn}")"
   for suffix in "" ".sig"; do
-    curl -sS --fail -L --retry 3 -o "${OUT}/${fn}${suffix}" "${STEAMLING_ALARM_PKG_MIRROR}/${x_repo[${x}]}/${fn}${suffix}" \
+    curl -sS --fail -L --retry 3 -o "${OUT}/${sfn}${suffix}" "${STEAMLING_ALARM_PKG_MIRROR}/${x_repo[${x}]}/${fn}${suffix}" \
       || die "cannot fetch ${fn}${suffix} from ${STEAMLING_ALARM_PKG_MIRROR} (mirror moved on? the sync db said ${x_ver[${x}]})"
   done
-  echo "${x_sha[${x}]}  ${OUT}/${fn}" | sha256sum --quiet -c - || die "checksum mismatch for ${fn}"
+  echo "${x_sha[${x}]}  ${OUT}/${sfn}" | sha256sum --quiet -c - || die "checksum mismatch for ${fn}"
 done
-( cd "${OUT}" && for x in "$@"; do printf '%s\n' "${x_file[${x}]}"; done | LC_ALL=C xargs repo-add -q "${BASE_DB}" ) \
+( cd "${OUT}" && for x in "$@"; do base_file_name "${x_file[${x}]}"; echo; done | LC_ALL=C xargs repo-add -q "${BASE_DB}" ) \
   || die "repo-add failed"
 rm -f "${OUT}"/*.old    # repo-add backups would match the db upload pattern
 

@@ -315,6 +315,13 @@ fetch_alarm_tarball() {
   fi
 }
 
+# A base package's file name as the base hosts it: letters, digits, '.', '_' and '-' only. GitHub
+# renames release assets with anything else in them (ALARM's epochs put a ':' in over a hundred
+# names, and '+' is common), and pacman downloads exactly the name the repo db records, so the
+# files are renamed before repo-add writes the db. The ALARM signatures still match: they sign
+# the bytes, not the name.
+base_file_name() { printf '%s' "$1" | tr -c 'A-Za-z0-9._-' '_'; }
+
 # pacman's sync-upgrade flags for a base chroot: with a frozen base pinned, -Syuu, so packages
 # the ALARM tarball carries at other versions are moved onto exactly what the base serves
 # (downgrades included); live ALARM: plain -Syu.
