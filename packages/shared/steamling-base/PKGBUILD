@@ -2,7 +2,7 @@
 # switch and the desktop updater.
 pkgname=steamling-base
 pkgver=0.2.0
-pkgrel=6.8
+pkgrel=6.9
 pkgdesc="Locked/rolling base mode switch, desktop updater and pacman cache trim for steamling"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -17,8 +17,9 @@ source=('steamling-base'
         'steamling-os-release'
         '50-steamling-os-release.hook'
         'steamling-os-release.service'
-        '95-steamling-paccache.hook')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        '95-steamling-paccache.hook'
+        'steamling-repo.gpg')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   install -Dm755 "${srcdir}/steamling-base" "${pkgdir}/usr/bin/steamling-base"
@@ -40,4 +41,10 @@ package() {
     "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/steamling-os-release.service"
   install -Dm644 "${srcdir}/95-steamling-paccache.hook" \
     "${pkgdir}/usr/share/libalpm/hooks/95-steamling-paccache.hook"
+  # The package repo's address (STEAMLING_REPO_URL from the build, empty while there's none) and
+  # its signing key: the install scriptlet adds the repos to a device that was flashed without
+  # them, so it starts updating from them.
+  printf '%s\n' "${STEAMLING_REPO_URL:-}" | install -Dm644 /dev/stdin "${pkgdir}/usr/share/steamling/repo-url"
+  [ ! -s "${srcdir}/steamling-repo.gpg" ] \
+    || install -Dm644 "${srcdir}/steamling-repo.gpg" "${pkgdir}/usr/share/steamling/steamling-repo.gpg"
 }

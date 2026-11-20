@@ -392,7 +392,8 @@ pkg_name() {  # $1 = package dir
 # the target snapshot URL and repo name into its script, so snapshot bumps re-target the migrator on rebuild.
 pkg_env() {  # $1 = package dir
   printf ' %s=%q' STEAMLING_BASE_URL "${STEAMLING_BASE_URL}" STEAMLING_BASE_SNAPSHOT "${STEAMLING_BASE_SNAPSHOT}" \
-    STEAMLING_BASE_REPO "${STEAMLING_BASE_REPO}" STEAMLING_BASE_PARTS "${STEAMLING_BASE_PARTS}"
+    STEAMLING_BASE_REPO "${STEAMLING_BASE_REPO}" STEAMLING_BASE_PARTS "${STEAMLING_BASE_PARTS}" \
+    STEAMLING_REPO_URL "${STEAMLING_REPO_URL}"
   case "$1" in */packages/shared/*) return ;; esac
   printf ' %s=%q' \
     STEAMLING_SOC "${SOC}" \

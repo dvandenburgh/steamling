@@ -233,7 +233,9 @@ install_local_packages() {
       "${root}/etc/pacman.conf"
     # Trust the repo key out of the box: bake the exported public key + lsign it, so a
     # fresh image can `pacman -Syu` without a manual pacman-key dance.
-    if [ -n "${STEAMLING_REPO_PUBKEY}" ]; then
+    [ -n "${STEAMLING_REPO_PUBKEY}" ] && [ ! -s "${STEAMLING_REPO_PUBKEY}" ] && [ -e "${STEAMLING_REPO_PUBKEY}" ] \
+      && warn "${STEAMLING_REPO_PUBKEY} is empty: the image won't trust the package repo until it gets the key"
+    if [ -n "${STEAMLING_REPO_PUBKEY}" ] && { [ -s "${STEAMLING_REPO_PUBKEY}" ] || [ ! -e "${STEAMLING_REPO_PUBKEY}" ]; }; then
       [ -f "${STEAMLING_REPO_PUBKEY}" ] || die "STEAMLING_REPO_PUBKEY not found: ${STEAMLING_REPO_PUBKEY}"
       install -Dm644 "${STEAMLING_REPO_PUBKEY}" "${root}/usr/share/steamling/steamling-repo.gpg"
       chroot "${root}" pacman-key --add /usr/share/steamling/steamling-repo.gpg
