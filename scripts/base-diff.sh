@@ -79,7 +79,7 @@ done < "${WATCH}"
 
 # --- 2. freshness ------------------------------------------------------------
 # BUILDDATE is ALARM's build, which trails the upstream release by days at most.
-db="${BUILD_DIR}/snapshot/${new_id}/pocknix-base.db.tar.gz"
+db="${BUILD_DIR}/snapshot/${new_id}/${STEAMLING_OWN_BASE_REPO}.db.tar.gz"
 log "built within ${FRESH_DAYS} days of the snapshot"
 if [ ! -f "${db}" ]; then
   warn "no ${db#"${STEAMLING_ROOT}/"} (run in the build VM after the dry run); freshness skipped"

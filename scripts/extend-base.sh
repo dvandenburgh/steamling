@@ -12,8 +12,8 @@ for t in curl tar awk sha256sum repo-add rclone; do need_tool "$t"; done
 LOCKFILE="${PACKAGES_DIR}/shared/steamling-base-lock/steamling-base.lock"
 EXTRAS_LIST="${CONFIG_DIR}/packages/base-extras.list"
 RCLONE_DEST="${STEAMLING_BASE_RCLONE_REMOTE}"
-BASE_DB="pocknix-base.db.tar.gz"
-BASE_FILES="pocknix-base.files.tar.gz"
+BASE_DB="${STEAMLING_BASE_REPO}.db.tar.gz"
+BASE_FILES="${STEAMLING_BASE_REPO}.files.tar.gz"
 conf="${STEAMLING_ROOT}/config/steamling.conf"
 
 # --- which base we are extending -------------------------------------------
@@ -32,7 +32,7 @@ case "${tree_id}" in
 esac
 OUT="${BUILD_DIR}/snapshot/${ID}"
 mkdir -p "${OUT}" 2>/dev/null || die "${OUT} not creatable — one-time: sudo install -d -o $(id -un) ${BUILD_DIR}/snapshot"
-rm -f "${OUT}"/*.pkg.tar.* "${OUT}"/pocknix-base.* "${OUT}"/SNAPSHOT_ID
+rm -f "${OUT}"/*.pkg.tar.* "${OUT}/${STEAMLING_BASE_REPO}".* "${OUT}"/SNAPSHOT_ID
 log "extending base ${tree_id} -> ${ID} with: $*"
 
 # --- the live db, and what it already serves --------------------------------
@@ -147,7 +147,7 @@ fi
 # SNAPSHOT_ID last: the next run keys on it. -L: repo-add's .db is a symlink.
 log "publishing the extension -> ${RCLONE_DEST}"
 rclone copy --include '*.pkg.tar.*' "${OUT}" "${RCLONE_DEST}"
-rclone copy -L --include 'pocknix-base.db*' --include 'pocknix-base.files*' \
+rclone copy -L --include "${STEAMLING_BASE_REPO}.db*" --include "${STEAMLING_BASE_REPO}.files*" \
   --include 'steamling-base.lock' "${OUT}" "${RCLONE_DEST}"
 rclone copy --include 'SNAPSHOT_ID' "${OUT}" "${RCLONE_DEST}"
 

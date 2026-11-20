@@ -40,7 +40,7 @@ if [ "${STEAMLING_BASE_SNAPSHOT}" = live ] || [ "${STEAMLING_BASE_LIVE:-}" = 1 ]
       STEAMLING_ALARM_TARBALL_URL="${ALARM_MIRROR}/${ALARM_TARBALL}" ;;
   esac
 fi
-# STEAMLING_BASE_URL is where a frozen base's pacman repo is hosted (it serves pocknix-base.db),
+# STEAMLING_BASE_URL is where a frozen base's pacman repo is hosted (it serves <repo>.db),
 # not Arch Linux ARM's tarball. Pointing it there 404s halfway through, so say so up front.
 case "${STEAMLING_BASE_URL:-}" in
   *.tar.gz|*.tar.xz|*.tar|*os.archlinuxarm.org*)
@@ -329,8 +329,11 @@ base_sync_flags() {
   if [ -n "${STEAMLING_BASE_SNAPSHOT}" ]; then printf -- '-Syuu'; else printf -- '-Syu'; fi
 }
 
+# The repo name every base we cut ourselves goes by (the borrowed one is [pocknix-base]).
+STEAMLING_OWN_BASE_REPO=steamling-base
+
 # Render the base pacman.conf: with a pinned snapshot, the only package source
-# is the frozen [pocknix-base] repo (ALARM's per-package .sig files are kept in
+# is the frozen base repo (ALARM's per-package .sig files are kept in
 # the snapshot, so package SigLevel stays Required; the repo-add DB is unsigned,
 # which DatabaseOptional permits). Without a pin: live ALARM. Shared
 # by the rootfs and the build chroot so both always install from the SAME base.
@@ -340,7 +343,7 @@ render_base_pacman_conf() {
     # keep the template's [options] block, replace every repo with the snapshot
     sed '/^\[core\]$/,$d' "${CONFIG_DIR}/pacman.conf.in" > "${out}"
     cat >> "${out}" <<EOF
-[pocknix-base]
+[${STEAMLING_BASE_REPO}]
 SigLevel = Required DatabaseOptional
 Server = ${STEAMLING_BASE_URL}
 EOF
@@ -374,9 +377,10 @@ pkg_name() {  # $1 = package dir
 # makepkg's environment for a package dir. Every makepkg call needs it, --packagelist included:
 # the kernel recipe's name and version come from it. Shared packages get NO SoC/tuning env: they
 # must be byte-stable whichever SoC's run builds them. STEAMLING_BASE_*: steamling-lock-migrate stamps
-# the target snapshot URL into its script, so snapshot bumps re-target the migrator on rebuild.
+# the target snapshot URL and repo name into its script, so snapshot bumps re-target the migrator on rebuild.
 pkg_env() {  # $1 = package dir
-  printf ' %s=%q' STEAMLING_BASE_URL "${STEAMLING_BASE_URL}" STEAMLING_BASE_SNAPSHOT "${STEAMLING_BASE_SNAPSHOT}"
+  printf ' %s=%q' STEAMLING_BASE_URL "${STEAMLING_BASE_URL}" STEAMLING_BASE_SNAPSHOT "${STEAMLING_BASE_SNAPSHOT}" \
+    STEAMLING_BASE_REPO "${STEAMLING_BASE_REPO}"
   case "$1" in */packages/shared/*) return ;; esac
   printf ' %s=%q' \
     STEAMLING_SOC "${SOC}" \

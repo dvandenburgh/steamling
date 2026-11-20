@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# snapshot-base.sh — freeze the ALARM package base into [pocknix-base] (make snapshot).
+# snapshot-base.sh — freeze the ALARM package base into [steamling-base] (make snapshot).
 #
 # Reproducible builds need a recorded, re-fetchable input set. This harvests the
 # GROUND-TRUTH union of every ALARM package a build actually installed (the image
 # rootfs + every SoC's build chroot) plus the opt-in extras in
 # config/packages/base-extras.list, collects exactly those files + their .sig
 # (build caches first, ALARM mirror for the residue), builds a fresh
-# pocknix-base.db covering only them, and publishes it.
+# steamling-base.db covering only them, and publishes it.
 #
-# ONE repo at a STABLE url ([pocknix-base]): "frozen" means it never moves on its
+# ONE repo at a STABLE url ([steamling-base]): "frozen" means it never moves on its
 # own, not that it is immutable — it moves exactly when a release moves it, so
 # devices pick up a bumped base with a plain -Syu and need no repointing. The
 # outgoing base is rotated to <remote>-prev first, which is what keeps the
@@ -33,7 +33,7 @@ source "$(dirname "$0")/lib.sh"
 [ "$(id -u)" -ne 0 ] || die "run as the user, no sudo (rclone + gpg live in the user account)"
 for t in curl tar awk sha256sum repo-add; do need_tool "$t"; done
 
-# A pinned build's sync dbs are [pocknix-base], not core/extra/alarm/aur, so the
+# A pinned build's sync dbs are the base repo, not core/extra/alarm/aur, so the
 # harvest below would drop the shadowed ALARM copies and point residue downloads
 # at a repo path the ALARM mirror does not serve. Only a live-ALARM build is harvestable.
 [ -z "${STEAMLING_BASE_SNAPSHOT}" ] || die "STEAMLING_BASE_SNAPSHOT=${STEAMLING_BASE_SNAPSHOT} — a snapshot can only be harvested from an UNPINNED (live ALARM) build.
@@ -46,7 +46,8 @@ RCLONE_PREV="${STEAMLING_BASE_RCLONE_REMOTE}-prev"
 DATED_TARBALL="ArchLinuxARM-aarch64-${ID}.tar.gz"
 LOCKFILE="${PACKAGES_DIR}/shared/steamling-base-lock/steamling-base.lock"
 EXTRAS_LIST="${CONFIG_DIR}/packages/base-extras.list"
-BASE_DB="pocknix-base.db.tar.gz"
+BASE_REPO="${STEAMLING_OWN_BASE_REPO}"
+BASE_DB="${BASE_REPO}.db.tar.gz"
 
 # --- collect harvest sources -------------------------------------------------
 # The union must cover the runtime closure (rootfs) AND build deps (chroots):
@@ -344,7 +345,7 @@ cp -f "${CACHE_DIR}/${ALARM_TARBALL}" "${CACHE_DIR}/${DATED_TARBALL}" 2>/dev/nul
 # Never copy ALARM's own db: it lists ~13k packages while we host ~900, and
 # pacman would resolve to entries that 404. LC_ALL=C: quiet bsdtar locale warns.
 log "building ${BASE_DB} (repo-add over ${#want[@]} packages)"
-( cd "${OUT}" && rm -f "${BASE_DB}" pocknix-base.db pocknix-base.files* \
+( cd "${OUT}" && rm -f "${BASE_DB}" "${BASE_REPO}.db" "${BASE_REPO}".files* \
   && ls *.pkg.tar.* | grep -v '\.sig$' | LC_ALL=C xargs repo-add -q "${BASE_DB}" ) \
   || die "repo-add failed"
 
@@ -398,14 +399,14 @@ fi
 log "publishing -> ${RCLONE_DEST} ($(du -sh "${OUT}" | cut -f1))"
 # packages + tarball first, db + lock LAST: a client syncing mid-publish sees
 # either the old db (its packages all still present) or the new one (ditto).
-# -L: repo-add's pocknix-base.db is a symlink. The closing sync prunes the
+# -L: repo-add's <repo>.db is a symlink. The closing sync prunes the
 # superseded package versions, which by then no live db references.
 # SNAPSHOT_ID goes up FIRST, before anything else is mutated: from here on any
 # interruption leaves the remote id equal to ours, so a re-run skips the rotation.
 rclone copy --include 'SNAPSHOT_ID' "${OUT}" "${RCLONE_DEST}"
 rclone copy --include '*.pkg.tar.*' "${OUT}" "${RCLONE_DEST}"
 rclone copy --include "${DATED_TARBALL}" "${OUT}" "${RCLONE_DEST}"
-rclone copy -L --include 'pocknix-base.db*' --include 'pocknix-base.files*' \
+rclone copy -L --include "${BASE_REPO}.db*" --include "${BASE_REPO}.files*" \
   --include 'steamling-base.lock' "${OUT}" "${RCLONE_DEST}"
 rclone sync -L "${OUT}" "${RCLONE_DEST}"
 
@@ -415,6 +416,7 @@ cp -f "${OUT}/steamling-base.lock" "${LOCKFILE}"
 conf="${STEAMLING_ROOT}/config/steamling.conf"
 sed -i \
   -e "s|^: \"\${STEAMLING_BASE_SNAPSHOT:=.*}\"|: \"\${STEAMLING_BASE_SNAPSHOT:=${ID}}\"|" \
+  -e "s|^: \"\${STEAMLING_BASE_REPO:=.*}\"|: \"\${STEAMLING_BASE_REPO:=${BASE_REPO}}\"|" \
   -e "s|^: \"\${ALARM_TARBALL:=.*}\"|: \"\${ALARM_TARBALL:=${DATED_TARBALL}}\"|" \
   -e "s|^: \"\${STEAMLING_ALARM_SHA256:=.*}\"|: \"\${STEAMLING_ALARM_SHA256:=${TARBALL_SHA}}\"|" \
   -e "s|^: \"\${STEAMLING_ALARM_TARBALL_URL:=.*}\"|: \"\${STEAMLING_ALARM_TARBALL_URL:=${STEAMLING_BASE_URL}/${DATED_TARBALL}}\"|" \

@@ -94,7 +94,7 @@ done
 note "staged" "${nstaged} packages"
 
 # Every live repo whatever the scope: reach is judged fleet-wide.
-fetch_db base "${STEAMLING_BASE_RCLONE_REMOTE}/pocknix-base.db" || die "no base db at ${STEAMLING_BASE_RCLONE_REMOTE}"
+fetch_db base "${STEAMLING_BASE_RCLONE_REMOTE}/${STEAMLING_BASE_REPO}.db" || die "no base db at ${STEAMLING_BASE_RCLONE_REMOTE}"
 db_facts base "${DBCACHE}/base.db" >> "${facts}"
 fetch_db shared "${STEAMLING_REPO_RCLONE_REMOTE}/shared/steamling-shared.db" || die "no [steamling-shared] db (first publish? STEAMLING_STAGE_CHECK_OFFLINE=1 with a cached copy)"
 db_facts shared "${DBCACHE}/shared.db" >> "${facts}"

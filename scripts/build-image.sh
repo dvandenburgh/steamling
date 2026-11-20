@@ -73,7 +73,7 @@ append_local_repo() {
   grep -q '^\[steamling\]' "${out}" && return 0
   log "adding local steamling + steamling-shared repos"
   local anchor="core"
-  grep -q '^\[pocknix-base\]' "${out}" && anchor="pocknix-base"
+  grep -qx "\[${STEAMLING_BASE_REPO}\]" "${out}" && anchor="${STEAMLING_BASE_REPO}"
   sed -i "0,/^\[${anchor}\]/s||[steamling]\nSigLevel = Never\nServer = file:///localrepo\n\n[steamling-shared]\nSigLevel = Never\nServer = file:///localrepo-shared\n\n[${anchor}]|" \
     "${out}"
 }
@@ -225,10 +225,10 @@ install_local_packages() {
   # never be shadowed by a same-name shared one.
   if [ -n "${STEAMLING_REPO_URL}" ]; then
     log "shipping [steamling] -> ${STEAMLING_REPO_URL}/${SOC} + [steamling-shared] -> ${STEAMLING_REPO_URL}/shared (SigLevel ${STEAMLING_REPO_SIGLEVEL})"
-    # anchor = the first base repo: [core] on a live-ALARM conf, [pocknix-base] on a
+    # anchor = the first base repo: [core] on a live-ALARM conf, the base repo on a
     # pinned one (which has no [core] at all, so anchoring on [core] would silently no-op)
     local anchor="core"
-    grep -q '^\[pocknix-base\]' "${root}/etc/pacman.conf" && anchor="pocknix-base"
+    grep -qx "\[${STEAMLING_BASE_REPO}\]" "${root}/etc/pacman.conf" && anchor="${STEAMLING_BASE_REPO}"
     sed -i "0,/^\[${anchor}\]/s||[steamling]\nSigLevel = ${STEAMLING_REPO_SIGLEVEL}\nServer = ${STEAMLING_REPO_URL}/${SOC}\n\n[steamling-shared]\nSigLevel = ${STEAMLING_REPO_SIGLEVEL}\nServer = ${STEAMLING_REPO_URL}/shared\n\n[${anchor}]|" \
       "${root}/etc/pacman.conf"
     # Trust the repo key out of the box: bake the exported public key + lsign it, so a
