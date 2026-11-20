@@ -43,8 +43,8 @@ missing for an image build.
 ## Quick start
 
 `./build.sh` builds for the SM8550 handhelds (the Retroid Pocket 6 and the rest of that family).
-Add `--device sm8250`, `sm8650` or `sm8750` for the other chips; [Supported devices](../devices.md)
-lists which handheld uses which.
+Add `--sm8250`, `--sm8650` or `--sm8750` for the other chips (the long form, `--device sm8250`,
+works too). [Supported devices](../devices.md) lists which handheld uses which.
 
 ```bash
 git clone https://github.com/dvandenburgh/steamling && cd steamling

@@ -120,7 +120,7 @@ friends). For anything else, add your handheld's chip, which you'll find in
 [Supported devices](../devices.md). For example, for a Retroid Pocket 5:
 
 ```bash
-./build.sh --device sm8250
+./build.sh --sm8250
 ```
 
 Keep in mind every handheld besides the RP6 is an untested port. In the next steps, swap

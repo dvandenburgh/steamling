@@ -47,12 +47,12 @@ open a terminal and do whatever you like.
 |---|---|---|---|
 | Snapdragon 8 Gen 2 (SM8550) | Retroid Pocket 6 (and TOP-DPAD) | Reference device: game mode and desktop mode both work | `./build.sh` |
 | Snapdragon 8 Gen 2 (SM8550) | Retroid Pocket Nova, AYN Odin 2 / Mini / Portal, AYN Thor, AYANEO Pocket ACE / DMG / DS / EVO / S | Untested ports | `./build.sh` |
-| Snapdragon 865 (SM8250) | Retroid Pocket 5, Flip 2, Mini, Mini V2, AYN Thor Lite, MANGMI Air Y Pro, MANGMI Pocket Max, AYANEO Pocket MICRO 2 | Untested ports | `./build.sh --device sm8250` |
-| Snapdragon 8 Gen 3 (SM8650) | AYANEO Pocket S2, KONKR Pocket FIT | Untested ports | `./build.sh --device sm8650` |
-| Snapdragon 8 Elite (SM8750) | AYN Odin 3, KONKR Pocket FIT Elite | Untested ports | `./build.sh --device sm8750` |
+| Snapdragon 865 (SM8250) | Retroid Pocket 5, Flip 2, Mini, Mini V2, AYN Thor Lite, MANGMI Air Y Pro, MANGMI Pocket Max, AYANEO Pocket MICRO 2 | Untested ports | `./build.sh --sm8250` |
+| Snapdragon 8 Gen 3 (SM8650) | AYANEO Pocket S2, KONKR Pocket FIT | Untested ports | `./build.sh --sm8650` |
+| Snapdragon 8 Elite (SM8750) | AYN Odin 3, KONKR Pocket FIT Elite | Untested ports | `./build.sh --sm8750` |
 
 One image covers every handheld in its row's chip family. The Snapdragon 8 Gen 2 family is the
-default, so a plain `./build.sh` builds it (the same as `./build.sh --device sm8550`). The
+default, so a plain `./build.sh` builds it (the same as `./build.sh --sm8550`). The
 [build guide](docs/building/README.md) walks you through everything before that step.
 
 "Untested port" means the device support is in place, it builds, and it should boot (it comes

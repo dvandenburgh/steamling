@@ -20,7 +20,7 @@ trying it and telling me what happened. See [Help test a device](#help-test-a-de
 
 ## The list
 
-### Snapdragon 8 Gen 2 (SM8550) - build with `--device sm8550` (the default)
+### Snapdragon 8 Gen 2 (SM8550) - build with `--sm8550` (the default)
 
 | Handheld | Status |
 |---|---|
@@ -36,7 +36,7 @@ trying it and telling me what happened. See [Help test a device](#help-test-a-de
 | AYANEO Pocket EVO | Untested port |
 | AYANEO Pocket S (1K and 2K) | Untested port |
 
-### Snapdragon 865 (SM8250) - build with `--device sm8250`
+### Snapdragon 865 (SM8250) - build with `--sm8250`
 
 | Handheld | Status |
 |---|---|
@@ -49,14 +49,14 @@ trying it and telling me what happened. See [Help test a device](#help-test-a-de
 | MANGMI Pocket Max | Untested port |
 | AYANEO Pocket MICRO 2 | Untested port |
 
-### Snapdragon 8 Gen 3 (SM8650) - build with `--device sm8650`
+### Snapdragon 8 Gen 3 (SM8650) - build with `--sm8650`
 
 | Handheld | Status |
 |---|---|
 | AYANEO Pocket S2 | Untested port |
 | KONKR Pocket FIT | Untested port |
 
-### Snapdragon 8 Elite (SM8750) - build with `--device sm8750`
+### Snapdragon 8 Elite (SM8750) - build with `--sm8750`
 
 | Handheld | Status |
 |---|---|
@@ -106,11 +106,11 @@ for this: Konsole in desktop mode, or [SSH](governor.md#remote-access).
 
 ## Building for your handheld
 
-Follow the [build guide](building/README.md), but add `--device` with your chip from the list
-above. For example, for a Retroid Pocket 5:
+Follow the [build guide](building/README.md), but add your chip from the list above as a flag.
+For example, for a Retroid Pocket 5:
 
 ```bash
-./build.sh --device sm8250
+./build.sh --sm8250
 ```
 
 The image ends up in `build/image/sm8250/` (the folder is named after the chip).
