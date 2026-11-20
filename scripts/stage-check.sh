@@ -11,7 +11,8 @@
 # STEAMLING_STAGE_CHECK_OFFLINE=1 reuses the last downloaded dbs. A FAIL withdraws .staged-ok.
 
 source "$(dirname "$0")/lib.sh"
-for t in bsdtar vercmp rclone; do need_tool "$t"; done
+for t in bsdtar vercmp; do need_tool "$t"; done
+[ -n "${STEAMLING_REPO_GITHUB}" ] && need_tool curl || need_tool rclone
 shopt -s nullglob
 
 STAGE="${REPO_STAGE_DIR}"
@@ -76,7 +77,12 @@ fetch_db() {  # $1 repo tag, $2 rclone source path; returns 1 when that tree has
   # rclone, not https: the CDN can still serve the db from before a publish
   # made seconds ago (shared publish -> per-SoC stage is one flow).
   rm -f "${dst}"
-  rclone copyto "$2" "${dst}" 2>/dev/null || die "cannot fetch $1 db from $2 (rclone failed: remote or credentials)"
+  if [ -n "${STEAMLING_REPO_GITHUB}" ] && [ "${2#"${STEAMLING_REPO_RCLONE_REMOTE}/"}" != "$2" ]; then
+    # one of our trees: the same path under the public address; a tree never published is a 404
+    curl -fsSL --retry 3 -o "${dst}" "${STEAMLING_REPO_PUBLIC}/${2#"${STEAMLING_REPO_RCLONE_REMOTE}/"}" 2>/dev/null || rm -f "${dst}"
+  else
+    rclone copyto "$2" "${dst}" 2>/dev/null || die "cannot fetch $1 db from $2 (rclone failed: remote or credentials)"
+  fi
   # rclone exits 0 for a missing source and writes nothing: that is the "never published" case.
   [ -f "${dst}" ] || return 1
   note "db: $1" "fetched"

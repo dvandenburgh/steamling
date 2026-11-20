@@ -21,7 +21,12 @@
 #     can never leak into the next one.
 
 source "$(dirname "$0")/lib.sh"
-need_tool rclone
+if [ -n "${STEAMLING_REPO_GITHUB}" ]; then
+  source "$(dirname "$0")/repo-github.sh"
+  ghr_init
+else
+  need_tool rclone
+fi
 read -ra DROPS <<< "${STEAMLING_STAGE_DROP:-}"
 [ "$#" -gt 0 ] || [ "${#DROPS[@]}" -gt 0 ] || die "no packages named — usage: make stage PKG=\"<artifact-name> ...\" [DROP=\"<name> ...\"]"
 # The stanza bridge: steamling-base retrofits [steamling-shared] onto stale devices, which can only
@@ -31,7 +36,7 @@ for d in "${DROPS[@]-}"; do
   case "${BRIDGE}" in *" ${d} "*) die "${d}: never DROP a stanza-bridge package from [steamling]" ;; esac
   for name in "$@"; do [ "${d}" = "${name}" ] && die "${d}: named in both PKG and DROP"; done
 done
-[ -n "${STEAMLING_REPO_RCLONE_REMOTE}" ] || die "STEAMLING_REPO_RCLONE_REMOTE unset — no live repo to stage from"
+[ -n "${STEAMLING_REPO_GITHUB}" ] || [ -n "${STEAMLING_REPO_RCLONE_REMOTE}" ] || die "STEAMLING_REPO_RCLONE_REMOTE unset — no live repo to stage from"
 [ "$(id -u)" -ne 0 ] || die "run as the publish user, not root (rclone + gpg config live in the user account)"
 
 # Scope (lib.sh): the per-SoC [steamling] tree by default, the SoC-neutral
@@ -46,9 +51,15 @@ rm -f "${MARKER}"
 # sync (not copy): also deletes local leftovers, so stage snaps back to
 # exactly-live before this run's swap — a previously staged-but-unpublished
 # package cannot survive into this release.
-log "refreshing staging mirror from live: ${REMOTE} -> ${REPO_STAGE_DIR}"
-rclone sync "${REMOTE}" "${REPO_STAGE_DIR}" \
-  || die "rclone sync from ${REMOTE} failed (first-ever publish of this tree? seed with: STEAMLING_PUBLISH_FROM=localrepo make publish)"
+if [ -n "${STEAMLING_REPO_GITHUB}" ]; then
+  log "refreshing staging mirror from live: ${STEAMLING_REPO_GITHUB} release ${REPO_SEG} -> ${REPO_STAGE_DIR}"
+  ghr_mirror "${REPO_SEG}" "${REPO_STAGE_DIR}" \
+    || die "${STEAMLING_REPO_GITHUB} has no ${REPO_SEG} release yet (first-ever publish of this tree? seed with: STEAMLING_PUBLISH_FROM=localrepo make publish)"
+else
+  log "refreshing staging mirror from live: ${REMOTE} -> ${REPO_STAGE_DIR}"
+  rclone sync "${REMOTE}" "${REPO_STAGE_DIR}" \
+    || die "rclone sync from ${REMOTE} failed (first-ever publish of this tree? seed with: STEAMLING_PUBLISH_FROM=localrepo make publish)"
+fi
 # drop the downloaded db/index so publish's repo-add rebuilds a FRESH database
 # containing exactly the staged package set (no ghost entries).
 rm -f "${REPO_STAGE_DIR}/${REPO_NAME}".db* "${REPO_STAGE_DIR}/${REPO_NAME}".files*
@@ -91,7 +102,9 @@ for name in "$@"; do
   for f in "${REPO_STAGE_DIR}/${name}"-[0-9]*.pkg.tar.* "${REPO_STAGE_DIR}/${name}"-*:*.pkg.tar.*; do
     [ "$(pkgbase "$f")" = "${name}" ] && rm -f "$f"
   done
-  cp "${found[0]}" "${REPO_STAGE_DIR}/"
+  # under the name it's published as (GitHub can't keep an epoch's ':'), so a rebuild at the
+  # live version is caught below as identical
+  cp "${found[0]}" "${REPO_STAGE_DIR}/$(base_file_name "$(basename "${found[0]}")")"
   log "staged: $(basename "${found[0]}")"
 done
 

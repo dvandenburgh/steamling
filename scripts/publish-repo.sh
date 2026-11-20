@@ -14,6 +14,7 @@
 #
 # Config (config/steamling.conf or env):
 #   STEAMLING_REPO_GPG_KEY        signing key id/email (required unless --unsigned)
+#   STEAMLING_REPO_GITHUB         publish to this repo's GitHub releases instead (repo-github.sh)
 #   STEAMLING_REPO_RCLONE_REMOTE  rclone destination (optional: skip upload if empty)
 #
 # Modes:
@@ -83,6 +84,48 @@ shopt -s nullglob
 pkgs=()
 for p in "${SRC}"/*.pkg.tar.*; do [[ "$p" == *.sig ]] || pkgs+=("$p"); done
 [ "${#pkgs[@]}" -gt 0 ] || die "no packages in ${SRC}"
+
+# --- GitHub releases (STEAMLING_REPO_GITHUB): scripts/repo-github.sh -------------------------
+# Signed and indexed in a copy under build/publish/repo/<tree>, under GitHub-safe names, so the
+# source dir (the stage, or the build's own localrepo on a first publish) is never touched.
+if [ -n "${STEAMLING_REPO_GITHUB}" ] && [ "${serve}" -eq 0 ]; then
+  source "$(dirname "$0")/repo-github.sh"
+  ghr_init
+  [ -n "${STEAMLING_REPO_GPG_KEY}" ] || die "STEAMLING_REPO_GPG_KEY unset: devices only take signed packages
+  one-time key setup: gpg --quick-gen-key 'Steamling Packaging <you@example.com>' ed25519 sign 2y"
+  need_tool gpg
+  need_tool cmp
+  PUB="${BUILD_DIR}/publish/repo/${REPO_SEG}"
+  mkdir -p "${PUB}" 2>/dev/null && [ -w "${PUB}" ] || die "${PUB} isn't writable: sudo install -d -o $(id -un) ${PUB}"
+  declare -A want=()
+  for p in "${pkgs[@]}"; do
+    n="$(base_file_name "$(basename "${p}")")"; want["${n}"]=1
+    if [ ! -f "${PUB}/${n}" ] || ! cmp -s "${p}" "${PUB}/${n}"; then
+      cp -f "${p}" "${PUB}/${n}"; rm -f "${PUB}/${n}.sig"
+    fi
+    # a signature that came down with the live files is reused
+    [ -f "${PUB}/${n}.sig" ] || { [ -f "${p}.sig" ] && [ ! "${p}" -nt "${p}.sig" ] && cp -f "${p}.sig" "${PUB}/${n}.sig"; } || true
+  done
+  for f in "${PUB}"/*; do
+    n="$(basename "${f}")"; n="${n%.sig}"
+    case "${n}" in *.pkg.tar.*) [ -n "${want[${n}]:-}" ] || rm -f "${f}" ;; *) rm -f "${f}" ;; esac
+  done
+  log "signing ${#pkgs[@]} packages with ${STEAMLING_REPO_GPG_KEY}"
+  for f in "${PUB}"/*.pkg.tar.*; do
+    case "${f}" in *.sig) continue ;; esac
+    [ -f "${f}.sig" ] || gpg --detach-sign --no-armor --yes -u "${STEAMLING_REPO_GPG_KEY}" "${f}" \
+      || die "gpg sign failed for ${f}"
+  done
+  log "building the signed ${REPO_NAME} database"
+  ( cd "${PUB}" && ls *.pkg.tar.* | grep -v '\.sig$' | LC_ALL=C xargs repo-add --sign --key "${STEAMLING_REPO_GPG_KEY}" -q "${REPO_DB}" ) \
+    || die "repo-add --sign failed"
+  rm -f "${PUB}"/*.old "${PUB}"/*.old.sig
+  gpg --export --armor "${STEAMLING_REPO_GPG_KEY}" > "${PUB}/steamling-repo.gpg"
+  ghr_publish "${REPO_SEG}" "${PUB}" "Steamling packages: ${REPO_SEG}"
+  [ -n "${MARKER}" ] && rm -f "${MARKER}"
+  ok "published ${REPO_SEG} to ${STEAMLING_REPO_GITHUB} (${STEAMLING_REPO_PUBLIC}/${REPO_SEG})"
+  exit 0
+fi
 
 if [ "${unsigned}" -eq 0 ]; then
   [ -n "${STEAMLING_REPO_GPG_KEY}" ] || die "STEAMLING_REPO_GPG_KEY unset (or pass --unsigned for LAN testing)

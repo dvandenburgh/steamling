@@ -90,6 +90,11 @@ source "${STEAMLING_ROOT}/devices/${DEVICE}/tuning.conf"
 # intended packages swapped in — publish-repo.sh publishes THIS, never the
 # raw localrepo (which parallel sessions fill with unvalidated builds).
 : "${STAGE_DIR:=${BUILD_DIR}/stage/${SOC}}"
+# Where the published repos can be read, for the publish tools: STEAMLING_REPO_URL once set,
+# or GitHub's download address while the first publish is still being made. Images only get
+# a [steamling] stanza from STEAMLING_REPO_URL itself.
+STEAMLING_REPO_PUBLIC="${STEAMLING_REPO_URL:-${STEAMLING_REPO_GITHUB:+https://github.com/${STEAMLING_REPO_GITHUB}/releases/download}}"
+
 # Which repo tree stage-repo.sh/publish-repo.sh operate on: the per-SoC
 # [steamling] tree (default) or the SoC-neutral [steamling-shared] tree
 # (make stage-shared / publish-shared). The db filename must equal the repo
