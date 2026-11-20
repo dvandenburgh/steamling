@@ -33,7 +33,7 @@ add_window_rule() {
 }
 
 base_mode() {
-  if grep -q '^\[pocknix-base\]' /etc/pacman.conf 2>/dev/null; then echo locked
+  if grep -Eq '^\[(steamling|pocknix)-base\]$' /etc/pacman.conf 2>/dev/null; then echo locked
   elif grep -q '^\[core\]' /etc/pacman.conf 2>/dev/null; then echo rolling
   else echo unknown; fi
 }

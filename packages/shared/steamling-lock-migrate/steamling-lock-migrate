@@ -12,26 +12,55 @@ STATE=/var/lib/steamling
 MARKER="${STATE}/lock-migrate-pending"
 BLOCKED="${STATE}/lock-converge-blocked"
 FOREIGN="${STATE}/foreign-packages"
-BASE_URL="@STEAMLING_BASE_URL@"   # stamped by the PKGBUILD from the build's pin
+# stamped by the PKGBUILD from the build's pin
+BASE_URL="@STEAMLING_BASE_URL@"
+BASE_REPO="@STEAMLING_BASE_REPO@"
+
+# The base section exactly as lib.sh render_base_pacman_conf writes it into an image.
+stanza() {
+  printf '[%s]\nSigLevel = Required DatabaseOptional\n' "${BASE_REPO}"
+  printf 'Server = %s\n' "${BASE_URL}"
+}
+# What the device has now: every base section (ours, or the borrowed [pocknix-base]), blank lines left out.
+current_stanza() {
+  awk '/^\[/{on = ($0=="[steamling-base]" || $0=="[pocknix-base]")} on && NF' "${CONF}"
+}
+# Rewrite the conf without the sections named (the next section header ends each one).
+drop_sections() {
+  awk -v names=" $* " 'BEGIN{drop=0}
+       /^\[/{drop = index(names, " " $0 " ") > 0}
+       !drop' "${CONF}" > "${CONF}.steamling-migrate" && cat "${CONF}.steamling-migrate" > "${CONF}"
+  rm -f "${CONF}.steamling-migrate"
+}
+# one blank line before the section, however the file ended
+append_stanza() {
+  [ -z "$(tail -n 1 "${CONF}")" ] || printf '\n' >> "${CONF}"
+  stanza >> "${CONF}"
+}
 
 prepare() {
   # no systemd = image-build chroot: rewriting the conf there would strip the repos
   # the rest of the build resolves against
   [ -d /run/systemd/system ] || exit 0
-  grep -q '^\[pocknix-base\]' "${CONF}" && exit 0
+  local now
+  now="$(current_stanza)"
+  if [ -n "${now}" ]; then
+    [ "${now}" = "$(stanza)" ] && exit 0
+    # Locked, but to another base: the build moved it (a new host, or our own base replacing the
+    # borrowed one). Swap the section and converge onto it like a fresh lock.
+    install -d "${STATE}"
+    drop_sections '[steamling-base]' '[pocknix-base]'
+    append_stanza
+    touch "${MARKER}"
+    echo "steamling: the base moved to [${BASE_REPO}] at ${BASE_URL}."
+    echo "steamling: the device converges onto it on the next connect/boot."
+    exit 0
+  fi
   # the rolling flag is admin intent — never auto-relock over it
   [ -e /etc/steamling/rolling-mode ] && exit 0
   install -d "${STATE}"
-  awk 'BEGIN{drop=0}
-       /^\[/{drop = ($0=="[core]" || $0=="[extra]" || $0=="[alarm]" || $0=="[aur]")}
-       !drop' "${CONF}" > "${CONF}.steamling-migrate" && cat "${CONF}.steamling-migrate" > "${CONF}"
-  rm -f "${CONF}.steamling-migrate"
-  cat >> "${CONF}" <<EOF
-
-[pocknix-base]
-SigLevel = Required DatabaseOptional
-Server = ${BASE_URL}
-EOF
+  drop_sections '[core]' '[extra]' '[alarm]' '[aur]'
+  append_stanza
   touch "${MARKER}"
   echo "steamling: device is now LOCKED to the steamling base."
   echo "steamling: base convergence runs automatically on the next connect/boot."
@@ -51,7 +80,7 @@ converge() {
     local owners
     owners="$(printf '%s\n' "${out}" \
       | sed -n 's/.*exists in filesystem (owned by \([^)]*\)).*/\1/p' | LC_ALL=C sort -u \
-      | LC_ALL=C comm -23 - <(pacman -Slq steamling steamling-shared pocknix-base 2>/dev/null | LC_ALL=C sort -u))"
+      | LC_ALL=C comm -23 - <(pacman -Slq steamling steamling-shared "${BASE_REPO}" 2>/dev/null | LC_ALL=C sort -u))"
     if [ -n "${owners}" ]; then
       echo "steamling: removing foreign packages superseded by the base:" ${owners}
       # shellcheck disable=SC2086
@@ -70,7 +99,7 @@ converge() {
   fi
   rm -f "${BLOCKED}"
   LC_ALL=C comm -23 <(pacman -Qq | LC_ALL=C sort) \
-                    <(pacman -Slq steamling steamling-shared pocknix-base 2>/dev/null | LC_ALL=C sort -u) > "${FOREIGN}"
+                    <(pacman -Slq steamling steamling-shared "${BASE_REPO}" 2>/dev/null | LC_ALL=C sort -u) > "${FOREIGN}"
   if [ -s "${FOREIGN}" ]; then
     echo "steamling: these packages are not from steamling and will no longer update:"
     sed 's/^/  /' "${FOREIGN}"

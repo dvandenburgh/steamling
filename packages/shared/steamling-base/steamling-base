@@ -15,8 +15,11 @@ BLOCKED=/var/lib/steamling/lock-converge-blocked
 
 die() { printf 'steamling-base: %s\n' "$*" >&2; exit 1; }
 
+# the base section's name: ours, or the borrowed [pocknix-base]
+base_repo() { sed -n 's/^\[\(steamling-base\|pocknix-base\)\]$/\1/p' "${CONF}" | head -1; }
+
 mode() {
-  if grep -q '^\[pocknix-base\]' "${CONF}"; then echo locked
+  if [ -n "$(base_repo)" ]; then echo locked
   elif grep -q '^\[core\]' "${CONF}"; then echo rolling
   else echo unknown; fi
 }
@@ -28,7 +31,7 @@ snapshot_id() { pacman -Q steamling-base-lock 2>/dev/null | awk '{print $2}' | c
 # no dbs) an empty repo list would make every installed package look foreign.
 foreign() {
   local repo
-  repo="$(pacman -Slq steamling steamling-shared steamling-base 2>/dev/null | LC_ALL=C sort -u)"
+  repo="$(pacman -Slq steamling steamling-shared $(base_repo) 2>/dev/null | LC_ALL=C sort -u)"
   [ -n "${repo}" ] || return 0
   LC_ALL=C comm -23 <(pacman -Qq | LC_ALL=C sort) <(printf '%s\n' "${repo}")
 }
@@ -41,7 +44,7 @@ status() {
              echo "base snapshot : $(snapshot_id || true)" ;;
     rolling) echo "mode          : ROLLING (bleeding edge, unsupported)"
              echo "                'sudo steamling-base locked' returns to the supported base" ;;
-    unknown) echo "mode          : UNKNOWN (neither [pocknix-base] nor [core] in ${CONF})" ;;
+    unknown) echo "mode          : UNKNOWN (neither a base section nor [core] in ${CONF})" ;;
   esac
   echo "repos         : $(grep -o '^\[[^]]*\]' "${CONF}" | tr -d '[]' | grep -v '^options$' | paste -sd' ' -)"
   if [ -f "${BLOCKED}" ]; then
@@ -83,11 +86,13 @@ EOF
     [ "${a}" = "ROLL" ] || { echo "cancelled."; exit 0; }
     # No [steamling] repo: nothing outranks ALARM, so the -Syu below would swap our gamescope and
     # mesa for theirs. Hold everything the locked base doesn't carry (ours, and whatever else was
-    # added by hand); listed now, while [pocknix-base] is still the only repo it's measured against.
+    # added by hand); listed now, while the base is still the only repo it's measured against.
     held=""
     grep -q '^\[steamling\]' "${CONF}" || held="$(pacman -Qqm | tr '\n' ' ')"
-    # both conf generators emit the section as header/SigLevel/Server, so the range is stable
-    sed -i '/^\[pocknix-base\]$/,/^Server = /d' "${CONF}"
+    # the next section header (or the end of the file) ends the base section
+    awk 'BEGIN{drop=0} /^\[/{drop = ($0=="[steamling-base]" || $0=="[pocknix-base]")} !drop' "${CONF}" \
+      > "${CONF}.steamling-rolling" && cat "${CONF}.steamling-rolling" > "${CONF}"
+    rm -f "${CONF}.steamling-rolling"
     if [ -n "${held// /}" ]; then
       sed -i "/^\[options\]$/a # steamling-base rolling: no [steamling] repo, so these stay as built\nIgnorePkg   = ${held% }" "${CONF}"
       echo "  holding Steamling's own packages (no [steamling] repo): ${held% }"

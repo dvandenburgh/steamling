@@ -8,7 +8,7 @@ set -euo pipefail
 SELF=/usr/bin/steamling-update
 
 if [ "$(id -u)" = 0 ]; then
-  if ! grep -q '^\[pocknix-base\]' /etc/pacman.conf && [ -e /etc/steamling/rolling-mode ]; then
+  if ! grep -Eq '^\[(steamling|pocknix)-base\]$' /etc/pacman.conf && [ -e /etc/steamling/rolling-mode ]; then
     echo "bleeding-edge rolling mode: this is a live ALARM upgrade. steamling-rollback"
     echo "undoes it; 'sudo steamling-base locked' returns to the supported base."
     echo
