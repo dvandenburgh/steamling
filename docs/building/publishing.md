@@ -38,7 +38,7 @@ folder: `sm8550`, `sm8250` and so on, and `shared`.
    Back up `~/.gnupg` somewhere safe. If the key is lost, every handheld has to be told about a
    new one by hand.
 
-3. **Tell the build about the key.** Put its email in `config/local.conf`:
+3. **Tell the build about the key.** Put its email in `config/local.conf`: <!-- docs-check: allow -->
 
    ```sh
    STEAMLING_REPO_GPG_KEY=you@example.com
@@ -101,7 +101,7 @@ One-time setup:
 
 1. Add an SSH key to your SourceForge account (**Account Settings → SSH Settings**). Make one
    with `ssh-keygen -t ed25519` if you don't have one, and paste in `~/.ssh/id_ed25519.pub`.
-2. Put your SourceForge username in `config/local.conf`:
+2. Put your SourceForge username in `config/local.conf`: <!-- docs-check: allow -->
 
    ```sh
    STEAMLING_IMAGE_SOURCEFORGE_USER=your-sourceforge-username
