@@ -1,0 +1,34 @@
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+Date: Tue, 1 Sep 2026 14:13:05 +0900
+Subject: [PATCH] zram: remove unreachable kernel_read_file_from_path() return
+ check
+
+Sashiko reported that:
+kernel_read_file_from_path() returns negative error for zero-sized
+files, so we cannot have "sz == 0" return, remove it and use a
+generic error message instead.
+
+Link: https://lore.kernel.org/20260901051335.2202390-1-senozhatsky@chromium.org
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Cc: Haoqin Huang <haoqinhuang7@gmail.com>
+(cherry picked from commit eb2c18a5f1173716cc5679cd4f35680590b286d2)
+
+Link: https://github.com/CachyOS/linux/commit/9be086eef4429b037565c41ccb28a3d2fc4492c0
+---
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1722,11 +1722,6 @@ static int comp_params_store(struct zram *zram, u32 prio, s32 level,
+ 			       dict_path, sz);
+ 			return sz;
+ 		}
+-		if (sz == 0) {
+-			pr_err("failed to load dictionary %s (empty file)\n",
+-			       dict_path);
+-			return -EINVAL;
+-		}
+ 	}
+ 
+ 	zram->params[prio].dict_sz = sz;

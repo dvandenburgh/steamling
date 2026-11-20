@@ -1,0 +1,24 @@
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+Date: Fri, 9 Oct 2026 16:11:25 +0900
+Subject: [PATCH] zram: remove debugfs entry on init failure
+
+Do not leak the debugfs entry when zram_init() fails to register
+the block device.
+
+Fixes: c0265342bff4 ("zram: introduce zram memory tracking")
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+
+Link: https://github.com/CachyOS/linux/commit/d1b78bc5e35716d6019b5dcd9055faa01e6d8ed4
+---
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -3297,6 +3297,7 @@ static int __init zram_init(void)
+ 	if (zram_major <= 0) {
+ 		pr_err("Unable to get major number\n");
+ 		class_unregister(&zram_control_class);
++		zram_debugfs_destroy();
+ 		cpuhp_remove_multi_state(CPUHP_ZCOMP_PREPARE);
+ 		return -EBUSY;
+ 	}
