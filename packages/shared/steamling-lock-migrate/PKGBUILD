@@ -4,7 +4,7 @@
 # move to another base, the upgrade's prepare swaps the device's section over.
 pkgname=steamling-lock-migrate
 pkgver=0.1.1
-pkgrel=2
+pkgrel=3
 pkgdesc="One-shot migration of a rolling steamling device onto the locked base snapshot"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -20,7 +20,8 @@ prepare() {
   [ -n "${STEAMLING_BASE_URL:-}" ] && [ -n "${STEAMLING_BASE_REPO:-}" ] \
     || { echo "STEAMLING_BASE_URL or STEAMLING_BASE_REPO is unset — the migrator needs both" >&2; exit 1; }
   sed -e "s|@STEAMLING_BASE_URL@|${STEAMLING_BASE_URL}|" \
-      -e "s|@STEAMLING_BASE_REPO@|${STEAMLING_BASE_REPO}|" "${srcdir}/steamling-lock-migrate" \
+      -e "s|@STEAMLING_BASE_REPO@|${STEAMLING_BASE_REPO}|" \
+      -e "s|@STEAMLING_BASE_PARTS@|${STEAMLING_BASE_PARTS:-1}|" "${srcdir}/steamling-lock-migrate" \
     > "${srcdir}/steamling-lock-migrate.stamped"
   grep -q '@STEAMLING_BASE_[A-Z]*@' "${srcdir}/steamling-lock-migrate.stamped" \
     && { echo "placeholder stamping failed" >&2; exit 1; } || true

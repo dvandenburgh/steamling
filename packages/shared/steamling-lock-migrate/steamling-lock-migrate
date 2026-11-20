@@ -15,10 +15,13 @@ FOREIGN="${STATE}/foreign-packages"
 # stamped by the PKGBUILD from the build's pin
 BASE_URL="@STEAMLING_BASE_URL@"
 BASE_REPO="@STEAMLING_BASE_REPO@"
+BASE_PARTS="@STEAMLING_BASE_PARTS@"
 
 # The base section exactly as lib.sh render_base_pacman_conf writes it into an image.
 stanza() {
+  local i
   printf '[%s]\nSigLevel = Required DatabaseOptional\n' "${BASE_REPO}"
+  for ((i = 2; i <= BASE_PARTS; i++)); do printf 'CacheServer = %s-%d\n' "${BASE_URL}" "${i}"; done
   printf 'Server = %s\n' "${BASE_URL}"
 }
 # What the device has now: every base section (ours, or the borrowed [pocknix-base]), blank lines left out.

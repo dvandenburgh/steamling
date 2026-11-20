@@ -332,6 +332,17 @@ base_sync_flags() {
 # The repo name every base we cut ourselves goes by (the borrowed one is [pocknix-base]).
 STEAMLING_OWN_BASE_REPO=steamling-base
 
+# The base section of pacman.conf. A base spread over GitHub releases lists the parts after the
+# first as CacheServers: pacman tries those first, passes over a 404 from one without a word and
+# never asks them for the db, so every package is found whichever part holds it.
+# steamling-lock-migrate writes the same section on devices; keep the two in step.
+base_stanza() {
+  local i
+  printf '[%s]\nSigLevel = Required DatabaseOptional\n' "${STEAMLING_BASE_REPO}"
+  for ((i = 2; i <= ${STEAMLING_BASE_PARTS:-1}; i++)); do printf 'CacheServer = %s-%d\n' "${STEAMLING_BASE_URL}" "${i}"; done
+  printf 'Server = %s\n' "${STEAMLING_BASE_URL}"
+}
+
 # Render the base pacman.conf: with a pinned snapshot, the only package source
 # is the frozen base repo (ALARM's per-package .sig files are kept in
 # the snapshot, so package SigLevel stays Required; the repo-add DB is unsigned,
@@ -342,11 +353,7 @@ render_base_pacman_conf() {
   if [ -n "${STEAMLING_BASE_SNAPSHOT}" ]; then
     # keep the template's [options] block, replace every repo with the snapshot
     sed '/^\[core\]$/,$d' "${CONFIG_DIR}/pacman.conf.in" > "${out}"
-    cat >> "${out}" <<EOF
-[${STEAMLING_BASE_REPO}]
-SigLevel = Required DatabaseOptional
-Server = ${STEAMLING_BASE_URL}
-EOF
+    base_stanza >> "${out}"
   else
     cp -f "${CONFIG_DIR}/pacman.conf.in" "${out}"
   fi
@@ -380,7 +387,7 @@ pkg_name() {  # $1 = package dir
 # the target snapshot URL and repo name into its script, so snapshot bumps re-target the migrator on rebuild.
 pkg_env() {  # $1 = package dir
   printf ' %s=%q' STEAMLING_BASE_URL "${STEAMLING_BASE_URL}" STEAMLING_BASE_SNAPSHOT "${STEAMLING_BASE_SNAPSHOT}" \
-    STEAMLING_BASE_REPO "${STEAMLING_BASE_REPO}"
+    STEAMLING_BASE_REPO "${STEAMLING_BASE_REPO}" STEAMLING_BASE_PARTS "${STEAMLING_BASE_PARTS}"
   case "$1" in */packages/shared/*) return ;; esac
   printf ' %s=%q' \
     STEAMLING_SOC "${SOC}" \
