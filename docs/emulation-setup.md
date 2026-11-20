@@ -220,6 +220,10 @@ version, it is moved into `~/Emulation/emulators/eden/` for you and keeps workin
 
 - **RetroArch**: controller mapping, 120Hz-panel frame pacing, and sensible per-system tuning
   (for example integer scaling and an LCD shader on GBA).
+- **GameCube and Wii (Dolphin)**: Vulkan, fullscreen, and both controllers bound, with the face
+  buttons going by the letters on them. GameCube: Z is R1, L and R are L2 and R2. Wii: a Wii
+  Remote with a Nunchuk, B on B or R2, 1 and 2 on Y and X, the pointer on the right stick, shake on
+  R1, and the Nunchuk on the left stick with C on L1 and Z on L2.
 - **PlayStation 2 (ARMSX2)**: setup wizard skipped, Vulkan renderer, controller bound, and
   upscaling enabled. You only supply `ps2-bios.bin` and your games.
 - **Nintendo Switch (Eden or Ryujinx, your own build)**: controller bound, fullscreen, vsync and
