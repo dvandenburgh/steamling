@@ -85,7 +85,7 @@ stage-check-shared: ## Re-run the consistency gate on the staged [steamling-shar
 publish-shared: ## Sign + publish the staged [steamling-shared] repo (run 'make stage-shared' first)
 	@STEAMLING_REPO_SCOPE=shared $(SCRIPTS)/publish-repo.sh $(PUBLISH_ARGS)
 
-publish-image: ## Compress + checksum + upload the SD image for download
+publish-image: ## Compress (xz) + checksum + upload the SD image to a draft GitHub release (as yourself, no sudo)
 	@$(SCRIPTS)/publish-image.sh
 
 install: ## Point at the on-device internal installer (steamling-install-internal); nothing runs on the host
