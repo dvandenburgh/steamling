@@ -21,7 +21,9 @@ larger is recommended.
 
 Build the image yourself with the [build guide](building/README.md) (it comes out as
 `build/image/sm8550/steamling-sm8550-sd.img`), or grab one from the
-[Releases](https://github.com/dvandenburgh/steamling/releases) page once there are some.
+[Releases](https://github.com/Steamling/steamling/releases) page once there are some. A downloaded
+image ends in `.img.xz`: balenaEtcher, Rufus and Raspberry Pi Imager write it as it is, so don't
+unpack it first.
 
 Write it to the card **as an image**, with [balenaEtcher](https://etcher.balena.io/), Rufus or `dd`.
 Don't copy the `.img` file onto the card like a normal file: that gives you a card with one big

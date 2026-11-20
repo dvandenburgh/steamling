@@ -60,7 +60,7 @@ explains how to build for it and what to report.
 
 1. **Get an image.** Build one with the [build guide](docs/building/README.md). It's written so
    you can follow it even if you've never built anything on Linux. Ready-made images will go up
-   on the [Releases](https://github.com/dvandenburgh/steamling/releases) page once there are some.
+   on the [Releases](https://github.com/Steamling/steamling/releases) page once there are some.
 2. **Install it** by following the [install guide](docs/install.md).
 3. **Play.** Launch a game, open the Quick Access Menu, go to **Performance** and set a
    **Framerate Limit**. If it still doesn't feel smooth, try the game's own vsync setting.
