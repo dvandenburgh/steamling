@@ -373,6 +373,12 @@ if [ -f "${LOCKFILE}" ] \
   STEAMLING_SNAPSHOT_ID=${ID}.1 make snapshot"
 fi
 
+# Asked for GitHub, so check gh can publish before hours of work go into a dry run's worth of files.
+if [ -n "${STEAMLING_BASE_GITHUB}" ] && [ -z "${STEAMLING_SNAPSHOT_NO_UPLOAD:-}" ]; then
+  source "$(dirname "$0")/base-github.sh"
+  gh_base_init
+fi
+
 if [ -n "${STEAMLING_SNAPSHOT_NO_UPLOAD:-}" ]; then
   cp -f "${OUT}/steamling-base.lock" "${LOCKFILE}"
   ok "dry run: snapshot dir ready at ${OUT} ($(du -sh "${OUT}" | cut -f1)); lockfile written, nothing uploaded, conf NOT pinned"
@@ -382,6 +388,13 @@ if [ -n "${STEAMLING_SNAPSHOT_NO_UPLOAD:-}" ]; then
 fi
 
 # --- publish: rotate the outgoing base, then replace it ----------------------
+PARTS=1
+if [ -n "${STEAMLING_BASE_GITHUB}" ]; then
+  log "publishing -> GitHub ${STEAMLING_BASE_GITHUB} ($(du -sh "${OUT}" | cut -f1))"
+  gh_publish_cut "${OUT}" "${ID}" "${BASE_REPO}" "${DATED_TARBALL}"
+  PARTS="${GH_PARTS}"
+  WHERE="GitHub ${STEAMLING_BASE_GITHUB}, ${PARTS} release(s) from ${GH_TAG} (previous kept as ${GH_TAG}-prev)"
+else
 [ -n "${RCLONE_DEST}" ] || die "STEAMLING_BASE_RCLONE_REMOTE unset — cannot upload"
 need_tool rclone
 if [ -n "$(rclone lsf --max-depth 1 "${RCLONE_DEST}" 2>/dev/null | head -1)" ]; then
@@ -409,6 +422,8 @@ rclone copy --include "${DATED_TARBALL}" "${OUT}" "${RCLONE_DEST}"
 rclone copy -L --include "${BASE_REPO}.db*" --include "${BASE_REPO}.files*" \
   --include 'steamling-base.lock' "${OUT}" "${RCLONE_DEST}"
 rclone sync -L "${OUT}" "${RCLONE_DEST}"
+WHERE="${RCLONE_DEST} (previous kept at ${RCLONE_PREV})"
+fi
 
 # --- pin the checkout --------------------------------------------------------
 # STEAMLING_BASE_URL is NOT pinned here: it is stable across snapshots by design.
@@ -417,9 +432,10 @@ conf="${STEAMLING_ROOT}/config/steamling.conf"
 sed -i \
   -e "s|^: \"\${STEAMLING_BASE_SNAPSHOT:=.*}\"|: \"\${STEAMLING_BASE_SNAPSHOT:=${ID}}\"|" \
   -e "s|^: \"\${STEAMLING_BASE_REPO:=.*}\"|: \"\${STEAMLING_BASE_REPO:=${BASE_REPO}}\"|" \
+  -e "s|^: \"\${STEAMLING_BASE_PARTS:=.*}\"|: \"\${STEAMLING_BASE_PARTS:=${PARTS}}\"|" \
   -e "s|^: \"\${ALARM_TARBALL:=.*}\"|: \"\${ALARM_TARBALL:=${DATED_TARBALL}}\"|" \
   -e "s|^: \"\${STEAMLING_ALARM_SHA256:=.*}\"|: \"\${STEAMLING_ALARM_SHA256:=${TARBALL_SHA}}\"|" \
   -e "s|^: \"\${STEAMLING_ALARM_TARBALL_URL:=.*}\"|: \"\${STEAMLING_ALARM_TARBALL_URL:=${STEAMLING_BASE_URL}/${DATED_TARBALL}}\"|" \
   "${conf}"
-ok "snapshot ${ID}: ${#want[@]} packages published to ${RCLONE_DEST} (previous kept at ${RCLONE_PREV})"
+ok "snapshot ${ID}: ${#want[@]} packages published to ${WHERE}"
 ok "pinned: config/steamling.conf + ${LOCKFILE#"${STEAMLING_ROOT}/"} — rebuild steamling-base-lock, review, commit"

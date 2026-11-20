@@ -6,7 +6,18 @@
 
 source "$(dirname "$0")/lib.sh"
 [ "$(id -u)" -ne 0 ] || die "run as the user, no sudo (rclone lives in the user account)"
-for t in curl tar awk sha256sum repo-add rclone; do need_tool "$t"; done
+for t in curl tar awk sha256sum repo-add; do need_tool "$t"; done
+if [ -n "${STEAMLING_BASE_GITHUB}" ]; then
+  source "$(dirname "$0")/base-github.sh"
+  gh_base_init
+else
+  need_tool rclone
+fi
+# what the live base says it is: on GitHub read the way a device would, elsewhere through rclone
+live_snapshot_id() {
+  if [ -n "${STEAMLING_BASE_GITHUB}" ]; then gh_live_id
+  else rclone cat "${RCLONE_DEST}/SNAPSHOT_ID" 2>/dev/null | head -1 | tr -d '[:space:]'; fi
+}
 [ "$#" -gt 0 ] || die "no packages named — usage: make extend-base PKG=\"<alarm-name> ...\""
 
 LOCKFILE="${PACKAGES_DIR}/shared/steamling-base-lock/steamling-base.lock"
@@ -23,7 +34,7 @@ tree_id="$(sed -n 's/^#.*snapshot \([0-9][0-9.]*\).*/\1/p' "${LOCKFILE}" | head 
 [ -n "${tree_id}" ] || die "cannot read the snapshot id from ${LOCKFILE}"
 [ "${STEAMLING_BASE_SNAPSHOT}" = "${tree_id}" ] \
   || die "config/steamling.conf pins ${STEAMLING_BASE_SNAPSHOT:-<unpinned>} but the lockfile is snapshot ${tree_id} — commit or revert first"
-live_id="$(rclone cat "${RCLONE_DEST}/SNAPSHOT_ID" 2>/dev/null | head -1 | tr -d '[:space:]')"
+live_id="$(live_snapshot_id)"
 [ "${live_id}" = "${tree_id}" ] \
   || die "live base is snapshot ${live_id:-<none>}, the tree is ${tree_id} — pull main (or finish the interrupted publish) first"
 case "${tree_id}" in
@@ -36,8 +47,12 @@ rm -f "${OUT}"/*.pkg.tar.* "${OUT}/${STEAMLING_BASE_REPO}".* "${OUT}"/SNAPSHOT_I
 log "extending base ${tree_id} -> ${ID} with: $*"
 
 # --- the live db, and what it already serves --------------------------------
-rclone copy --include "${BASE_DB}" --include "${BASE_FILES}" "${RCLONE_DEST}" "${OUT}"
-[ -s "${OUT}/${BASE_DB}" ] && [ -s "${OUT}/${BASE_FILES}" ] || die "could not fetch ${BASE_DB}/${BASE_FILES} from ${RCLONE_DEST}"
+if [ -n "${STEAMLING_BASE_GITHUB}" ]; then
+  for f in "${BASE_DB}" "${BASE_FILES}"; do curl -fsSL --retry 3 -o "${OUT}/${f}" "${STEAMLING_BASE_URL}/${f}" || true; done
+else
+  rclone copy --include "${BASE_DB}" --include "${BASE_FILES}" "${RCLONE_DEST}" "${OUT}"
+fi
+[ -s "${OUT}/${BASE_DB}" ] && [ -s "${OUT}/${BASE_FILES}" ] || die "could not fetch ${BASE_DB}/${BASE_FILES} from the live base"
 tmp="$(mktemp -d)"; trap 'rm -rf "${tmp}"' EXIT
 mkdir -p "${tmp}/base"
 tar -xf "${OUT}/${BASE_DB}" -C "${tmp}/base" 2>/dev/null || die "cannot read ${BASE_DB}"
@@ -145,11 +160,18 @@ fi
 # --- publish: additive, no rotation ------------------------------------------
 # packages before the db: a mid-publish client never sees a db naming absent files.
 # SNAPSHOT_ID last: the next run keys on it. -L: repo-add's .db is a symlink.
-log "publishing the extension -> ${RCLONE_DEST}"
-rclone copy --include '*.pkg.tar.*' "${OUT}" "${RCLONE_DEST}"
-rclone copy -L --include "${STEAMLING_BASE_REPO}.db*" --include "${STEAMLING_BASE_REPO}.files*" \
-  --include 'steamling-base.lock' "${OUT}" "${RCLONE_DEST}"
-rclone copy --include 'SNAPSHOT_ID' "${OUT}" "${RCLONE_DEST}"
+if [ -n "${STEAMLING_BASE_GITHUB}" ]; then
+  WHERE="GitHub ${STEAMLING_BASE_GITHUB}"
+  log "publishing the extension -> ${WHERE}"
+  gh_publish_extension "${OUT}" "${STEAMLING_BASE_REPO}" $(for x in "$@"; do base_file_name "${x_file[${x}]}"; echo; done)
+else
+  WHERE="${RCLONE_DEST}"
+  log "publishing the extension -> ${WHERE}"
+  rclone copy --include '*.pkg.tar.*' "${OUT}" "${RCLONE_DEST}"
+  rclone copy -L --include "${STEAMLING_BASE_REPO}.db*" --include "${STEAMLING_BASE_REPO}.files*" \
+    --include 'steamling-base.lock' "${OUT}" "${RCLONE_DEST}"
+  rclone copy --include 'SNAPSHOT_ID' "${OUT}" "${RCLONE_DEST}"
+fi
 
 # --- pin the checkout ----------------------------------------------------------
 # tarball pins stay on the parent cut: this changes what the base hosts, not what
@@ -159,6 +181,6 @@ sed -i -e "s|^: \"\${STEAMLING_BASE_SNAPSHOT:=.*}\"|: \"\${STEAMLING_BASE_SNAPSH
 for x in "$@"; do
   grep -qx "${x}" <<< "$(read_pkglist "${EXTRAS_LIST}")" || printf '%s\n' "${x}" >> "${EXTRAS_LIST}"
 done
-ok "base ${ID}: +$* published to ${RCLONE_DEST} (additive; ${tree_id} was not rotated)"
+ok "base ${ID}: +$* published to ${WHERE} (additive; ${tree_id} was not rotated)"
 ok "pinned: config/steamling.conf + lockfile; ${EXTRAS_LIST#"${STEAMLING_ROOT}/"} lists the extras (group/comment them, then commit)"
 log "next: sudo make packages PKG=steamling-base-lock, then stage + publish it to shared AND every SoC (it is dual-published)"

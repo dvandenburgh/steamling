@@ -94,7 +94,16 @@ done
 note "staged" "${nstaged} packages"
 
 # Every live repo whatever the scope: reach is judged fleet-wide.
-fetch_db base "${STEAMLING_BASE_RCLONE_REMOTE}/${STEAMLING_BASE_REPO}.db" || die "no base db at ${STEAMLING_BASE_RCLONE_REMOTE}"
+if [ -n "${STEAMLING_BASE_GITHUB}" ] && [ "${STEAMLING_STAGE_CHECK_OFFLINE:-0}" = "1" ] && [ -f "${DBCACHE}/base.db" ]; then
+  note "db: base" "cached (offline)"
+elif [ -n "${STEAMLING_BASE_GITHUB}" ]; then
+  # a GitHub release has no CDN in front to go stale, so the public address is fine here
+  curl -fsSL --retry 3 -o "${DBCACHE}/base.db" "${STEAMLING_BASE_URL}/${STEAMLING_BASE_REPO}.db" \
+    || die "no base db at ${STEAMLING_BASE_URL}"
+  note "db: base" "fetched"
+else
+  fetch_db base "${STEAMLING_BASE_RCLONE_REMOTE}/${STEAMLING_BASE_REPO}.db" || die "no base db at ${STEAMLING_BASE_RCLONE_REMOTE}"
+fi
 db_facts base "${DBCACHE}/base.db" >> "${facts}"
 fetch_db shared "${STEAMLING_REPO_RCLONE_REMOTE}/shared/steamling-shared.db" || die "no [steamling-shared] db (first publish? STEAMLING_STAGE_CHECK_OFFLINE=1 with a cached copy)"
 db_facts shared "${DBCACHE}/shared.db" >> "${facts}"
