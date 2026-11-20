@@ -2,7 +2,7 @@
 # configs, shipped as an arch=any data/scripts package.
 pkgname=steamling-emulation
 pkgver=0.1.1
-pkgrel=19
+pkgrel=20
 pkgdesc="ES-DE + preconfigured emulators: drop ROMs into ~/Emulation and play; star -> Steam"
 arch=('any')
 url="https://github.com/dvandenburgh/steamling"
@@ -23,11 +23,11 @@ source=('steamling-roms-init' 'steamling-roms-init.service' 'steamling-seed-merg
         'ryujinx-Config.policy'
         'steamling-cemu-profile' 'cemu-settings.xml.in' 'cemu-controller0.xml.in'
         'dolphin-Dolphin.ini.in' 'dolphin-GFX.ini.in' 'dolphin-GCPadNew.ini.in'
-        'dolphin-WiimoteNew.ini.in'
+        'dolphin-WiimoteNew.ini.in' 'rpcs3-Default.yml.in'
         # FLAT names: makepkg cannot retrieve local sources from subdirectory paths, so
         # package() maps retroarch-<Core>-<file> back into the retroarch-config/<Core>/ tree.
         'retroarch-mGBA-gba.cfg' 'retroarch-mGBA-gba.slangp')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   install -Dm755 "${srcdir}/steamling-roms-init" "${pkgdir}/usr/bin/steamling-roms-init"
@@ -94,6 +94,8 @@ package() {
     "${pkgdir}/usr/share/steamling-emulation/dolphin-GCPadNew.ini.in"
   install -Dm644 "${srcdir}/dolphin-WiimoteNew.ini.in" \
     "${pkgdir}/usr/share/steamling-emulation/dolphin-WiimoteNew.ini.in"
+  install -Dm644 "${srcdir}/rpcs3-Default.yml.in" \
+    "${pkgdir}/usr/share/steamling-emulation/rpcs3-Default.yml.in"
   install -Dm644 "${srcdir}/retroarch-mGBA-gba.cfg"    "${pkgdir}/usr/share/steamling-emulation/retroarch-config/mGBA/gba.cfg"
   install -Dm644 "${srcdir}/retroarch-mGBA-gba.slangp" "${pkgdir}/usr/share/steamling-emulation/retroarch-config/mGBA/gba.slangp"
   # SwanStation's own renderer option; "OpenGL" drags the session onto GL (see es-retroarch).

@@ -53,7 +53,8 @@ have_cemu()      { emu_path cemu >/dev/null 2>&1; }
 have_ppsspp()    { emu_path ppsspp >/dev/null 2>&1; }
 have_ryujinx()   { emu_path ryujinx >/dev/null 2>&1; }
 have_azahar()    { emu_path azahar >/dev/null 2>&1; }
-EMULATORS=(esde retroarch armsx2 eden ryujinx dolphin cemu ppsspp azahar)
+have_rpcs3()     { emu_path rpcs3 >/dev/null 2>&1; }
+EMULATORS=(esde retroarch armsx2 eden ryujinx dolphin cemu ppsspp azahar rpcs3)
 
 TMP="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/steamling-seed.XXXXXX")" || exit 0
 trap 'rm -rf "${TMP}"' EXIT
@@ -165,6 +166,11 @@ seed_ppsspp() { seed_b ini ppsspp.ini "${HOME}/.config/ppsspp/PSP/SYSTEM/ppsspp.
 # Azahar's own defaults are keyboard keys; the policy turns them into the pad binding.
 seed_azahar() { seed_b ini azahar-qt-config.ini "${HOME}/.config/azahar-emu/qt-config.ini" azahar-qt-config; }
 
+# RPCS3 puts player 1 on the keyboard until a pad is set up, so a game started from game mode
+# has no controls. This is the profile RPCS3 itself saved on an RP6: SDL, the built-in pad as
+# "pad 1", PlayStation buttons by position (Cross is the bottom button whatever its letter).
+seed_rpcs3() { seed_a rpcs3-Default.yml.in "${HOME}/.config/rpcs3/input_configs/global/Default.yml"; }
+
 # ROMS was read before any reset, so restoring ES-DE defaults keeps the user's ROM location
 label() {
   local l own=""
@@ -173,7 +179,7 @@ label() {
     armsx2) l="ARMSX2 (PS2)" ;;          eden) l="Eden (Switch)" ;;
     dolphin) l="Dolphin (GameCube/Wii)" ;; cemu) l="Cemu (Wii U)" ;;
     ppsspp) l="PPSSPP (PSP)" ;;          ryujinx) l="Ryujinx (Switch)" ;;
-    azahar) l="Azahar (3DS)" ;;
+    azahar) l="Azahar (3DS)" ;;           rpcs3) l="RPCS3 (PS3)" ;;
   esac
   case "$(emu_path "$1" 2>/dev/null)" in "${EMU_DROP}"/*) own=" - your own build" ;; esac
   echo "${l}${own}"
@@ -201,6 +207,7 @@ reset_dolphin()   { local f; for f in Dolphin.ini GFX.ini GCPadNew.ini WiimoteNe
 reset_cemu()      { reset_target "${HOME}/.config/Cemu/settings.xml"; }
 reset_ppsspp()    { reset_target "${HOME}/.config/ppsspp/PSP/SYSTEM/ppsspp.ini"; }
 reset_azahar()    { reset_target "${HOME}/.config/azahar-emu/qt-config.ini"; }
+reset_rpcs3()     { reset_target "${HOME}/.config/rpcs3/input_configs/global/Default.yml"; }
 
 present=()
 for e in "${EMULATORS[@]}"; do "have_${e}" && present+=("${e}"); done
