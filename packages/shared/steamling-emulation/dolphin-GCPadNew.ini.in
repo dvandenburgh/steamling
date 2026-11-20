@@ -1,9 +1,10 @@
 # Dolphin GameCube pad seed (-> ~/.config/dolphin-emu/GCPadNew.ini); Dolphin's own default is
-# keyboard-only, i.e. a dead controller. Face buttons follow the letters on the handheld's own
-# buttons (A is A, B is B), not the GameCube's positions, which put B west and X east.
-# The pad follows xpad's lettering: X sends code 0x133 and Y 0x134, which evdev names NORTH and
-# WEST, so the X button is "NORTH" here and the Y button "WEST" (the same order as the
-# button:2/button:3 indices in Eden's seed).
+# keyboard-only, i.e. a dead controller. Face buttons follow the letters on the RP6's buttons,
+# which are Nintendo-style (A east, B south, X north, Y west), not the GameCube's positions.
+# The pad reports buttons by position, with xpad's lettering: the west button sends code 0x133
+# and the north one 0x134, which evdev names NORTH and WEST. So the north button (X) is "WEST"
+# here and the west one (Y) "NORTH" (the same order as the button:2/button:3 indices in Eden's
+# seed).
 # Z is R1; the analog L and R triggers are L2 and R2, as on the GameCube.
 # The trailing " 0" belongs to the evdev device name — drop it and Dolphin binds nothing.
 # Dolphin's evdev backend numbers axes in event-code order: on that pad X Y Z RX RY RZ HAT0X
@@ -11,10 +12,10 @@
 # their minimum, and "Axis 2+" only covers the top half of travel; "Full Axis" spans all of it.
 [GCPad1]
 Device = evdev/0/Microsoft X-Box 360 pad 0
-Buttons/A = SOUTH
-Buttons/B = EAST
-Buttons/X = NORTH
-Buttons/Y = WEST
+Buttons/A = EAST
+Buttons/B = SOUTH
+Buttons/X = WEST
+Buttons/Y = NORTH
 Buttons/Z = TR
 Buttons/Start = START
 Main Stick/Up = `Axis 1-`
