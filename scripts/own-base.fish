@@ -3,10 +3,13 @@
 # so builds and devices stop borrowing Pocknix's. docs/building/own-base.md explains each step;
 # this runs them.
 #
-#   scripts/own-base.fish [--remote <rclone destination>] [--url <public url>] [--id <label>] [--yes]
-# With no --remote/--url it takes STEAMLING_BASE_RCLONE_REMOTE and STEAMLING_BASE_URL from
-# config/local.conf (copy config/local.conf.example to start one), so a filled-in local.conf
-# makes this a single command. The flags win over the file.
+#   scripts/own-base.fish [--github <owner/repo>] [--remote <rclone destination>] [--url <public url>]
+#                         [--id <label>] [--yes]
+# --github hosts the base on that repo's releases (the URL follows from it); --remote and --url
+# host it on rclone storage instead. With no flags it takes STEAMLING_BASE_GITHUB, or
+# STEAMLING_BASE_RCLONE_REMOTE and STEAMLING_BASE_URL, from config/local.conf (copy
+# config/local.conf.example to start one), so a filled-in local.conf makes this a single
+# command. The flags win over the file.
 #
 # It points config/steamling.conf at your base and unpins it, builds everything against live Arch
 # Linux ARM, freezes exactly what that build installed with `make snapshot` (which uploads it and
@@ -23,9 +26,9 @@ function fail
     set_color red; echo "error: $argv" >&2; set_color normal; exit 1
 end
 
-argparse 'remote=' 'url=' 'id=' y/yes h/help -- $argv; or exit 2
+argparse 'github=' 'remote=' 'url=' 'id=' y/yes h/help -- $argv; or exit 2
 if set -q _flag_help
-    sed -n '6,9p' (status filename)
+    sed -n '6,12p' (status filename)
     exit 0
 end
 # config/local.conf is bash, so let bash read it
@@ -33,12 +36,20 @@ function local_conf -a name
     test -f config/local.conf; or return
     bash -c 'source config/local.conf >/dev/null 2>&1; printf "%s" "${!1}"' sh $name
 end
+set -l github (local_conf STEAMLING_BASE_GITHUB)
 set -l remote (local_conf STEAMLING_BASE_RCLONE_REMOTE)
 set -l url (local_conf STEAMLING_BASE_URL)
+set -q _flag_github; and set github $_flag_github
 set -q _flag_remote; and set remote $_flag_remote
 set -q _flag_url; and set url $_flag_url
-test -n "$remote"; and test -n "$url"
-or fail "no base storage set: fill in config/local.conf (cp config/local.conf.example config/local.conf), or pass --remote and --url"
+# GitHub: the URL is the repo's release download address unless one was given that already is
+if test -n "$github"
+    string match -q "https://github.com/$github/releases/download/*" -- $url
+    or set url https://github.com/$github/releases/download/base
+    set remote ""
+end
+test -n "$github"; or begin; test -n "$remote"; and test -n "$url"; end
+or fail "no base storage set: fill in config/local.conf (cp config/local.conf.example config/local.conf), or pass --github, or --remote and --url"
 string match -q '*REPLACE-ME*' -- $url
 and fail "config/local.conf still has the example address: put your bucket's public URL in STEAMLING_BASE_URL"
 set url (string trim --right --chars / -- $url)
@@ -47,8 +58,10 @@ set -q _flag_id; and set id $_flag_id
 set -l conf config/steamling.conf
 
 step "checking the host"
-for t in git make rclone repo-add curl sudo
-    command -q $t; or fail "$t is missing: sudo pacman -S --needed git make rclone pacman curl sudo"
+set -l uploader rclone
+test -n "$github"; and set uploader github-cli
+for t in git make (string replace github-cli gh -- $uploader) repo-add curl sudo
+    command -q $t; or fail "$t is missing: sudo pacman -S --needed git make $uploader pacman curl sudo"
 end
 switch (uname -m)
     case x86_64
@@ -65,12 +78,22 @@ if not grep -q "STEAMLING_BASE_URL:=$url}" $conf
     git diff --quiet -- $conf packages/shared/steamling-base-lock
     or fail "$conf or the base lock has uncommitted changes; commit or stash them first"
 end
-rclone lsf --max-depth 1 $remote >/dev/null 2>&1; or rclone mkdir $remote
-or fail "rclone can't reach $remote (set the remote up with: rclone config)"
+if test -n "$github"
+    gh auth status >/dev/null 2>&1; or fail "gh isn't logged in: run gh auth login"
+    gh repo view $github >/dev/null 2>&1
+    or fail "gh can't see $github: create it on GitHub first (tick 'Add a README' so it has a commit)"
+else
+    rclone lsf --max-depth 1 $remote >/dev/null 2>&1; or rclone mkdir $remote
+    or fail "rclone can't reach $remote (set the remote up with: rclone config)"
+end
 
 echo
 echo "  base label:   $id"
-echo "  uploads to:   $remote"
+if test -n "$github"
+    echo "  uploads to:   releases of github.com/$github"
+else
+    echo "  uploads to:   $remote"
+end
 echo "  served from:  $url"
 echo "  This builds everything twice. Under qemu that takes hours, mostly the first time."
 if not set -q _flag_yes
@@ -80,13 +103,15 @@ end
 
 # Every build names its base outright: config/local.conf may say STEAMLING_BASE_SNAPSHOT=live or
 # hold other storage, and the command line beats it.
-set -l base STEAMLING_BASE_URL=$url STEAMLING_BASE_RCLONE_REMOTE=$remote
+set -l base STEAMLING_BASE_URL=$url STEAMLING_BASE_RCLONE_REMOTE=$remote STEAMLING_BASE_GITHUB=$github
 
 step "pointing $conf at your storage"
-sed -i \
-    -e "s|^: \"\${STEAMLING_BASE_URL:=.*}\"|: \"\${STEAMLING_BASE_URL:=$url}\"|" \
-    -e "s|^: \"\${STEAMLING_BASE_RCLONE_REMOTE:=.*}\"|: \"\${STEAMLING_BASE_RCLONE_REMOTE:=$remote}\"|" \
-    $conf
+# the rclone remote line keeps its default when the base goes to GitHub
+set -l edits -e "s|^: \"\${STEAMLING_BASE_URL:=.*}\"|: \"\${STEAMLING_BASE_URL:=$url}\"|" \
+    -e "s|^: \"\${STEAMLING_BASE_GITHUB:=.*}\"|: \"\${STEAMLING_BASE_GITHUB:=$github}\"|"
+test -n "$remote"
+and set -a edits -e "s|^: \"\${STEAMLING_BASE_RCLONE_REMOTE:=.*}\"|: \"\${STEAMLING_BASE_RCLONE_REMOTE:=$remote}\"|"
+sed -i $edits $conf
 grep -q "STEAMLING_BASE_URL:=$url}" $conf; or fail "couldn't point $conf at $url"
 
 if grep -q "STEAMLING_BASE_SNAPSHOT:=$id}" $conf
@@ -102,8 +127,8 @@ else
 end
 
 step "checking $url serves the new base"
-curl -fsI $url/pocknix-base.db >/dev/null
-or fail "$url/pocknix-base.db isn't reachable. Make the bucket public (or put a domain in front of it), then run this again"
+curl -fsIL $url/steamling-base.db >/dev/null
+or fail "$url/steamling-base.db isn't reachable. Make the bucket or repo public (or put a domain in front of the bucket), then run this again"
 
 step "building against the frozen base (make image)"
 env $base STEAMLING_BASE_SNAPSHOT=$id make image
@@ -113,6 +138,6 @@ echo
 step "done: base $id is live at $url"
 echo "  Next: git add $conf packages/shared/steamling-base-lock/steamling-base.lock"
 echo "        git commit -m \"base: our own snapshot $id\""
-echo "  Devices move onto it with their next update once you publish packages too (docs/building/own-base.md)."
+echo "  Handhelds move onto it the next time you update them from this build (docs/updating.md)."
 string match -q live -- (local_conf STEAMLING_BASE_SNAPSHOT)
 and echo "  config/local.conf still says STEAMLING_BASE_SNAPSHOT=live: delete that line, or later builds skip your base."

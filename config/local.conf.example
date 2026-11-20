@@ -46,6 +46,8 @@ STEAMLING_CCACHE_SIZE=20G
 # --- Only if you host things yourself -------------------------------------------------------------
 # None of this is needed to build. It's for hosting your own frozen base, a package repo for
 # over-the-air updates, or image downloads (docs/building/own-base.md).
+# The base goes to GitHub releases of this repo, or (the two lines after it) to rclone storage.
+#STEAMLING_BASE_GITHUB=Steamling/base
 #STEAMLING_BASE_RCLONE_REMOTE=r2:steamling/repo/base
 #STEAMLING_BASE_URL=https://pub-REPLACE-ME.r2.dev/repo/base
 #STEAMLING_REPO_RCLONE_REMOTE=r2:steamling/repo
