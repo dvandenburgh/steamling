@@ -27,6 +27,8 @@ Image options
                         for this SoC, in place of the prebuilt ones (works with --update too)
 
 Build options
+  --<family>            build for that device family (they're listed below), the short way
+                        to write --device <family>
   -d, --device NAME     image target, a family under devices/ (listed below)
   -j, --jobs N          kernel compile jobs (default: every core)
   --update              only the kernel and the packages that changed, no rootfs or SD image:
@@ -48,7 +50,7 @@ or `export SSH=1` to turn SSH on for every build:
 
 From another shell: make status shows how far it is and the time left; make watch follows it.
 EOF
-  printf '\nFamilies for --device (default: DEVICE in config/steamling.conf):\n'
+  printf '\nDevice families, for --<family> or --device <family> (default: DEVICE in config/steamling.conf):\n'
   local p
   for p in "$(dirname "$0")"/../devices/*/profile.conf; do
     printf '  %-20s %s\n' "$(basename "$(dirname "${p}")")" "$(sed -n 's/^DEVICE_PRETTY="\(.*\)"$/\1/p' "${p}")"
@@ -89,6 +91,11 @@ while [ "$#" -gt 0 ]; do
     --no-status-bar) export STEAMLING_STATUS_BAR=off ;;
     --build-base) build_base=1 ;;
     -h|--help) usage; exit 0 ;;
+    # --<family> for any family under devices/, so the list never needs updating here
+    --*) fam="${opt#--}"
+         case "${fam}" in */*|.*|"") bad "unknown option '${opt}'" ;; esac
+         [ -f "$(dirname "$0")/../devices/${fam}/profile.conf" ] || bad "unknown option '${opt}'"
+         export DEVICE="${fam}" ;;
     *) bad "unknown option '${opt}'" ;;
   esac
   shift
