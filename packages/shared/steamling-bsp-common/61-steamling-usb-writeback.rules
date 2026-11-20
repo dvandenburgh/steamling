@@ -1,0 +1,8 @@
+# A USB stick or drive may hold only 16 MiB of unwritten data, its own limit inside the global one
+# (vm.dirty_bytes, 256 MiB, in 60-steamling-gaming.conf). Without it a copy to a slow stick "finishes"
+# at once while up to 256 MiB is still to go, and unmounting or ejecting then sits there until it's
+# written. strict_limit holds the drive to its cap even while the global limit isn't reached.
+# From CachyOS's 61-writeback-limits.rules (CachyOS/CachyOS-Settings), USB part only: the SD card
+# and UFS hold the system and games, and the global cap already suits them.
+ACTION=="add|change", SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", ENV{ID_BUS}=="usb", \
+    ATTR{bdi/strict_limit}="1", ATTR{bdi/max_bytes}="16777216"
