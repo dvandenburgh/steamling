@@ -1,0 +1,56 @@
+From 9f3d197e08b9fe0b97e8a0e4f873427b7a0e41a7 Mon Sep 17 00:00:00 2001
+From: David Dai <david.dai@linux.dev>
+Date: Sat, 21 Nov 2026 00:21:29 +0900
+Subject: [PATCH] scx_lavd: Harden the cpufreq per-CPU reads (update_effective_capacity only)
+
+update_effective_capacity() indexed cpufreq_cpu_data from its address
+to find a CPU's policy. cpufreq_cpu_data is a per-CPU variable, so read
+it with cpu_cpufreq_policy() from scx/percpu.bpf.h, which goes through
+bpf_per_cpu_ptr() and tolerates a kernel without cpufreq.
+
+Add cpu_cpufreq_update_util() to scx/percpu.bpf.h for
+cpufreq_update_util_data, and use both helpers in
+read_schedutil_rate_limit_ns() too, so that every per-CPU cpufreq read
+in lavd goes through one place.
+
+Fixes: e435e8f841e3 ("scx_lavd: Estimate the effective capacity of a CPU.")
+Signed-off-by: David Dai <david.dai@linux.dev>
+Signed-off-by: Changwoo Min <changwoo@igalia.com>
+---
+diff --git a/scheds/rust/scx_lavd/src/bpf/power.bpf.c b/scheds/rust/scx_lavd/src/bpf/power.bpf.c
+index 8e50a5e6..66d9ca1b 100644
+--- a/scheds/rust/scx_lavd/src/bpf/power.bpf.c
++++ b/scheds/rust/scx_lavd/src/bpf/power.bpf.c
+@@ -5,6 +5,7 @@
+  */
+ 
+ #include <scx/common.bpf.h>
++#include <scx/percpu.bpf.h>
+ #include "intf.h"
+ #include "lavd.bpf.h"
+ #include "util.bpf.h"
+@@ -107,12 +108,11 @@ __hidden
+ void update_effective_capacity(struct cpu_ctx *cpuc)
+ {
+ 	/* WARNING: This should be called after updating cpuc->cur_util. */
+-	extern struct cpufreq_policy *cpufreq_cpu_data __ksym;
+ 	extern const unsigned long hw_pressure __ksym __weak;
+ 
+ 	u16 capacity_policy = 0, capacity_observed;
+ 	unsigned long *p_pressure, pressure = 0;
+-	struct cpufreq_policy **base, *policy;
++	struct cpufreq_policy *policy;
+ 	u32 mfo;
+ 	int cpu;
+ 
+@@ -133,9 +133,7 @@ void update_effective_capacity(struct cpu_ctx *cpuc)
+ 	 */
+ 	capacity_policy = cpuc->max_capacity;
+ 
+-	if (unlikely((base = (struct cpufreq_policy **)&cpufreq_cpu_data) &&
+-	    (bpf_probe_read_kernel(&policy, sizeof(policy), base + cpu) == 0) &&
+-	    policy)) {
++	if (unlikely(policy = cpu_cpufreq_policy(cpu))) {
+ 		u32 cpu_max = BPF_CORE_READ(policy, cpuinfo.max_freq);
+ 		u32 scaling_max = BPF_CORE_READ(policy, max);
+ 

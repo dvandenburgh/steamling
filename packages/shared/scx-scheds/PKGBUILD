@@ -2,7 +2,7 @@
 # Shadows the base's copy by repo order: a newer base scx never reaches devices while published.
 pkgname=scx-scheds
 pkgver=1.1.4
-pkgrel=5
+pkgrel=6
 _commit=e7b3a219617472cf78880ac424714e52c932db61
 _rustver=1.99.0
 pkgdesc='sched_ext schedulers and tools'
@@ -17,9 +17,11 @@ source=("scx::git+https://github.com/sched-ext/scx.git#commit=${_commit}"
         '0006-scx_lavd-cap-the-load-balancing-band-by-the-other-domains-share.patch'
         '0007-scx_lavd-use-setters-for-the-remaining-slice-and-dsq_vtime-writes.patch'
         '0008-libbpf-add-128-bit-integer-types-to-linux-types.h.patch'
-        '0009-scx_lavd-dont-drop-a-performance-level-extended-to-the-same-capacity.patch')
+        '0009-scx_lavd-dont-drop-a-performance-level-extended-to-the-same-capacity.patch'
+        '0010-scx_lavd-harden-the-cpufreq-per-cpu-reads.patch')
 sha256sums=('SKIP'
             '5a30ce742be0835d9b23fc862db5cbbbc71464e1c9b1fca22917e10e4ba32a92'
+            'SKIP'
             'SKIP'
             'SKIP'
             'SKIP'
