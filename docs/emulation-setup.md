@@ -225,8 +225,7 @@ version, it is moved into `~/Emulation/emulators/eden/` for you and keeps workin
   Remote with a Nunchuk, B on B or R2, 1 and 2 on Y and X, the pointer on the right stick, shake on
   R1, and the Nunchuk on the left stick with C on L1 and Z on L2.
 - **Nintendo 3DS (Azahar)**: controller bound, each face button by its letter, ZL and ZR on L2
-  and R2, Home on R3, the circle pad and C-stick on the two sticks. The touchscreen is the
-  handheld's own.
+  and R2, Home on R3, the circle pad and C-stick on the two sticks.
 - **PlayStation 2 (ARMSX2)**: setup wizard skipped, Vulkan renderer, controller bound, and
   upscaling enabled. You only supply `ps2-bios.bin` and your games.
 - **Nintendo Switch (Eden or Ryujinx, your own build)**: controller bound, fullscreen, vsync and
