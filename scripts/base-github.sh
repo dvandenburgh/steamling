@@ -93,6 +93,28 @@ gh_upload_missing() {
   done
 }
 
+# The db, the lockfile and SNAPSHOT_ID go up every time. Their names never change and two versions
+# can easily be the same size (SNAPSHOT_ID 20261120.1 and 20261120.2 are), so the size check above
+# would keep the old one. $1 tag, then paths.
+gh_upload_always() {
+  local tag="$1"; shift
+  gh release upload "${tag}" --repo "${GH_REPO}" --clobber "$@" >/dev/null \
+    || die "upload to ${tag} failed; run the same command again to carry on"
+}
+
+# Delete whatever a staging release holds besides the files given: an earlier attempt at the same
+# id may have left package versions this one doesn't use, and they'd count toward the 1000.
+gh_prune_others() {  # $1 tag, then the paths it should hold
+  local tag="$1" n _ f; shift
+  declare -A keep=()
+  for f in "$@"; do keep["$(basename "${f}")"]=1; done
+  while read -r n _; do
+    [ -z "${n}" ] || [ -n "${keep[${n}]:-}" ] && continue
+    log "removing ${n} from ${tag} (left by an earlier attempt)"
+    gh release delete-asset "${tag}" "${n}" --repo "${GH_REPO}" --yes >/dev/null || die "couldn't remove ${n} from ${tag}"
+  done < <(gh_assets "${tag}")
+}
+
 # How many parts a set of packages needs ($1 = number of packages; each comes with a .sig).
 gh_parts_for() { local files=$(( $1 * 2 + 8 )); printf '%d' $(( (files + GH_PART_CAP - 1) / GH_PART_CAP )); }
 
@@ -111,22 +133,25 @@ gh_publish_cut() {
   fi
 
   # Contiguous runs of the sorted package list, the same size each, a package and its .sig together.
-  local per=$(( (${#pkgs[@]} + GH_PARTS - 1) / GH_PARTS )) part tag files
+  local per=$(( (${#pkgs[@]} + GH_PARTS - 1) / GH_PARTS )) part tag files meta
   for ((part = 1; part <= GH_PARTS; part++)); do
     gh_title_is "$(gh_part_tag "${part}")" "${id}" && continue   # went live before an interruption
     tag="$(gh_part_tag "${part}" -next)"
     gh_ensure_release "${tag}" "base ${id} (part ${part} of ${GH_PARTS}, staging)"
     files=()
     for p in "${pkgs[@]:$(( (part - 1) * per )):per}"; do files+=("${p}" "${p}.sig"); done
+    meta=()
+    [ "${part}" -ne 1 ] || meta=("${out}/${tarball}" "${out}/${repo}.db" "${out}/${repo}.db.tar.gz" \
+      "${out}/${repo}.files" "${out}/${repo}.files.tar.gz" "${out}/steamling-base.lock" "${out}/SNAPSHOT_ID")
+    gh_prune_others "${tag}" "${files[@]}" ${meta[@]+"${meta[@]}"}
     gh_upload_missing "${tag}" "${files[@]}"
   done
   # the tarball, then the db, lockfile and id last, as on R2
   tag="$(gh_part_tag 1 -next)"
-  gh_release_exists "${tag}" || gh_ensure_release "${tag}" "base ${id} (part 1 of ${GH_PARTS}, staging)"
   gh_upload_missing "${tag}" "${out}/${tarball}"
-  gh_upload_missing "${tag}" "${out}/${repo}.db" "${out}/${repo}.db.tar.gz" \
+  gh_upload_always "${tag}" "${out}/${repo}.db" "${out}/${repo}.db.tar.gz" \
     "${out}/${repo}.files" "${out}/${repo}.files.tar.gz" "${out}/steamling-base.lock"
-  gh_upload_missing "${tag}" "${out}/SNAPSHOT_ID"
+  gh_upload_always "${tag}" "${out}/SNAPSHOT_ID"
 
   # The swap, written so a run that dies halfway can simply be run again. A live part whose title
   # names another id is the outgoing base: it becomes -prev. The old -prev is deleted only while the
@@ -173,7 +198,7 @@ gh_publish_extension() {
   for f in "$@"; do files+=("${out}/${f}" "${out}/${f}.sig"); done
   gh_upload_missing "${best}" "${files[@]}"
   # packages before the db, SNAPSHOT_ID last: the next run keys on it
-  gh_upload_missing "$(gh_part_tag 1)" "${out}/${repo}.db" "${out}/${repo}.db.tar.gz" \
+  gh_upload_always "$(gh_part_tag 1)" "${out}/${repo}.db" "${out}/${repo}.db.tar.gz" \
     "${out}/${repo}.files" "${out}/${repo}.files.tar.gz" "${out}/steamling-base.lock"
-  gh_upload_missing "$(gh_part_tag 1)" "${out}/SNAPSHOT_ID"
+  gh_upload_always "$(gh_part_tag 1)" "${out}/SNAPSHOT_ID"
 }
