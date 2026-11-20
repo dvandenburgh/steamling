@@ -1,0 +1,37 @@
+# Dolphin Wii Remote seed (-> ~/.config/dolphin-emu/WiimoteNew.ini). Dolphin's own default binds
+# the emulated Wii Remote to keyboard and mouse, so Wii games had no controls at all in game mode.
+# Same pad, device name and button naming as dolphin-GCPadNew.ini.in (see there): letters follow
+# the RP6's Nintendo-style buttons, so EAST is A, SOUTH is B, "WEST" is X and "NORTH" is Y.
+# Wii Remote with a Nunchuk, which most Wii games want:
+#   A = A, B = B or R2 (the Wii Remote's trigger), 1 = Y, 2 = X, - = Select, + = Start,
+#   Home = R3, pointer = right stick, shake = R1,
+#   Nunchuk stick = left stick, C = L1, Z = L2.
+[Wiimote1]
+Source = 1
+Device = evdev/0/Microsoft X-Box 360 pad 0
+Buttons/A = EAST
+Buttons/B = SOUTH | `Full Axis 5+`
+Buttons/1 = NORTH
+Buttons/2 = WEST
+Buttons/- = SELECT
+Buttons/+ = START
+Buttons/Home = THUMBR
+D-Pad/Up = `Axis 7-`
+D-Pad/Down = `Axis 7+`
+D-Pad/Left = `Axis 6-`
+D-Pad/Right = `Axis 6+`
+IR/Up = `Axis 4-`
+IR/Down = `Axis 4+`
+IR/Left = `Axis 3-`
+IR/Right = `Axis 3+`
+Shake/X = TR
+Shake/Y = TR
+Shake/Z = TR
+Extension = Nunchuk
+Nunchuk/Buttons/C = TL
+Nunchuk/Buttons/Z = `Full Axis 2+`
+Nunchuk/Stick/Up = `Axis 1-`
+Nunchuk/Stick/Down = `Axis 1+`
+Nunchuk/Stick/Left = `Axis 0-`
+Nunchuk/Stick/Right = `Axis 0+`
+Rumble/Motor = Strong

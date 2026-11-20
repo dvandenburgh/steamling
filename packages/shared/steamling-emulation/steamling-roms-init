@@ -149,6 +149,7 @@ seed_dolphin() {
   seed_b ini Dolphin.ini "${HOME}/.config/dolphin-emu/Dolphin.ini"
   seed_b ini GFX.ini     "${HOME}/.config/dolphin-emu/GFX.ini"
   seed_a dolphin-GCPadNew.ini.in "${HOME}/.config/dolphin-emu/GCPadNew.ini"
+  seed_a dolphin-WiimoteNew.ini.in "${HOME}/.config/dolphin-emu/WiimoteNew.ini"
 }
 
 seed_cemu() {
@@ -190,7 +191,7 @@ reset_retroarch() {
 reset_armsx2()    { reset_target "${HOME}/.config/ARMSX2/inis/PCSX2.ini"; }
 reset_eden()      { reset_target "${HOME}/.config/eden/qt-config.ini"; }
 reset_ryujinx()   { reset_target "${HOME}/.config/Ryujinx/Config.json"; }
-reset_dolphin()   { local f; for f in Dolphin.ini GFX.ini GCPadNew.ini; do reset_target "${HOME}/.config/dolphin-emu/${f}"; done; }
+reset_dolphin()   { local f; for f in Dolphin.ini GFX.ini GCPadNew.ini WiimoteNew.ini; do reset_target "${HOME}/.config/dolphin-emu/${f}"; done; }
 reset_cemu()      { reset_target "${HOME}/.config/Cemu/settings.xml"; }
 reset_ppsspp()    { reset_target "${HOME}/.config/ppsspp/PSP/SYSTEM/ppsspp.ini"; }
 
