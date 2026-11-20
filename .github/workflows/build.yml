@@ -20,7 +20,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Shell syntax (bash -n) for every script + PKGBUILD
         run: |
           set -e
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 300
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Host deps (the build bootstraps its own ALARM chroot)
         run: sudo apt-get install -y -qq libarchive-tools curl rsync flex bison bc python3 git
       - name: Bootstrap + packages + kernel
@@ -51,7 +51,7 @@ jobs:
           sudo make kernel
           sudo make packages
       - name: Upload localrepo as artifact (unsigned — sign locally with make publish)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: localrepo
           path: build/localrepo/
