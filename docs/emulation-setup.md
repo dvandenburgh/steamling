@@ -226,6 +226,8 @@ version, it is moved into `~/Emulation/emulators/eden/` for you and keeps workin
   R1, and the Nunchuk on the left stick with C on L1 and Z on L2.
 - **Nintendo 3DS (Azahar)**: controller bound, each face button by its letter, ZL and ZR on L2
   and R2, Home on R3, the circle pad and C-stick on the two sticks.
+- **PlayStation 3 (RPCS3)**: controller bound. PlayStation buttons go by position, so Cross is
+  the bottom face button, Circle the right, Square the left and Triangle the top.
 - **PlayStation 2 (ARMSX2)**: setup wizard skipped, Vulkan renderer, controller bound, and
   upscaling enabled. You only supply `ps2-bios.bin` and your games.
 - **Nintendo Switch (Eden or Ryujinx, your own build)**: controller bound, fullscreen, vsync and
