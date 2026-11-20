@@ -149,3 +149,23 @@ echo never | sudo tee /sys/kernel/mm/transparent_hugepage/hugepages-64kB/enabled
 Run the load and frames tests, put it back with `echo always | sudo tee
 /sys/kernel/mm/transparent_hugepage/hugepages-64kB/enabled`, and run them again. Memory a game
 already has keeps the size it got, so restart the game after each switch.
+
+## Trying another disk scheduler
+
+The disk scheduler decides which reads and writes the storage gets to first. Steamling uses
+mq-deadline on the built-in storage and the microSD card, which puts reads ahead of writes that
+can wait, and reads 256 KB ahead instead of the kernel's 128 KB. ADIOS, the adaptive scheduler
+CachyOS uses, is built in too. `steamling-storage` shows what each disk is using and switches it
+straight away, no reboot needed:
+
+```bash
+steamling-storage                         # what each disk uses now
+sudo steamling-storage scheduler adios    # or mq-deadline, kyber, bfq, none
+sudo steamling-storage readahead 128      # the kernel's own readahead
+sudo steamling-storage reset              # back to Steamling's defaults
+```
+
+Your choice is kept across reboots. Readahead shows up in loading times: time a game from launch
+to its main menu, or a save loading, a few times with each setting. For the scheduler, the case
+it's meant for is a game running while Steam downloads: start a big download, then run the frames
+test with each scheduler and compare the stutter.
