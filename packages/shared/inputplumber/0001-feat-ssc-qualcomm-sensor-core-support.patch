@@ -28,15 +28,43 @@ Co-authored-by: Radical <radical@radical.fun>
 Co-authored-by: virtudude <virtudude@protonmail.com>
 Assisted-by: LLM
 ---
-
+diff --git a/Cargo.lock b/Cargo.lock
+index 358c3e8..fc94b23 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1025,6 +1025,7 @@ dependencies = [
+  "glob-match",
+  "hidapi",
+  "libc",
++ "libloading",
+  "log",
+  "mio",
+  "nix 0.30.1",
+@@ -1191,6 +1192,16 @@ version = "0.2.178"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "37c93d8daa9d8a012fd8ab92f088405fb202ea0b6ab73ee2482ae66af4f42091"
+ 
++[[package]]
++name = "libloading"
++version = "0.9.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "754ca22de805bb5744484a5b151a9e1a8e837d5dc232c2d7d8c2e3492edc8b60"
++dependencies = [
++ "cfg-if",
++ "windows-link",
++]
++
+ [[package]]
+ name = "libudev"
+ version = "0.3.0"
 diff --git a/Cargo.toml b/Cargo.toml
-index 061ad89..09b444b 100644
+index b2f2235..8036e94 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -122,6 +122,7 @@ glob-match = "0.2.1"
  hidapi = "2.6.4"
  #evdev = { version = "0.12.1", features = ["tokio"] }
- inotify = "0.11.0"
+ libc = "0.2"
 +libloading = "0.9.0"
  # Omit trace logging for release builds
  log = { version = "0.4.29", features = [
@@ -1140,7 +1168,7 @@ index 0000000..23eaf8d
 +    }
 +}
 diff --git a/src/input/composite_device/mod.rs b/src/input/composite_device/mod.rs
-index b7045ba..e569b64 100644
+index 9781499..5927810 100644
 --- a/src/input/composite_device/mod.rs
 +++ b/src/input/composite_device/mod.rs
 @@ -36,8 +36,8 @@ use crate::{
@@ -1154,7 +1182,7 @@ index b7045ba..e569b64 100644
          },
          target::TargetDeviceTypeId,
      },
-@@ -1803,6 +1803,12 @@ impl CompositeDevice {
+@@ -1832,6 +1832,12 @@ impl CompositeDevice {
                          let device = TtyDevice::new(device, self.client(), source_config.clone())?;
                          SourceDevice::Tty(device)
                      }
@@ -1168,7 +1196,7 @@ index b7045ba..e569b64 100644
                          return Err(format!(
                              "Unspported subsystem: {subsystem}, unable to add source device {}",
 diff --git a/src/input/manager.rs b/src/input/manager.rs
-index 5003528..ff7b777 100644
+index 2f15628..44665ee 100644
 --- a/src/input/manager.rs
 +++ b/src/input/manager.rs
 @@ -27,15 +27,15 @@ use crate::config::{
@@ -1191,7 +1219,7 @@ index 5003528..ff7b777 100644
      target::{TargetDevice, TargetDeviceTypeId},
  };
  use crate::udev::{
-@@ -194,6 +194,8 @@ pub struct Manager {
+@@ -191,6 +191,8 @@ pub struct Manager {
      /// Devices that udev has not finished initializing, keyed by
      /// (subsystem, sysname) with the recheck attempt count
      uninitialized_udev_devices: HashMap<(String, String), u32>,
@@ -1200,7 +1228,7 @@ index 5003528..ff7b777 100644
  }
  
  impl Manager {
-@@ -234,6 +236,7 @@ impl Manager {
+@@ -231,6 +233,7 @@ impl Manager {
              composite_device_targets: HashMap::new(),
              composite_device_tasks: Default::default(),
              manage_all_devices: false,
@@ -1208,7 +1236,7 @@ index 5003528..ff7b777 100644
              target_gamepad_order: vec![],
              target_gamepad_order_changing: false,
              uninitialized_udev_devices: HashMap::new(),
-@@ -1392,6 +1395,7 @@ impl Manager {
+@@ -1363,6 +1366,7 @@ impl Manager {
                  "iio" => iio::get_dbus_path(sys_name),
                  "leds" => led::get_dbus_path(sys_name),
                  "tty" => tty::get_dbus_path(sys_name),
@@ -1216,7 +1244,7 @@ index 5003528..ff7b777 100644
                  _ => return Err(format!("Device subsystem not supported: {subsystem:?}").into()),
              };
              let conn = self.dbus.connection().clone();
-@@ -1419,6 +1423,10 @@ impl Manager {
+@@ -1390,6 +1394,10 @@ impl Manager {
                      let tty_iface = SourceTtyInterface::new(dev);
                      dbus.register(tty_iface);
                  }
@@ -1227,7 +1255,7 @@ index 5003528..ff7b777 100644
                  _ => (),
              }
  
-@@ -1599,6 +1607,28 @@ impl Manager {
+@@ -1570,6 +1578,28 @@ impl Manager {
                  }
              }
  
@@ -1256,27 +1284,26 @@ index 5003528..ff7b777 100644
              _ => {
                  return Err(format!("Device subsystem not supported: {subsystem:?}").into());
              }
-@@ -1726,13 +1756,12 @@ impl Manager {
-                 WatchEvent::Create { name, base_path } => {
-                     let subsystem = {
-                         match base_path.as_str() {
--                            "/dev" => {
--                                if !name.starts_with("hidraw") {
--                                    None
--                                } else {
--                                    Some("hidraw")
--                                }
--                            }
-+                            "/dev" => match &name {
-+                                x if x.starts_with("hidraw") => Some("hidraw"),
-+                                // udev files FastRPC nodes under misc
-+                                x if x.starts_with("fastrpc") => Some("misc"),
-+                                _ => None,
-+                            },
-                             "/dev/input" => Some("input"),
+@@ -1646,6 +1676,8 @@ impl Manager {
+                 .match_subsystem("hidraw")?
+                 .match_subsystem("iio")?
+                 .match_subsystem("input")?
++                // FastRPC nodes are in the "misc" subsystem; the sensor core's comes up late
++                .match_subsystem("misc")?
+                 .listen()?;
  
-                             _ => None,
-@@ -1842,6 +1871,15 @@ impl Manager {
+             let mut poll = Poll::new()?;
+@@ -1667,6 +1699,9 @@ impl Manager {
+                         .subsystem()
+                         .map(|s| s.to_string_lossy().to_string())
+                         .unwrap_or_default();
++                    if subsystem == "misc" && !dev_sysname.starts_with("fastrpc") {
++                        continue;
++                    }
+ 
+                     match action.to_string_lossy().trim() {
+                         "add" => {
+@@ -1717,6 +1752,15 @@ impl Manager {
          let tty_devices = tty_devices.into_iter().map(|dev| dev.into()).collect();
          Manager::discover_devices(cmd_tx, tty_devices).await?;
  
@@ -1546,7 +1573,7 @@ index 0000000..7ec8a57
 +    Capability::Gyroscope(Source::Center),
 +];
 diff --git a/src/input/source/iio/accel_gyro_3d.rs b/src/input/source/iio/accel_gyro_3d.rs
-index 53af26e..df99891 100644
+index 9d573e5..f7c1ac8 100644
 --- a/src/input/source/iio/accel_gyro_3d.rs
 +++ b/src/input/source/iio/accel_gyro_3d.rs
 @@ -83,6 +83,6 @@ impl Debug for AccelGyro3dImu {
@@ -1558,10 +1585,10 @@ index 53af26e..df99891 100644
  // a single thread.
  unsafe impl Send for AccelGyro3dImu {}
 diff --git a/src/input/source/iio/bmi_imu.rs b/src/input/source/iio/bmi_imu.rs
-index 3456115..27f0ff4 100644
+index f4b2637..c9a5b55 100644
 --- a/src/input/source/iio/bmi_imu.rs
 +++ b/src/input/source/iio/bmi_imu.rs
-@@ -82,6 +82,6 @@ impl Debug for BmiImu {
+@@ -84,6 +84,6 @@ impl Debug for BmiImu {
      }
  }
  
@@ -1757,32 +1784,3 @@ index 37f6093..0a97b03 100644
          let sysname = device.sysname().to_string_lossy().to_string();
          let syspath = device.syspath().to_string_lossy().to_string();
          let properties = device.get_properties();
-diff --git a/Cargo.lock b/Cargo.lock
-index e1efd66..133efec 100644
---- a/Cargo.lock
-+++ b/Cargo.lock
-@@ -1047,6 +1047,7 @@ dependencies = [
-  "glob-match",
-  "hidapi",
-  "inotify",
-+ "libloading",
-  "log",
-  "mio",
-  "nix 0.30.1",
-@@ -1213,6 +1214,16 @@ version = "0.2.178"
- source = "registry+https://github.com/rust-lang/crates.io-index"
- checksum = "37c93d8daa9d8a012fd8ab92f088405fb202ea0b6ab73ee2482ae66af4f42091"
- 
-+[[package]]
-+name = "libloading"
-+version = "0.9.0"
-+source = "registry+https://github.com/rust-lang/crates.io-index"
-+checksum = "754ca22de805bb5744484a5b151a9e1a8e837d5dc232c2d7d8c2e3492edc8b60"
-+dependencies = [
-+ "cfg-if",
-+ "windows-link",
-+]
-+
- [[package]]
- name = "libudev"
- version = "0.3.0"

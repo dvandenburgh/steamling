@@ -3,9 +3,9 @@
 # release, for the gyro: the patches (PATCHES.md) add a FastRPC source that reads the IMU off the
 # Qualcomm sensor core through libssc. The per-device config ships in steamling-bsp-<soc>.
 pkgname=inputplumber
-pkgver=0.84.0
-pkgrel=2
-_commit=117cb04e949f842397b96178bcc0d7fc7ba23acf   # v0.84.0
+pkgver=0.85.0
+pkgrel=1
+_commit=0f4b1995e9427463ac8af68ddcf316d07ca8a4dd   # v0.85.0
 _rustver=1.99.0
 pkgdesc="Open source input router and remapper daemon"
 arch=('aarch64')
