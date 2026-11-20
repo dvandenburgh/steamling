@@ -68,8 +68,9 @@ if [ -n "${STEAMLING_IMAGE_GITHUB}" ]; then
 
 ## Install
 
-Download the \`.img.xz\` for your handheld (\`sm8550\` is the Retroid Pocket 6 and the other
-Snapdragon 8 Gen 2 handhelds) and write it to a microSD card with
+Download the \`.img.xz\` for your handheld's chip family (the
+[device list](https://github.com/${repo}/blob/main/docs/devices.md) says which one yours is) and
+write it to a microSD card with
 [balenaEtcher](https://etcher.balena.io/), Rufus or Raspberry Pi Imager. There's no need to unpack
 it first. Then follow the [install guide](https://github.com/${repo}/blob/main/docs/install.md).
 
