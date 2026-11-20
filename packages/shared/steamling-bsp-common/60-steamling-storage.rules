@@ -1,0 +1,4 @@
+# The I/O scheduler and readahead for the handheld's own disks, the UFS (sd*) and the microSD card
+# (mmcblk*), as steamling-storage sets them. USB drives keep the kernel's choices.
+ACTION=="add|change", SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", KERNEL=="sd[a-z]|mmcblk[0-9]", \
+    ENV{ID_BUS}!="usb", RUN+="/usr/bin/steamling-storage apply %k"

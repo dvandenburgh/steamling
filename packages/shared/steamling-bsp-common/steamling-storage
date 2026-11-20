@@ -1,0 +1,83 @@
+#!/bin/bash
+# steamling-storage — the I/O scheduler and readahead for the handheld's own storage (UFS and the
+# microSD card; USB drives are left alone). The defaults live in /usr/share/steamling/storage.conf,
+# your choices in /etc/steamling/storage.conf, and 60-steamling-storage.rules applies them to each
+# disk as it appears.
+#
+#   steamling-storage                     what each disk uses now, and what's set
+#   sudo steamling-storage scheduler X    mq-deadline, adios, kyber, bfq or none
+#   sudo steamling-storage readahead N    in KB, e.g. 128 (the kernel's own) or 256
+#   sudo steamling-storage reset          back to Steamling's defaults
+#   steamling-storage apply <disk>        what the udev rule runs
+set -euo pipefail
+
+DEFAULTS=/usr/share/steamling/storage.conf
+LOCAL=/etc/steamling/storage.conf
+
+load() {
+  SCHEDULER="" READAHEAD_KB=""
+  # shellcheck source=/dev/null
+  . "${DEFAULTS}"
+  # shellcheck source=/dev/null
+  [ -f "${LOCAL}" ] && . "${LOCAL}"
+  return 0
+}
+
+# the handheld's own disks: UFS shows up as sd*, the microSD card as mmcblk*
+disks() {
+  local d bus
+  for d in /sys/block/sd* /sys/block/mmcblk[0-9]; do
+    [ -e "${d}/queue/scheduler" ] || continue
+    bus="$(udevadm info -q property -p "${d}" 2>/dev/null | sed -n 's/^ID_BUS=//p')"
+    [ "${bus}" = usb ] && continue
+    printf '%s\n' "${d##*/}"
+  done
+}
+
+apply() {  # $1 disk name (sda, mmcblk0)
+  local q="/sys/block/$1/queue"
+  [ -d "${q}" ] || return 0
+  load
+  # only a scheduler this kernel has: the list in the file is what it can take
+  if [ -n "${SCHEDULER}" ] && grep -qw -- "${SCHEDULER}" "${q}/scheduler" 2>/dev/null; then
+    echo "${SCHEDULER}" > "${q}/scheduler" 2>/dev/null || true
+  fi
+  [ -z "${READAHEAD_KB}" ] || echo "${READAHEAD_KB}" > "${q}/read_ahead_kb" 2>/dev/null || true
+}
+
+set_key() {  # $1 key, $2 value
+  [ "$(id -u)" -eq 0 ] || { echo "steamling-storage: run it with sudo" >&2; exit 1; }
+  install -d /etc/steamling
+  touch "${LOCAL}"
+  sed -i "/^$1=/d" "${LOCAL}"
+  printf '%s=%s\n' "$1" "$2" >> "${LOCAL}"
+  local d; while read -r d; do apply "${d}"; done < <(disks)
+}
+
+status() {
+  load
+  echo "set: scheduler ${SCHEDULER:-kernel default}, readahead ${READAHEAD_KB:-kernel default} KB$([ -f "${LOCAL}" ] && echo " (your choices in ${LOCAL})")"
+  local d
+  while read -r d; do
+    printf '%-10s scheduler %-40s readahead %s KB\n' "${d}" \
+      "$(cat "/sys/block/${d}/queue/scheduler")" "$(cat "/sys/block/${d}/queue/read_ahead_kb")"
+  done < <(disks)
+}
+
+case "${1:-status}" in
+  status) status ;;
+  scheduler)
+    case "${2:-}" in mq-deadline|adios|kyber|bfq|none) set_key SCHEDULER "$2" ;;
+      *) echo "usage: steamling-storage scheduler mq-deadline|adios|kyber|bfq|none" >&2; exit 2 ;; esac
+    status ;;
+  readahead)
+    [[ "${2:-}" =~ ^[0-9]+$ ]] || { echo "usage: steamling-storage readahead <KB>" >&2; exit 2; }
+    set_key READAHEAD_KB "$2"; status ;;
+  reset)
+    [ "$(id -u)" -eq 0 ] || { echo "steamling-storage: run it with sudo" >&2; exit 1; }
+    rm -f "${LOCAL}"
+    while read -r d; do apply "${d}"; done < <(disks)
+    status ;;
+  apply) apply "${2:?disk name}" ;;
+  *) sed -n '7,12p' "$0" >&2; exit 2 ;;
+esac
