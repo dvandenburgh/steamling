@@ -14,8 +14,10 @@ published() {  # <tree> <db name> -> "name filename" per package
   curl -fsSL --retry 3 "${STEAMLING_REPO_URL}/$1/$2.db" | bsdtar -xOf - \
     | awk '/^%FILENAME%$/{getline f} /^%NAME%$/{getline n; print n, f}'
 }
-soc_list="$(published "${SOC}" steamling)" || die "could not read ${STEAMLING_REPO_URL}/${SOC}/steamling.db"
-shared_list="$(published shared steamling-shared)" || die "could not read ${STEAMLING_REPO_URL}/shared/steamling-shared.db"
+# A tree that isn't published yet (a new family, or before the first publish) just means its
+# packages compile, so it warns instead of stopping the build.
+soc_list="$(published "${SOC}" steamling)" || { warn "nothing published at ${STEAMLING_REPO_URL}/${SOC} yet"; soc_list=""; }
+shared_list="$(published shared steamling-shared)" || { warn "nothing published at ${STEAMLING_REPO_URL}/shared yet"; shared_list=""; }
 # Keyed by the local repo a package builds into, so a copy published in the other tree (the
 # per-SoC repo's steamling-base bridge) is never taken for a shared package.
 declare -A pub=()
@@ -38,7 +40,13 @@ while IFS='|' read -r repo d p v a; do
     have=$((have + 1)); continue
   fi
   src="${pub["${repo}|${p}"]:-}"
-  case "${src##*/}" in "${p}-${v}-${a}.pkg.tar."*) ;; *) differ=$((differ + 1)); continue ;; esac
+  # Published under its GitHub-safe name (an epoch's ':' becomes '_'), kept here under the real
+  # one, which is what build-packages.sh looks for.
+  case "${src##*/}" in
+    "${p}-${v}-${a}.pkg.tar."*|"$(base_file_name "${p}-${v}-${a}").pkg.tar."*) ;;
+    *) differ=$((differ + 1)); continue ;;
+  esac
+  dest="${p}-${v}-${a}.pkg.tar.${src##*.pkg.tar.}"
   # A fresh download is newer than every file in the package dir, so build-packages.sh would
   # skip uncommitted edits there. Run as root on the user's checkout, hence safe.directory.
   if [ -n "$(git -c safe.directory='*' -C "${d}" status --porcelain -- . 2>/dev/null)" ]; then
@@ -54,7 +62,7 @@ while IFS='|' read -r repo d p v a; do
   # One version per package, as build-packages.sh keeps it: a second breaks `pacman -U` and
   # leaves the repo db on whichever repo-add saw last.
   rm -f "${repo}/${p}"-[0-9]*.pkg.tar.* "${repo}/${p}"-*:*.pkg.tar.*
-  mv "${part}" "${repo}/${src##*/}"; part=""
+  mv "${part}" "${repo}/${dest}"; part=""
   got=$((got + 1))
 done < <(local_artifacts)
 
