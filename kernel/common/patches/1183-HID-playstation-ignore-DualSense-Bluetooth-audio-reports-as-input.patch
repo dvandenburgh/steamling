@@ -1,0 +1,42 @@
+From: M0n7y5 <17201053+M0n7y5@users.noreply.github.com>
+Date: Sat, 14 Nov 2026 15:58:52 +0100
+Subject: [PATCH] HID: playstation: Ignore DualSense Bluetooth audio reports as
+ input
+
+Over Bluetooth, input report 0x31 carries controller state or microphone
+audio, told apart by the low nibble of the byte after the report ID.
+Audio reports were parsed as controller state, so enabling audio through
+hidraw produced bogus button, stick and touchpad events. Skip them; they
+still reach hidraw.
+
+Fixes: 799b2b533a29 ("HID: playstation: add DualSense Bluetooth support.")
+
+Link: https://github.com/CachyOS/linux/commit/5aec130e7f6b0036ec93953765e0a8477845610a
+---
+ drivers/hid/hid-playstation.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/hid/hid-playstation.c b/drivers/hid/hid-playstation.c
+--- a/drivers/hid/hid-playstation.c
++++ b/drivers/hid/hid-playstation.c
+@@ -82,6 +82,8 @@ struct ps_led_info {
+ #define DS_INPUT_REPORT_USB_SIZE		64
+ #define DS_INPUT_REPORT_BT			0x31
+ #define DS_INPUT_REPORT_BT_SIZE			78
++#define DS_INPUT_REPORT_BT_TYPE			GENMASK(3, 0)
++#define DS_INPUT_REPORT_BT_TYPE_AUDIO		0x2
+ #define DS_OUTPUT_REPORT_USB			0x02
+ #define DS_OUTPUT_REPORT_USB_SIZE		63
+ #define DS_OUTPUT_REPORT_BT			0x31
+@@ -1463,6 +1465,11 @@ static int dualsense_parse_report(struct ps_device *ps_dev, struct hid_report *r
+ 			return -EILSEQ;
+ 		}
+ 
++		/* Report 0x31 also carries microphone audio, which is not input. */
++		if (FIELD_GET(DS_INPUT_REPORT_BT_TYPE, data[1]) ==
++		    DS_INPUT_REPORT_BT_TYPE_AUDIO)
++			return 0;
++
+ 		ds_report = (struct dualsense_input_report *)&data[2];
+ 	} else {
+ 		hid_err(hdev, "Unhandled reportID=%d\n", report->id);
