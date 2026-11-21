@@ -113,6 +113,8 @@ for _bsp in "${STEAMLING_ROOT}"/devices/*/packages/steamling-bsp-*/PKGBUILD; do
   while read -r _dep; do
     _dep="${_dep%%[<>=]*}"
     case "${_dep}" in ''|steamling-*) continue ;; esac
+    # our own packages (hexagonrpc, libssc) come from [steamling-shared], never the base
+    [ -n "${ours[${_dep}]:-}" ] && continue
     [ -n "${want[${_dep}]:-}" ] && continue
     soc_missing+="  ${_dep} (needed by $(basename "$(dirname "${_bsp}")"))"$'\n'
   done <<< "${_deps}"
