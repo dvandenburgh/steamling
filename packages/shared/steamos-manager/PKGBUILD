@@ -1,9 +1,9 @@
 # steamos-manager - the D-Bus daemon behind Steam's QAM performance controls. The pinned
 # upstream Rust is needed because the locked base carries no rust/cargo.
 pkgname=steamos-manager
-pkgver=26.4.1.r12.g8e2883d
-pkgrel=3
-_commit=8e2883d0d7e2fc3994e822ca9853c03561ca6eec
+pkgver=26.4.1.r52.g2c51fc8
+pkgrel=1
+_commit=2c51fc82eabc95f9a61235ca98d4a5249c14239f
 _rustver=1.99.0
 pkgdesc="SteamOS Manager daemon (Steam's system-integration D-Bus service)"
 arch=('aarch64')

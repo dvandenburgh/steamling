@@ -14,7 +14,7 @@ the feature the voice list is simply empty.
  2 files changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/steamos-manager/Cargo.toml b/steamos-manager/Cargo.toml
-index a24a47d..fe46ecb 100644
+index b06503d..3f0a611 100644
 --- a/steamos-manager/Cargo.toml
 +++ b/steamos-manager/Cargo.toml
 @@ -4,6 +4,9 @@ version = "26.4.1"

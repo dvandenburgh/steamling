@@ -15,7 +15,7 @@ calls reach the next owner. Transient remotes keep the old behaviour.
  1 file changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/steamos-manager-macros/src/lib.rs b/steamos-manager-macros/src/lib.rs
-index 583b2d4..504b4ed 100644
+index 1ac98af..ed87bdb 100644
 --- a/steamos-manager-macros/src/lib.rs
 +++ b/steamos-manager-macros/src/lib.rs
 @@ -856,7 +856,16 @@ impl ToTokens for BaseInterface {

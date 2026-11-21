@@ -11,10 +11,10 @@ silent once Steam starts. It can still be enabled through state.toml.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/steamos-manager/src/daemon/root.rs b/steamos-manager/src/daemon/root.rs
-index 7a71215..bff19a3 100644
+index 82b2aaf..cf9bd07 100644
 --- a/steamos-manager/src/daemon/root.rs
 +++ b/steamos-manager/src/daemon/root.rs
-@@ -59,7 +59,7 @@ pub(crate) struct DsInhibit {
+@@ -58,7 +58,7 @@ pub(crate) struct DsInhibit {
  
  impl Default for DsInhibit {
      fn default() -> DsInhibit {

@@ -8,9 +8,11 @@ that 100, so MaxChargeLevel reported a 100% limit instead of -1 right
 after Steam turned it off. Report it as no limit, like the write side
 treats it.
 ---
+diff --git a/steamos-manager/src/power.rs b/steamos-manager/src/power.rs
+index 4d5ee9e..b133c68 100644
 --- a/steamos-manager/src/power.rs
 +++ b/steamos-manager/src/power.rs
-@@ -726,7 +726,13 @@
+@@ -806,7 +806,13 @@ fn parse_max_charge_level(result: std::io::Result<String>) -> Result<i32> {
  
  pub(crate) async fn get_max_charge_level() -> Result<i32> {
      let path = find_battery_charge_path().await?;
@@ -25,7 +27,7 @@ treats it.
  }
  
  pub(crate) async fn set_max_charge_level(limit: i32) -> Result<oneshot::Receiver<SysfsWritten>> {
-@@ -1511,6 +1517,41 @@
+@@ -1712,6 +1718,41 @@ pub(crate) mod test {
          assert_eq!(get_max_charge_level().await.unwrap(), 80);
      }
  

@@ -13,10 +13,10 @@ From armada-os/armada packages/steamos-manager/patches/0011, verbatim.
  1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/steamos-manager/src/inputplumber.rs b/steamos-manager/src/inputplumber.rs
-index 0da1ea7..0a0a05b 100644
+index c34da8b..ff3c50c 100644
 --- a/steamos-manager/src/inputplumber.rs
 +++ b/steamos-manager/src/inputplumber.rs
-@@ -103,12 +103,13 @@ impl DeckService {
+@@ -102,12 +102,13 @@ impl DeckService {
              .await?;
          if !self.is_deck(&proxy).await? {
              let config = device_config().await?;
@@ -34,7 +34,7 @@ index 0da1ea7..0a0a05b 100644
              let new_targets: Vec<&str> = targets.iter().map(AsRef::as_ref).collect();
  
              debug!(
-@@ -127,6 +128,18 @@ impl Service for DeckService {
+@@ -126,6 +127,18 @@ impl Service for DeckService {
      const NAME: &'static str = "inputplumber";
  
      async fn run(&mut self) -> Result<()> {

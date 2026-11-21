@@ -14,7 +14,7 @@ any previous task so a later load() does not double it.
  1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/steamos-manager-macros/src/lib.rs b/steamos-manager-macros/src/lib.rs
-index 3fcac6c..583b2d4 100644
+index df44a3f..1ac98af 100644
 --- a/steamos-manager-macros/src/lib.rs
 +++ b/steamos-manager-macros/src/lib.rs
 @@ -600,6 +600,9 @@ impl ToTokens for BaseInterface {

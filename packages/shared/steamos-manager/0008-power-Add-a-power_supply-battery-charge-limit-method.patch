@@ -18,10 +18,10 @@ minimum of 55. Write 100 instead.
  1 file changed, 81 insertions(+), 25 deletions(-)
 
 diff --git a/steamos-manager/src/power.rs b/steamos-manager/src/power.rs
-index 710f2ef..847004f 100644
+index a5f4594..4d5ee9e 100644
 --- a/steamos-manager/src/power.rs
 +++ b/steamos-manager/src/power.rs
-@@ -75,6 +75,10 @@ const SB_PATHS: &[&str] = &[
+@@ -89,6 +89,10 @@ const SB_PATHS: &[&str] = &[
  ];
  #[cfg(test)]
  const SB_PATHS: &[&str] = &["power_supply", "power_supply_legacy"];
@@ -32,7 +32,7 @@ index 710f2ef..847004f 100644
  pub const BATTERY_DEFAULT_SUGGESTED_MINIMUM_LIMIT: i32 = 10;
  const SB_LIMIT_PATH: &str = "charge_control_end_threshold";
  
-@@ -271,6 +275,7 @@ pub(crate) enum TdpManagerCommand {
+@@ -290,6 +294,7 @@ pub(crate) enum TdpManagerCommand {
  pub(crate) enum BatteryChargeLimitMethod {
      #[default]
      AcpiSb,
@@ -40,7 +40,7 @@ index 710f2ef..847004f 100644
      HwmonAttribute {
          hwmon: String,
          attribute: String,
-@@ -719,36 +724,40 @@ async fn find_battery_charge_path() -> Result<PathBuf> {
+@@ -748,36 +753,40 @@ async fn find_battery_charge_path() -> Result<PathBuf> {
          .and_then(|config| config.battery_charge_limit.as_ref())
          .ok_or(anyhow!("No battery charge limit configured"))?;
  
@@ -105,7 +105,7 @@ index 710f2ef..847004f 100644
          }
      }
      bail!("Battery not found");
-@@ -773,8 +782,14 @@ pub(crate) async fn get_max_charge_level() -> Result<i32> {
+@@ -802,8 +811,14 @@ pub(crate) async fn get_max_charge_level() -> Result<i32> {
  
  pub(crate) async fn set_max_charge_level(limit: i32) -> Result<oneshot::Receiver<SysfsWritten>> {
      ensure!((0..=100).contains(&limit), "Invalid limit");
@@ -121,7 +121,7 @@ index 710f2ef..847004f 100644
      sysfs_queued_write(path, data.as_bytes().to_owned()).await
  }
  
-@@ -1594,6 +1609,47 @@ pub(crate) mod test {
+@@ -1656,6 +1671,47 @@ pub(crate) mod test {
          assert!(set_max_charge_level(-1).await.is_err());
      }
  
