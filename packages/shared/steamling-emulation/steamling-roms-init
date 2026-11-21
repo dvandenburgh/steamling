@@ -65,6 +65,21 @@ have_merge() { command -v python3 >/dev/null 2>&1 && [ -x "${MERGE}" ]; }
 render_all() {  # $1 template dir, $2 out dir
   local src="$1" out="$2"; mkdir -p "${out}"
   printf '<?xml version="1.0"?>\n<string name="ROMDirectory" value="%s" />\n' "${ROMS}" > "${out}/es_settings.xml"
+  # Face buttons lettered the Nintendo way (A right, B bottom, STEAMLING_PAD_LETTERS in the board
+  # file): ES-DE takes the button labelled A as accept and shows Switch button prompts, so what
+  # the screen says matches what's printed on the pad.
+  [ "${STEAMLING_PAD_LETTERS:-}" = nintendo ] && printf '%s\n' \
+      '<string name="InputControllerType" value="switchpro" />' \
+      '<bool name="InputSwapButtons" value="true" />' >> "${out}/es_settings.xml"
+  # ES-DE keeps theme images and game art in VRAM up to this cap (512 MiB by default), and drops
+  # and reloads them as you scroll past it. The GPU shares the handheld's RAM, so the cap grows
+  # with it: 768 MiB from 12 GB, 1 GiB from 16 GB.
+  local ram_mb; ram_mb="$(awk '/^MemTotal:/{print int($2 / 1024)}' /proc/meminfo 2>/dev/null)"
+  if [ "${ram_mb:-0}" -ge 15000 ]; then
+    printf '<int name="MaxVRAM" value="1024" />\n' >> "${out}/es_settings.xml"
+  elif [ "${ram_mb:-0}" -ge 11000 ]; then
+    printf '<int name="MaxVRAM" value="768" />\n' >> "${out}/es_settings.xml"
+  fi
   local si=$(( REFRESH / 60 )); [ "${si}" -lt 1 ] && si=1
   local hdr=true nits="${STEAMLING_PANEL_HDR_NITS:-0}"
   case "${nits}" in ''|0|*[!0-9]*) hdr=false; nits=1000 ;; esac

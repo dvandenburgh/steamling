@@ -236,3 +236,7 @@ version, it is moved into `~/Emulation/emulators/eden/` for you and keeps workin
   (see above) and your games.
 - **ES-DE**: reads `~/Emulation/Library` (your games on the handheld and on a microSD card, see
   [above](#more-room-games-on-a-microsd-card)) and already knows where every emulator is installed.
+  On the Retroid Pocket 6, whose buttons are lettered the Nintendo way, the button marked A
+  confirms and the on-screen prompts show Switch-style letters. With 12 GB of RAM or more, ES-DE
+  is allowed more graphics memory for themes and game art, so it reloads them less as you scroll.
+  Anything you change in ES-DE's own menus is kept.
