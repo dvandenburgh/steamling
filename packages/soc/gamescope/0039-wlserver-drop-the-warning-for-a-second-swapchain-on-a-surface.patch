@@ -1,0 +1,33 @@
+From: Matthew Schwartz <matthew.schwartz@linux.dev>
+Date: Mon, 16 Nov 2026 15:08:59 -0800
+Subject: [PATCH] wlserver: drop the warning for a second swapchain on a
+ surface
+
+create_swapchain logs an error whenever a surface already has a
+gamescope_swapchain. Vulkan needs oldSwapchain alive while its
+replacement is created, so every client that passes one hits it on each
+recreation, and zink keeps the old one until the new one has presented.
+
+9563271d made a surface keep a list so a window can have several
+swapchains, which makes this a supported state. The layer already logs
+every creation along with its oldSwapchain.
+---
+ src/wlserver.cpp | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/wlserver.cpp b/src/wlserver.cpp
+--- a/src/wlserver.cpp
++++ b/src/wlserver.cpp
+@@ -1238,9 +1238,6 @@ static void create_gamescope_swapchain( struct wl_client *client, struct wl_reso
+ 		= wl_resource_create( client, &gamescope_swapchain_interface, wl_resource_get_version( resource ), id );
+ 	wl_resource_set_implementation( gamescope_swapchain_resource, &gamescope_swapchain_impl, wl_surface_info, gamescope_swapchain_handle_resource_destroy );
+ 
+-	if (wl_surface_info->gamescope_swapchains.size())
+-		wl_log.errorf("create_swapchain: Surface already had a gamescope_swapchain! Warning!");
+-
+ 	s_PresentTimingRoutes.emplace( gamescope_swapchain_resource,
+ 		std::make_shared<gamescope::PresentTimingRoute>( gamescope::PresentTimingRoute{ .resource = gamescope_swapchain_resource, .timing_events = timing_events } ) );
+ 	wl_surface_info->gamescope_swapchains.emplace_back( gamescope_swapchain_resource );
+-- 
+2.34.1
+

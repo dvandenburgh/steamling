@@ -6,7 +6,7 @@
 pkgname=gamescope
 epoch=1
 pkgver=3.17.0.rocknix.20261116.9fda8d1
-pkgrel=1
+pkgrel=2
 _commit=9fda8d1d43154b250d883697e72dcf698178000c
 install=gamescope.install
 pkgdesc="SteamOS session compositing WM — patched (for msm handhelds)"
@@ -53,8 +53,9 @@ source=("gamescope::git+https://github.com/ValveSoftware/gamescope.git#commit=${
         # Steam's refresh slider gets the rate it asked for, not its highest multiple (armada 0032)
         '0032-steamcompmgr-use-the-exact-rate-for-refresh-only-requests.patch'
         '0034-drm-apply-the-preferred-mode-to-internal-screens-only.patch'
-        '0038-steamcompmgr-take-the-cursor-repaint-flag-before-deciding-to-paint.patch')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        '0038-steamcompmgr-take-the-cursor-repaint-flag-before-deciding-to-paint.patch'
+        '0039-wlserver-drop-the-warning-for-a-second-swapchain-on-a-surface.patch')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
   cd gamescope
