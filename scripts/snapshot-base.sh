@@ -395,7 +395,8 @@ if [ -n "${STEAMLING_BASE_GITHUB}" ]; then
   log "publishing -> GitHub ${STEAMLING_BASE_GITHUB} ($(du -sh "${OUT}" | cut -f1))"
   gh_publish_cut "${OUT}" "${ID}" "${BASE_REPO}" "${DATED_TARBALL}"
   PARTS="${GH_PARTS}"
-  WHERE="GitHub ${STEAMLING_BASE_GITHUB}, ${PARTS} release(s) from ${GH_TAG} (previous kept as ${GH_TAG}-prev)"
+  WHERE="GitHub ${STEAMLING_BASE_GITHUB}, ${PARTS} release(s) from ${GH_TAG}"
+  if gh_release_exists "${GH_TAG}-prev"; then WHERE+=" (previous kept as ${GH_TAG}-prev)"; else WHERE+=" (the first one there)"; fi
 else
 [ -n "${RCLONE_DEST}" ] || die "STEAMLING_BASE_RCLONE_REMOTE unset — cannot upload"
 need_tool rclone
