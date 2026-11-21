@@ -2,9 +2,9 @@
 # the AArch64 recompiler backend only exists on main. Bump = move _commit to a newer main commit
 # and set pkgver to <last release>.<commit date>.<short sha>, which vercmp orders by date.
 pkgname=cemu
-pkgver=2.6.20261113.d4f7205
+pkgver=2.6.20261120.2f49c07
 pkgrel=1
-_commit=d4f720597e022737782e6215c0ec3ab1d9ae6636
+_commit=2f49c079da1d50b85cea0ed99aedda58846b3523
 pkgdesc="Cemu — Wii U emulator (native aarch64 build with the ARM64 recompiler)"
 arch=('aarch64')
 url="https://cemu.info"
