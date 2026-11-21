@@ -4,9 +4,9 @@
 # soname has moved with each Plasma minor release, so the upper bound makes pacman refuse a newer
 # libplasma this build can't load instead of installing it.
 pkgname=plasma-mobile
-pkgver=6.8.1
-pkgrel=1.2
-_commit=31477b8d72aba7df6ef13cb45548cea3d27ba696  # v6.8.1
+pkgver=6.8.3
+pkgrel=1
+_commit=db5fae30e56962c69f95dcd4ad48d267e4e4e31c  # v6.8.3
 pkgdesc='Plasma shell and components targeted for phones'
 arch=('aarch64')
 url='https://invent.kde.org/plasma/plasma-mobile'
