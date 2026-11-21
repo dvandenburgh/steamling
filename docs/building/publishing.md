@@ -76,6 +76,14 @@ handheld that was flashed before the repo existed adds the repo when it installs
 update has to come from your PC ([Updating Steamling](../updating.md)); after that it updates
 itself.
 
+A handheld you've been updating from your PC already has `[steamling]` sections pointing at it,
+and those are left alone. Once the repo is up, switch it over with:
+
+```bash
+sudo steamling-base repo
+sudo pacman -Syu
+```
+
 ### Every release after that
 
 Build as usual, then name the packages that changed:
