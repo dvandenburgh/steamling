@@ -22,20 +22,25 @@ That does **not** mean you need an ARM computer to build it:
 | SD image (`make sd-image`) | native | native: just partitioning and copying files |
 
 The emulated steps are the slow part on x86_64. Most of that cost is compiling the big packages
-(mesa, gamescope, FEX, the emulators). Your first build compiles all of them; after that, a build
-only recompiles the packages whose recipe changed, so it is far quicker.
+(mesa, gamescope, FEX, the emulators). The build skips that wherever it can: it downloads every
+package already published for your chip at the version your checkout builds, and only compiles
+the rest. For the Snapdragon 8 Gen 2 handhelds that leaves little to compile; for a chip with
+nothing published yet, the first build compiles them all. After that, a build only recompiles the
+packages whose recipe changed.
 
 An aarch64 host (an Arch/Fedora VM on Apple Silicon, an ARM cloud server) needs no emulation at all
 and is still the fastest way to build everything from source.
 
 ## What a build does
 
-1. **Kernel** - `make kernel` builds the committed kernel (`kernel/<soc>/`) into a boot image.
-2. **Packages** - `make build` first builds every Steamling package that is not already in
-   `build/localrepo/` at its current version, so after the first build only real changes compile.
-3. **Root filesystem** - `make build` then installs the Arch Linux ARM base and the packages into
+1. **Published packages** - `make seed` downloads the packages the package repo already has at
+   exactly the version this checkout builds into `build/localrepo/` (`--no-seed` skips it).
+2. **Kernel** - `make kernel` builds the committed kernel (`kernel/<soc>/`) into a boot image.
+3. **Packages** - `make build` first builds every Steamling package that is not already in
+   `build/localrepo/` at its current version, so only real changes compile.
+4. **Root filesystem** - `make build` then installs the Arch Linux ARM base and the packages into
    `build/rootfs/`, and pre-installs the ARM Steam client so first boot works offline.
-4. **Image** - `make sd-image` turns that into a flashable `build/image/<soc>/steamling-<soc>-sd.img`.
+5. **Image** - `make sd-image` turns that into a flashable `build/image/<soc>/steamling-<soc>-sd.img`.
 
 `make help` lists every target; `make check` is a preflight that also reports what this host is
 missing for an image build.
@@ -70,6 +75,7 @@ These are the steps it runs, and each is a target of its own:
 
 ```bash
 make check                                   # host lines must say ok (make host-setup fixes most)
+sudo make seed                               # download what's already published
 sudo make kernel
 make pending                                 # what `make build` would still compile
 sudo make build
@@ -91,8 +97,9 @@ newer ROCKNIX.
 
 ### Before `make build`: read `make pending`
 
-`make pending` lists every package `make build` would compile: on a first build that is all of
-them, after that only the ones whose recipe changed since you last built them, plus the kernel
+`make pending` lists every package `make build` would compile: on a first build everything that
+wasn't published at your version, after that only the ones whose recipe changed since you last
+built them, plus the kernel
 package (`linux-steamling-<soc>`, which is just repackaged from your `make kernel` output). If it
 lists something big like `mesa`, `gamescope` or `dolphin-emu` you didn't expect, a `git pull`
 moved that package's version. Compiling it under qemu takes hours, so plan for it.
@@ -119,6 +126,7 @@ environment (for example `make image SSH=1`, `export SSH=1` to make it the defau
 | `--no-sd-image` | `SD_IMAGE=off` | stop at the finished rootfs (`make rootfs`) |
 | `--update` | `STEAMLING_UPDATE=1` | build only the kernel and the packages that changed, with no rootfs or SD image (`make update`): what [updating a handheld from your own build](updating-from-your-pc.md) needs |
 | `--publish` | `STEAMLING_PUBLISH=1` | after the build, publish every package that's newer than the package repo, both trees (`make publish-changed`; [publishing.md](publishing.md#every-release-after-that)). Run it as yourself, usually with `--update` |
+| `--no-seed` | `STEAMLING_SEED=off` | compile every package instead of downloading the published ones first |
 | `--no-host-setup` | `STEAMLING_HOST_SETUP=off` | stop when host packages are missing instead of installing them |
 | `--no-status-bar` | `STEAMLING_STATUS_BAR=off` | plain output, without the status line at the bottom |
 | (none) | `STEAMLING_BASE_SNAPSHOT=live` | build straight from Arch Linux ARM's own repos and latest tarball instead of the frozen base: nothing to host or upload, but every build gets whatever ALARM has that day (put it in `config/local.conf` to keep it) | <!-- docs-check: allow -->
@@ -162,14 +170,14 @@ one go instead of package by package, see [Updating a handheld from your own bui
 
 Plan on roughly **100 GB free** for a full build (build chroot, rootfs, kernel tree with debug info,
 caches, and the image). Rough times on a recent 8-core x86_64 PC: kernel 20-40 minutes the first
-time, `make build` one to three hours under qemu once every package is compiled (the first time,
-compiling them all adds many hours on x86_64), `make sd-image` 10-20 minutes. An aarch64 host is faster for the package and rootfs steps.
+time, `make build` one to three hours under qemu once every package is there (compiling them all,
+on a chip with nothing published, adds many hours on x86_64), `make sd-image` 10-20 minutes. An aarch64 host is faster for the package and rootfs steps.
 `make kernel` does nothing when `kernel/<soc>/` has not changed since its last build, and with
 ccache installed a small kernel change rebuilds in minutes. Packages use their own ccache inside
 the build chroot, so after the first build a version bump or a small patch only recompiles the files
-that changed. It needs up to 20 GB in `build/cache/ccache-pkg`. ccache has to be in the package
-base the build uses: the current frozen base doesn't carry it, so for now the build says so and
-compiles without it. A base snapshot taken after a live-base build includes it.
+that changed. It needs up to 20 GB in `build/cache/ccache-pkg`. ccache comes from the package
+base the build uses, and the current frozen base carries it; on an older base without it, the
+build says so and compiles without it.
 
 ## Upstream mirrors (optional)
 

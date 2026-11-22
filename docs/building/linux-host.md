@@ -94,7 +94,7 @@ Follow the [Quick start](advanced.md#quick-start). In short:
 (`make image` is the same; `./build.sh --help` lists the options), or step by step:
 
 ```bash
-sudo make kernel && make pending
+sudo make seed && sudo make kernel && make pending
 sudo make build && sudo make sd-image
 ```
 
