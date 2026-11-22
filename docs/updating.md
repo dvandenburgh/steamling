@@ -1,13 +1,17 @@
 # Updating Steamling
 
-Steamling has no download server: there's no package repo and no over-the-air updates. A new
-version of Steamling comes from building it yourself. You then get it onto the handheld one of two
-ways:
+Steamling's own packages (the kernel, Mesa, gamescope, Governor and the rest) come from
+Steamling's package repo, so a handheld updates over the internet: **Governor → System → Check for
+Updates** in game mode, the **Steamling Updater** app in desktop mode, or `sudo pacman -Syu` in a
+terminal. An image built from a current Steamling checkout already knows about the repo. A
+handheld set up before the repo existed needs [switching over once](#switching-to-the-package-repo).
+
+If you build Steamling yourself, there are two more ways to get your own build onto a handheld:
 
 - **Reflash** the SD card with the new image. Simple, but it wipes the card, so back up your saves
   and anything else on it first.
 - **Update over your home network** from the PC you build on. Nothing is wiped and it takes a few
-  minutes. The rest of this page walks through it.
+  minutes. Most of this page walks through it.
 
 Some things update on their own either way: the Steam client updates itself and tells you when one
 is ready, Decky offers its own updates, and games update through Steam as usual.
@@ -115,23 +119,39 @@ roll it back.
 
 ### Undoing it
 
-To stop updating from your PC:
+To stop updating from your PC and go back to the package repo, see the next section.
 
-```bash
-sudo sed -i '/^\[steamling\]$/,+3d;/^\[steamling-shared\]$/,+3d' /etc/pacman.conf
-```
+## Switching to the package repo
+
+A handheld from an image built before the package repo existed, or one you've been updating from
+your PC, doesn't update from the repo yet. To switch it over:
+
+1. If it has never been updated from your PC, do that once first, following the steps above. That
+   brings in a `steamling-base` package that knows where the repo is.
+2. Then, over SSH:
+
+   ```bash
+   sudo steamling-base repo
+   sudo pacman -Syu
+   ```
+
+The first command replaces the sections pointing at your PC with the repo's, and trusts the key the
+repo's packages are signed with. The update after it usually has little or nothing to do. From then
+on the handheld updates from the repo, and you can stop the server on your PC.
 
 ## Governor's System tab and Steamling Updater
 
 **Governor → System**, the **Steamling Updater** app in desktop mode and
 `sudo pacman -Syu` all do the same thing: install updates from the repos the handheld knows about.
-On a fresh image that means the Arch Linux ARM side only, never Steamling's own packages:
+That means:
 
-- an image built on Steamling's frozen base finds nothing new until a newer build moves the base
-- an image built from live Arch Linux ARM gets Arch's latest packages, with ours held back
+- Steamling's own packages from the package repo, or from your PC if you've pointed the handheld
+  there as above
+- the Arch Linux ARM side from Steamling's frozen base, which only changes when a newer Steamling
+  release moves the base (an image you built from live Arch Linux ARM gets Arch's latest packages
+  instead)
 
-Once your handheld points at your PC as above, they install your new build too. The **Roll Back Last Update** button there undoes the last update, whichever way
-you ran it.
+The **Roll Back Last Update** button there undoes the last update, whichever way you ran it.
 
 ## Steam's update channel
 
@@ -139,7 +159,8 @@ Steam's **Settings → System → Beta Participation** has two drop-downs:
 
 - **Steam Client Update Channel** switches the Steam client between **Steam Stable** and
   **Steam Beta**. Steam restarts onto the channel you pick, and it stays on it across reboots.
-- **OS Update Channel** always reads **stable** and has nothing else to pick. Steamling has no
-  update server behind it; your system updates come from your own builds, as above.
+- **OS Update Channel** always reads **stable** and has nothing else to pick. Steam's own system
+  update check isn't connected to Steamling: system updates come through Governor → System, as
+  above.
 
 ![Steam's Beta Participation settings: OS Update Channel on stable and Steam Client Update Channel on Steam Stable](images/steam-settings-update-channel.jpeg)

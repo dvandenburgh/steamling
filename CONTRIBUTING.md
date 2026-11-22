@@ -119,8 +119,9 @@ This tree builds four SoC families: `sm8550` (the Retroid Pocket 6, the referenc
 (`--emulation`) bakes the emulation layer into the image.
 
 Packages compress as `.pkg.tar.zst` (older ones as `.pkg.tar.xz`), so glob `*.pkg.tar.*`.
-There's no package repo or release download: everyone builds their own image, and updates a
-handheld from their own build ([docs/updating.md](docs/updating.md)).
+Handhelds update Steamling's own packages from its package repo on GitHub
+([docs/building/publishing.md](docs/building/publishing.md) covers putting packages there). To try
+your own changes, update a handheld from your own build ([docs/updating.md](docs/updating.md)).
 
 ## Testing on a device
 

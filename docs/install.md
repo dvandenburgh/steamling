@@ -125,10 +125,10 @@ came back: …**. The menu's **Log** entry has the details. Here's what each one
 
 ## Updating
 
-There's no download server for Steamling, so updates don't arrive on their own. When you build a
-newer version, you can either flash the new image (which wipes the card, so back up your saves
-first) or send it to the handheld over your home network without reflashing.
-[Updating Steamling](updating.md) walks through both.
+Steamling updates from its package repo: **Governor → System → Check for Updates** in game mode,
+or the **Steamling Updater** app in desktop mode. If you build Steamling yourself, you can also send
+your own build to the handheld over your home network, or flash a new image (which wipes the card,
+so back up your saves first). [Updating Steamling](updating.md) walks through all of it.
 
 The Steam client updates itself separately and tells you when one is available. If an update goes
 wrong, see [snapshots and rollback](snapshots.md).

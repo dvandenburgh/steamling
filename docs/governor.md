@@ -301,9 +301,10 @@ System updates, without leaving game mode:
    game may stutter while it installs.
 3. Restart when it finishes to apply everything (**Restart Now** appears right there).
 
-Steamling has no package server of its own, so on a fresh image this only covers the Arch Linux
-ARM side. Steamling's own packages come from building it yourself: point the handheld at your
-build PC as [Updating Steamling](updating.md) shows, and this button installs your new build too.
+That covers Steamling's own packages, from its package repo, and the Arch Linux ARM side, from
+Steamling's frozen base. A handheld set up before the repo existed needs
+[switching over once](updating.md#switching-to-the-package-repo) first. If you build Steamling
+yourself and point the handheld at your PC, this button installs your own build instead.
 
 The update keeps running even if you close the Quick Access menu - reopen the tab to check
 on progress. If you prefer, the same update is just `sudo pacman -Syu` in a terminal, or the
