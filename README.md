@@ -62,9 +62,11 @@ explains how to build for it and what to report.
 
 ## Getting started
 
-1. **Get an image.** Build one with the [build guide](docs/building/README.md). It's written so
-   you can follow it even if you've never built anything on Linux. Ready-made images will go up
-   on the [Releases](https://github.com/Steamling/steamling/releases) page once there are some.
+1. **Get an image.** Download it from the [Releases](https://github.com/Steamling/steamling/releases)
+   page. So far there's one for the Snapdragon 8 Gen 2 handhelds (`sm8550`: the Retroid Pocket 6
+   and the others in the first two rows). For the other chips, build one with the
+   [build guide](docs/building/README.md). It's written so you can follow it even if you've never
+   built anything on Linux.
 2. **Install it** by following the [install guide](docs/install.md).
 3. **Play.** Launch a game, open the Quick Access Menu, go to **Performance** and set a
    **Framerate Limit**. If it still doesn't feel smooth, try the game's own vsync setting.
