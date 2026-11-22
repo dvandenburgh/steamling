@@ -41,8 +41,8 @@ trap 'rm -f "${tmp}"' EXIT
   elif [ -n "${soc}" ]; then
     echo "VARIANT_ID=${soc}"
   fi
-  echo 'HOME_URL="https://github.com/dvandenburgh/steamling"'
-  echo 'BUG_REPORT_URL="https://github.com/dvandenburgh/steamling/issues"'
+  echo 'HOME_URL="https://github.com/Steamling/steamling"'
+  echo 'BUG_REPORT_URL="https://github.com/Steamling/steamling/issues"'
   grep -vE '^(NAME|PRETTY_NAME|VERSION|VERSION_ID|VERSION_CODENAME|BUILD_ID|VARIANT|VARIANT_ID|HOME_URL|DOCUMENTATION_URL|SUPPORT_URL|BUG_REPORT_URL)=' "${osr}" || true
 } > "${tmp}"
 # Runs every boot: leave the file alone when nothing changed.
