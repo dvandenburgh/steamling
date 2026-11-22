@@ -9,7 +9,7 @@ SCRIPTS := scripts
 
 .DEFAULT_GOAL := help
 
-.PHONY: help image rootfs update status watch host-setup sync bootstrap build kernel packages seed pending sd-image snapshot base-diff extend-base stage stage-check publish stage-shared stage-check-shared publish-shared publish-sources publish-image install check mirrors du trim clean distclean
+.PHONY: help image rootfs update status watch host-setup sync bootstrap build kernel packages seed pending sd-image snapshot base-diff extend-base stage stage-check publish stage-shared stage-check-shared publish-shared publish-changed publish-sources publish-image install check mirrors du trim clean distclean
 
 help: ## Show this help
 	@echo "steamling build targets:"
@@ -84,6 +84,9 @@ stage-check-shared: ## Re-run the consistency gate on the staged [steamling-shar
 
 publish-shared: ## Sign + publish the staged [steamling-shared] repo (run 'make stage-shared' first)
 	@STEAMLING_REPO_SCOPE=shared $(SCRIPTS)/publish-repo.sh $(PUBLISH_ARGS)
+
+publish-changed: ## Publish every built package that's newer than the package repo, both trees (as yourself, no sudo)
+	@$(SCRIPTS)/publish-changed.sh
 
 publish-sources: ## Keep our own copies of the files the build gets from the Arch Linux Archive (as yourself, no sudo)
 	@$(SCRIPTS)/publish-sources.sh
