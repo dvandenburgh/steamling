@@ -97,9 +97,11 @@ added), then run plain `make sync`.
 
 **`make pending` lists `mesa`, `gamescope`, an emulator or another big package**
 
-`make build` will compile it, and under qemu that can take hours. On a first build every package is
-listed. After that, it means the package's version changed: a `git pull` brought a newer recipe, or
-you changed it yourself. The compile is expected; it only happens once per version.
+`make build` will compile it, and under qemu that can take hours. On a first build, every package
+the package repo doesn't have at your checkout's version is listed (for a chip with nothing
+published yet, that's all of them). After that, it means the package's version changed: a
+`git pull` brought a newer recipe, or you changed it yourself. The compile is expected; it only
+happens once per version.
 
 **`error still mounted under .../build/pkgbuild-root-<soc>, not wiping it`**
 
@@ -111,8 +113,30 @@ device nodes. `make clean` refuses in that state for the same reason.
 
 **`error chroot base upgrade failed — refusing to build against a stale base`**
 
-The package build chroot could not reach the Arch Linux ARM mirrors. Re-run when the network is
-back.
+The package build chroot could not reach the frozen base on
+[Steamling/base](https://github.com/Steamling/base) (or Arch Linux ARM's own mirrors, on a live
+base build). Re-run when the network is back.
+
+**`STALE ARTIFACT WILL SHIP`** at the end of `make packages`
+
+A package failed to build, and the copy from an earlier build is still in `build/localrepo/`, so
+the image or update gets that older version without any other error. Scroll up to the first error
+for that package and fix it, or rebuild it on its own with `sudo make packages PKG=<name>`.
+
+**A download from `archive.archlinux.org` hangs or fails**
+
+fex-emu, fex-rootfs and steamling-turnip-x86 are built from old x86 Arch packages that only the Arch
+Linux Archive still keeps. The build takes Steamling's own copies of those first
+([publishing.md](publishing.md#copies-of-the-arch-linux-archive-files)), so this only happens for a
+file that isn't saved there yet, usually right after a version pin moved. If the archive is down,
+ship the copies you already built and rebuild later: add this to `config/local.conf`, <!-- docs-check: allow -->
+
+```sh
+STEAMLING_KEEP_PKGS="fex-emu fex-rootfs steamling-turnip-x86"
+```
+
+then take it out again once the archive answers and run
+`sudo make packages PKG="fex-emu fex-rootfs steamling-turnip-x86"`.
 
 **`make packages` prints the package list, then `make: *** [Makefile:...: packages] Error 2`**
 
