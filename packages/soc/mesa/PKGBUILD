@@ -6,7 +6,7 @@ pkgname=(mesa vulkan-freedreno)
 epoch=2
 pkgver=26.3.1
 _srcver=${pkgver}
-pkgrel=3
+pkgrel=4
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${pkgver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -34,6 +34,7 @@ options=(!lto)
 # 0020 is the one Turnip fix the previous series had that this branch has not picked up.
 # 0022 fixes a use-after-free when Turnip fails to place a descriptor set in its pool (main only).
 # 0023 keeps Turnip's descriptor sets 64-byte aligned after a pool reset (main only).
+# 0024 stops a Turnip assertion on 64-bit values in inline uniform blocks (26.3 branch).
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
@@ -51,7 +52,8 @@ source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0019-tu-copy-mutable-ubwc-images-through-their-written-format.patch'
         '0020-tu-Skip-zero-sized-inline-uniform-blocks.patch'
         '0022-tu-Fix-tu_descriptor_set-UAF-in-tu_descriptor_set_create.patch'
-        '0023-tu-Fix-descriptor-set-alignment-after-descriptor-pool-reset.patch')
+        '0023-tu-Fix-descriptor-set-alignment-after-descriptor-pool-reset.patch'
+        '0024-tu-Lower-UBO-access-sizes-before-lowering-inline-uni.patch')
 sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             'b302a6716d00d24cb33aaef758cc95a5b78bfc348cd4d103a66b673ae9125e42'
             '59aacd0c04f838834121822887e9c2218ba7d56012c8433696632d72fb619903'
@@ -69,7 +71,8 @@ sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             '24c20cd1c8ba6810f8c9eb4bc01ac67755e33b3d2a004567b4b2cf083a9c8662'
             '8ac0ae731202cdee5c728e4fe07b1328898bb3285f289cb6f095ca64bcd8aab5'
             'c9c9e6d01d37dcd98507faee8022e574f166f72edf49df475dc9a40297322aa0'
-            'b843e1995229b8aef974b53f67d1f15e9ced9940099c7ee891e0e46a016a652d')
+            'b843e1995229b8aef974b53f67d1f15e9ced9940099c7ee891e0e46a016a652d'
+            'dc8a3a86f8c4912cf5db03cf1f774d88e579f30050ef1c480fd510bbebfca524')
 
 prepare() {
   cd "mesa-${_srcver}"

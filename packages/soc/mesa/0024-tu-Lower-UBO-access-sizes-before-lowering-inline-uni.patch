@@ -1,0 +1,42 @@
+From d4f62914adcbc13c303cfa8a8a1ed8270f73f430 Mon Sep 17 00:00:00 2001
+From: Valentine Burley <valentine.burley@collabora.com>
+Date: Tue, 17 Nov 2026 11:30:58 +0100
+Subject: [PATCH] tu: Lower UBO access sizes before lowering inline uniform
+ blocks
+
+Inline uniform blocks are lowered to const file loads, which don't
+support 64-bit components. This can trigger an assertion failure in
+ir3_64b_get_lo() when using shaderInt64.
+
+Cc: mesa-stable
+Assisted-by: LLM
+Signed-off-by: Valentine Burley <valentine.burley@collabora.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46334>
+(cherry picked from commit 6f26f219568115d04b8154f52f45e49432987eb9)
+---
+ src/freedreno/vulkan/tu_shader.cc | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.cc
+index 48c9bdf35cd..f7688efba80 100644
+--- a/src/freedreno/vulkan/tu_shader.cc
++++ b/src/freedreno/vulkan/tu_shader.cc
+@@ -3648,10 +3648,13 @@ tu_lower_nir(struct tu_device *dev,
+       nir_shader_gather_xfb_info(nir);
+ 
+    {
+-      /* Lower 64b push constants before lowering IO. */
++      /* Lower push constant and UBO access sizes before lowering IO, because
++       * tu_lower_io() turns push constants and inline uniform blocks into
++       * const file loads, which can only load whole 32-bit components.
++       */
+       nir_lower_mem_access_bit_sizes_options options = {
+          .callback = ir3_mem_access_size_align,
+-         .modes = nir_var_mem_push_const,
++         .modes = nir_var_mem_push_const | nir_var_mem_ubo,
+       };
+ 
+       NIR_PASS(_, nir, nir_lower_mem_access_bit_sizes, &options);
+-- 
+2.34.1
+
