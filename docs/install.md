@@ -19,7 +19,8 @@ larger is recommended.
 
 ## 1. Flash the SD card
 
-Download the image from the [Releases](https://github.com/Steamling/steamling/releases) page: the
+[Download the latest image](https://sourceforge.net/projects/steamling/files/latest/download)
+(the [Releases](https://github.com/Steamling/steamling/releases) page has what's new in each). The
 `steamling-sm8550-...-sd.img.xz` file is the one for the Retroid Pocket 6 and the other
 Snapdragon 8 Gen 2 handhelds. balenaEtcher, Rufus and Raspberry Pi Imager write a `.img.xz` as it
 is, so don't unpack it first. Or build the image yourself with the [build guide](building/README.md)
