@@ -5,7 +5,7 @@
 pkgname=fex-emu
 _commit=4f9c1f1e36443d22d7655477e34f51b95b685bf1
 pkgver=2611.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Fast usermode x86/x86-64 emulator for AArch64, built with host+guest thunks"
 arch=('aarch64')
 url="https://github.com/FEX-Emu/FEX"
@@ -15,7 +15,6 @@ depends=('systemd-libs' 'squashfuse' 'erofs-utils' 'fuse2'
 # clang is mandatory (FEX upstream only builds with clang); lld for the guest cross-link.
 makedepends=('git' 'clang' 'lld' 'llvm' 'cmake' 'ninja' 'pkgconf'
              'python' 'python-setuptools'
-             'qt6-base' 'qt6-declarative'
              'libepoxy' 'sdl2-compat'
              'alsa-lib' 'libdrm' 'libglvnd' 'libx11' 'libxrandr' 'openssl' 'wayland' 'zlib')
 # FEX falls back to its pinned External/ submodules only when find_package misses, and Arch's
@@ -87,6 +86,8 @@ build() {
   # TUNE_CPU (injected per-SoC by build-packages.sh) tunes only FEXCore's own engine — JIT
   # output is runtime-tuned to the real CPU — so it stays at a safe armv8.2 core to avoid an
   # armv9 host-tool SIGILL on the build host. Do not raise it to the device's prime core.
+  # FEXConfig, FEX's Qt settings app, stays out: nothing here uses it, and with no Qt in the
+  # base it made the build look for Qt5 and stop.
   cmake -G Ninja -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -96,6 +97,7 @@ build() {
     -DENABLE_OFFLINE_TELEMETRY=OFF \
     -DBUILD_TESTING=OFF \
     -DBUILD_FEX_LINUX_TESTS=OFF \
+    -DBUILD_FEXCONFIG=OFF \
     -DBUILD_THUNKS=ON \
     -DENABLE_CLANG_THUNKS=ON \
     -DX86_DEV_ROOTFS="${srcdir}/sysroot" \
