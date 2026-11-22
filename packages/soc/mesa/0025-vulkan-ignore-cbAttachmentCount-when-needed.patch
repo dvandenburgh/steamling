@@ -1,0 +1,82 @@
+From 143dde4a1a2b3622f9e202e5940a484b4538fb0d Mon Sep 17 00:00:00 2001
+From: Samuel Pitoiset <samuel.pitoiset@gmail.com>
+Date: Thu, 12 Nov 2026 11:23:15 +0100
+Subject: [PATCH] vulkan: ignore cbAttachmentCount when needed
+
+The Vulkan spec 1.4.368 clarified this:
+    "attachmentCount is the number of
+     VkPipelineColorBlendAttachmentState elements in pAttachments. It
+     is ignored if the pipeline is created with
+     VK_DYNAMIC_STATE_COLOR_BLEND_ENABLE_EXT,
+     VK_DYNAMIC_STATE_COLOR_BLEND_EQUATION_EXT, and
+     VK_DYNAMIC_STATE_COLOR_WRITE_MASK_EXT dynamic states set, and
+     either VK_DYNAMIC_STATE_COLOR_BLEND_ADVANCED_EXT set or the
+     VK_EXT_blend_operation_advanced extension not enabled."
+
+Same rule applies to pAttachments.
+
+Cc: mesa-stable
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16842
+Signed-off-by: Samuel Pitoiset <samuel.pitoiset@gmail.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46229>
+(cherry picked from commit 5755e59f03b02a6fff2f2b47fb4d7efc5e789125)
+---
+ src/vulkan/runtime/vk_graphics_state.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/src/vulkan/runtime/vk_graphics_state.c b/src/vulkan/runtime/vk_graphics_state.c
+index e11d9d36cd5e..90ed2ce702a9 100644
+--- a/src/vulkan/runtime/vk_graphics_state.c
++++ b/src/vulkan/runtime/vk_graphics_state.c
+@@ -1026,17 +1026,21 @@ vk_color_blend_state_init(struct vk_color_blend_state *cb,
+    cb->logic_op_enable = cb_info->logicOpEnable;
+    cb->logic_op = cb_info->logicOp;
+ 
+-   assert(cb_info->attachmentCount <= MESA_VK_MAX_COLOR_ATTACHMENTS);
+-   cb->attachment_count = cb_info->attachmentCount;
+-
+-   /* Per spec, pAttachments is ignored if BLEND_ENABLES, BLEND_EQUATIONS,
+-    * WRITE_MASKS, and BLEND_ADVANCED are all dynamic.
++   /* Per spec, attachmentCount and pAttachments are ignored if
++    * BLEND_ENABLES, BLEND_EQUATIONS, WRITE_MASKS, and BLEND_ADVANCED are all
++    * dynamic. BLEND_ADVANCED is implicitly dynamic when
++    * advancedBlendCoherentOperations is not enabled.
+     */
+    bool full_dynamic = IS_DYNAMIC(CB_BLEND_ENABLES) &&
+                        IS_DYNAMIC(CB_BLEND_EQUATIONS) &&
+                        IS_DYNAMIC(CB_WRITE_MASKS) &&
+                        IS_DYNAMIC(CB_BLEND_ADVANCED);
+ 
++   if (!full_dynamic) {
++      assert(cb_info->attachmentCount <= MESA_VK_MAX_COLOR_ATTACHMENTS);
++      cb->attachment_count = cb_info->attachmentCount;
++   }
++
+    /* Advanced blend state is ignored if CB_BLEND_ADVANCED is dynamic */
+    const VkPipelineColorBlendAdvancedStateCreateInfoEXT *advanced = NULL;
+    if (!IS_DYNAMIC(CB_BLEND_ADVANCED)) {
+@@ -1044,9 +1048,8 @@ vk_color_blend_state_init(struct vk_color_blend_state *cb,
+          PIPELINE_COLOR_BLEND_ADVANCED_STATE_CREATE_INFO_EXT);
+    }
+ 
+-   for (uint32_t a = 0; a < cb_info->attachmentCount; a++) {
+-      const VkPipelineColorBlendAttachmentState *att =
+-         full_dynamic ? NULL : &cb_info->pAttachments[a];
++   for (uint32_t a = 0; a < cb->attachment_count; a++) {
++      const VkPipelineColorBlendAttachmentState *att = &cb_info->pAttachments[a];
+ 
+       cb->attachments[a] = (struct vk_color_blend_attachment_state) {
+          .blend_enable = IS_DYNAMIC(CB_BLEND_ENABLES) || att->blendEnable,
+@@ -1071,7 +1074,8 @@ vk_color_blend_state_init(struct vk_color_blend_state *cb,
+       vk_find_struct_const(cb_info->pNext, PIPELINE_COLOR_WRITE_CREATE_INFO_EXT);
+    if (!IS_DYNAMIC(CB_COLOR_WRITE_ENABLES) && cw_info != NULL) {
+       uint8_t color_write_enables = 0;
+-      assert(cb_info->attachmentCount == cw_info->attachmentCount);
++      assert(full_dynamic ||
++             cb_info->attachmentCount == cw_info->attachmentCount);
+       for (uint32_t a = 0; a < cw_info->attachmentCount; a++) {
+          if (cw_info->pColorWriteEnables[a])
+             color_write_enables |= BITFIELD_BIT(a);
+-- 
+2.34.1
+
