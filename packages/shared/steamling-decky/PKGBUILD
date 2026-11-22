@@ -3,7 +3,7 @@
 # The plugin frontend (dist/index.js) is prebuilt and committed — no node at package build time.
 pkgname=steamling-decky
 pkgver=0.1.1
-pkgrel=7
+pkgrel=8
 pkgdesc="Decky Loader (native arm64) + the Governor QAM plugin"
 arch=('aarch64')
 # PluginLoader is a PyInstaller onefile build: stripping would cut off the archive appended to it.
@@ -12,12 +12,12 @@ url="https://github.com/dvandenburgh/steamling"
 license=('GPL-2.0-or-later')
 # Every game's launch options name steamling-game-launch; older steamling-steam releases lack it.
 depends=('fex-emu' 'fex-rootfs' 'steamling-steam>=0.1.0-67')
-_loaderver=v3.3.0
+_loaderver=v3.3.1
 source=('steamling-decky-run' 'steamling-decky-sync' 'steamling-decky-killall' 'steamling-decky-sync.service'
         'steamling-decky-loader.service' 'PluginLoader.json'
         "PluginLoader-${_loaderver}::https://github.com/SteamDeckHomebrew/decky-loader/releases/download/${_loaderver}/PluginLoader-arm64")
 sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
-            '8ef5dcf36cbbbb6e97201a6baed5d79c4cc44ec27789fc9af1c5b6ae8f0b25b6')
+            '6320bcf990aacc1c7a8aff67e17c98ece66601d1a7cc3d21d4259c7273adb2bb')
 
 package() {
   install -Dm755 "${srcdir}/PluginLoader-${_loaderver}" "${pkgdir}/usr/share/decky-loader/PluginLoader"
