@@ -56,10 +56,8 @@ Steam library, under the **Non-Steam** tab.
 
 ![The Non-Steam tab in the Steam library with ES-DE (and Heroic Games Launcher) on it](images/emulation-steam-library.jpeg)
 
-The emulators come from your own Steamling build, the same way updates do, so the handheld needs to
-reach your PC while it installs: build with `./build.sh --update`, start the package server and
-point the handheld at your PC, as in [Updating from your own build](updating.md#updating-from-your-own-build-without-reflashing)
-(steps 1 to 3). If the PC's server isn't running, the install stops and tells you so.
+The emulators download from Steamling's package repo, the same place updates come from, so the
+handheld needs an internet connection while it installs.
 
 The same entry removes the layer again. Your ROMs, BIOS files, saves and emulator settings stay
 where they are, so installing it again later picks up exactly where you left off.
