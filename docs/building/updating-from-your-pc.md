@@ -64,19 +64,20 @@ Log in over SSH (`ssh deck@steamling`) and run this, with your PC's address on t
 PC=192.168.1.50
 FAMILY=sm8550
 sudo awk -v pc="$PC" -v fam="$FAMILY" '
-  !done && /^\[/ && $0 != "[options]" {
+  /^\[/ { drop = ($0 == "[steamling]" || $0 == "[steamling-shared]") }
+  !done && /^\[/ && !drop && $0 != "[options]" {
     print "[steamling]\nSigLevel = Never\nServer = http://" pc ":8080/" fam "\n"
     print "[steamling-shared]\nSigLevel = Never\nServer = http://" pc ":8080/shared\n"
     done = 1
   }
-  { print }' /etc/pacman.conf > /tmp/pacman.conf && sudo cp /tmp/pacman.conf /etc/pacman.conf
+  !drop { print }' /etc/pacman.conf > /tmp/pacman.conf && sudo cp /tmp/pacman.conf /etc/pacman.conf
 sudo sed -i '/^IgnorePkg/d' /etc/pacman.conf
 ```
 
-This adds your PC as the first place pacman looks, so Steamling's own packages (the kernel, Mesa,
-gamescope, Plasma Mobile and the rest) come from your build. The second command drops a hold that
-images built from live Arch Linux ARM carry: it stopped Arch's versions replacing ours, and with
-your PC listed first it's no longer needed.
+This puts your PC in place of the package repo, as the first place pacman looks, so Steamling's
+own packages (the kernel, Mesa, gamescope, Plasma Mobile and the rest) come from your build. The
+second command drops a hold that images built from live Arch Linux ARM carry: it stopped Arch's
+versions replacing ours, and with your PC listed first it's no longer needed.
 
 Check the handheld can reach the PC. Both lines should say `200 OK`:
 
