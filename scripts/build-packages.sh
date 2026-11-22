@@ -229,6 +229,19 @@ build_one() {
   repo_dir="$(pkg_repo_dir "${pkgdir}")"
   repo_db="$(pkg_repo_db "${pkgdir}")"
   repo_mount="$(pkg_repo_mount "${pkgdir}")"
+  # STEAMLING_KEEP_PKGS="a b": ship what localrepo already has for these instead of rebuilding,
+  # for when a package's sources can't be downloaded (archive.archlinux.org down) and every
+  # attempt would sit waiting on it. PKG= still rebuilds them.
+  if [ "${force}" -eq 0 ] && [[ " ${STEAMLING_KEEP_PKGS:-} " == *" ${name} "* ]]; then
+    local kept
+    kept="$(ls -1 "${repo_dir}/${name}"-[0-9]*.pkg.tar.* "${repo_dir}/${name}"-*:*.pkg.tar.* 2>/dev/null \
+      | grep -v '\.sig$' | head -1)"
+    if [ -n "${kept}" ]; then
+      warn "keep: ${name} not rebuilt (STEAMLING_KEEP_PKGS), $(basename "${kept}") ships as it is"
+      return 0
+    fi
+    warn "${name} is in STEAMLING_KEEP_PKGS but localrepo has no copy of it, so it builds anyway"
+  fi
   rm -rf "${BROOT}/build/${name}"
   mkdir -p "${BROOT}/build"
   cp -r "${pkgdir}" "${BROOT}/build/${name}"
