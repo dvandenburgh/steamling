@@ -100,6 +100,24 @@ the repo.
 
 A published file must never change: bump `pkgrel` for every rebuild, or `make stage` refuses.
 
+## Copies of the Arch Linux Archive files
+
+fex-rootfs, steamling-turnip-x86 and fex-emu are built from old x86 Arch packages pinned to exact
+versions, and [archive.archlinux.org](https://archive.archlinux.org/) is the only place those are
+kept. When it's down, those packages can't build. So Steamling keeps its own copies, in the
+`sources` release of Steamling/packages, and the build looks there first.
+
+After a build that downloaded something new from the archive (the first one, or after a version
+pin moved), save the files it fetched:
+
+```bash
+make publish-sources
+```
+
+It only uploads a file whose checksum matches its PKGBUILD, so the copies are exactly Arch's, and
+it skips what's already there. If it lists files that aren't in the build's cache, rebuild the
+packages it names while the archive is up and run it again.
+
 ## SD card images
 
 An image is several GB, past GitHub's 2 GiB limit for a release file, so it goes to SourceForge
