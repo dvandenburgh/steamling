@@ -10,3 +10,6 @@ PHY_QCOM_QMP_UFS
 MMC_SDHCI_MSM
 # steamling-bench and the preemption A/B in docs/benchmarking.md rely on it.
 PREEMPT_DYNAMIC
+# TCP's default congestion control, from config-delta.
+TCP_CONG_BBR
+DEFAULT_BBR

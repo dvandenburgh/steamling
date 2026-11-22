@@ -67,3 +67,10 @@
 # scheduler per disk, and `steamling-storage scheduler adios` tries it.
 --enable MQ_IOSCHED_ADIOS
 --disable MQ_IOSCHED_DEFAULT_ADIOS
+
+# BBR for TCP on every tree, not only the SM8550 one: it keeps a download fast on Wi-Fi that drops
+# the odd packet, where cubic backs off. The shared tree built cubic only.
+--enable TCP_CONG_ADVANCED
+--enable TCP_CONG_BBR
+--enable DEFAULT_BBR
+--disable DEFAULT_CUBIC
