@@ -118,6 +118,7 @@ environment (for example `make image SSH=1`, `export SSH=1` to make it the defau
 | (none) | `STEAMLING_CCACHE=off` | compile packages from scratch instead of reusing the ccache in `build/cache/ccache-pkg` (`STEAMLING_CCACHE_SIZE` sets its limit, 20G by default) |
 | `--no-sd-image` | `SD_IMAGE=off` | stop at the finished rootfs (`make rootfs`) |
 | `--update` | `STEAMLING_UPDATE=1` | build only the kernel and the packages that changed, with no rootfs or SD image (`make update`): what [updating a handheld from your own build](updating-from-your-pc.md) needs |
+| `--publish` | `STEAMLING_PUBLISH=1` | after the build, publish every package that's newer than the package repo, both trees (`make publish-changed`; [publishing.md](publishing.md#every-release-after-that)). Run it as yourself, usually with `--update` |
 | `--no-host-setup` | `STEAMLING_HOST_SETUP=off` | stop when host packages are missing instead of installing them |
 | `--no-status-bar` | `STEAMLING_STATUS_BAR=off` | plain output, without the status line at the bottom |
 | (none) | `STEAMLING_BASE_SNAPSHOT=live` | build straight from Arch Linux ARM's own repos and latest tarball instead of the frozen base: nothing to host or upload, but every build gets whatever ALARM has that day (put it in `config/local.conf` to keep it) | <!-- docs-check: allow -->

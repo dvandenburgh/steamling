@@ -86,7 +86,21 @@ sudo pacman -Syu
 
 ### Every release after that
 
-Build as usual, then name the packages that changed:
+The quick way builds what changed and publishes it in one go:
+
+```bash
+./build.sh --update --publish
+```
+
+`--update` builds only the kernel and the packages that changed, with no new SD image. `--publish`
+then compares what was built with the repo and publishes every package that's new or newer, the
+chip family's `[steamling]` tree first and then `[steamling-shared]`. It goes through the same
+checks as the step-by-step way below, so a package that would break an install stops it before
+anything is uploaded. Run it as yourself: it checks your GitHub login and signing key before the
+build starts, so it won't fail hours in. If the build is already done, `make publish-changed`
+does just the publishing part.
+
+Step by step, naming the packages yourself:
 
 ```bash
 make stage PKG="mesa gamescope"
@@ -96,7 +110,7 @@ make publish
 `make stage` copies what's live, swaps in only the packages you named and checks the result can
 actually be installed on every family. `make publish` signs and uploads it. Shared packages go the
 same way with `make stage-shared` and `make publish-shared`. `DROP="name"` takes a package out of
-the repo.
+the repo, which `--publish` never does.
 
 A published file must never change: bump `pkgrel` for every rebuild, or `make stage` refuses.
 
