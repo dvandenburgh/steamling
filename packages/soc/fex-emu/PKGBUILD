@@ -48,8 +48,15 @@ noextract=('fexsysroot-glibc.pkg.tar.zst'
            'fexsysroot-gcc-libs.pkg.tar.zst'
            'fexsysroot-lib32-gcc-libs.pkg.tar.zst'
            'fexsysroot-linux-api-headers.pkg.tar.zst')
+# The sysroot files are pinned by checksum too, so make publish-sources can keep copies of them
+# (the archive is the only other place they live). Moving _glibc, _gcc or _apihdr means new sums.
 sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
-            'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+            '2c20828b3a571b272697671c90b1e3a8c426d6a7e7fb99a242099373f2710fe1'
+            '23180e188d93640712c7e3ba81c08eb517011454f4b2a389354f6338e3a0d831'
+            '80ecc89c7ca567a2c1d460803e1efa434040861f824c34d8fe7000bf27ad82c0'
+            '6e1e94eced9459789a5b9193b2f11937d6192e26b7caf6d2e5a47edb0cc69351'
+            'ff756f1e0d83a44d2ef636528e4b3d1c321ea0bc2045ba3b0553f000ddc2719f'
+            'a6edb1e19a58c43abb93b38e70eb327b2e8b0c15aa74abf31a187c0ee6a5d732')
 
 prepare() {
   cd "${srcdir}/fex"
