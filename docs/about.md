@@ -29,8 +29,11 @@ these projects some love too.
   Pocknix hosts until it had its own. Thank you for doing the hard groundwork and sharing it so
   openly.
 - **[ROCKNIX](https://github.com/ROCKNIX/distribution)** and its contributors. The kernel, the
-  bootloader (ABL) that lets these handhelds boot Linux at all, the Snapdragon device support,
-  and the panel refresh calibration all come from ROCKNIX. None of this runs without them.
+  Snapdragon device support and the panel refresh calibration all come from ROCKNIX, and the
+  ROCKNIX ABL was the bootloader that first let these handhelds boot Linux at all. None of this
+  runs without them.
+- **[OpenABL](https://github.com/OpenHandheldCollective/OpenABL)** by the Open Handheld
+  Collective, the bootloader Steamling installs today, which carried the ROCKNIX ABL on.
 - **[armada](https://github.com/armada-os/armada)**, for the HDR and color work, the suspend
   fixes, the gamescope and MangoHud patches, the RP6 firmware and a long list of kernel fixes.
   armada is also where Steamling's support for every handheld besides the RP6 comes from: their
@@ -41,8 +44,9 @@ these projects some love too.
   with armada.
 - **[Arch Linux ARM](https://archlinuxarm.org/)**, the base everything sits on.
 - **Valve**, for SteamOS, the ARM Steam client, [gamescope](https://github.com/ValveSoftware/gamescope)
-  and [steamos-manager](https://gitlab.steamos.cloud/holo/steamos-manager), and for showing
-  what a handheld PC should feel like.
+  and [steamos-manager](https://gitlab.steamos.cloud/holo/steamos-manager), the Steam Frame's
+  kernel and packaging sources that several fixes here come from, and for showing what a
+  handheld PC should feel like.
 - **[FEX-Emu](https://github.com/FEX-Emu/FEX)**, which runs x86 games and Steam's Windows tools
   on ARM. It's close to magic.
 - **[Mesa](https://www.mesa3d.org/)** and the Turnip/freedreno developers, for the open Adreno
