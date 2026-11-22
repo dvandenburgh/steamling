@@ -4,6 +4,11 @@ This guide takes you from nothing to a Steamling SD card image you can flash. Yo
 know Linux. Copy each command, paste it into the terminal, press Enter, and wait for it to finish
 before moving on.
 
+**Only want to install Steamling?** For the Retroid Pocket 6 and the other Snapdragon 8 Gen 2
+handhelds there's no need to build: [download the image](https://sourceforge.net/projects/steamling/files/latest/download)
+and go straight to the [install guide](../install.md). Building is for the other chips, and for
+changing Steamling yourself.
+
 If you already know your way around, [advanced.md](advanced.md) has every option and target.
 
 ## What you need
@@ -12,9 +17,11 @@ If you already know your way around, [advanced.md](advanced.md) has every option
   64-bit PC works. 16 GB of RAM is comfortable; 8 GB works, just slower.
 - **About 100 GB of free disk space.**
 - **An internet connection.** The build downloads a few gigabytes.
-- **Time.** The first build compiles everything from source, and on a normal PC that takes a long
-  time: plan on leaving it running overnight, possibly longer. Later builds only redo what
-  changed, so they're much faster.
+- **Time.** The build downloads every package Steamling has already published for your chip and
+  only compiles the rest. For the Snapdragon 8 Gen 2 handhelds that's mostly the kernel, so expect
+  an hour or two. For the other chips nothing is published yet, so the first build compiles
+  everything from source: plan on leaving it running overnight, possibly longer. Later builds only
+  redo what changed, so they're much faster.
 - **A microSD card** (128 GB or bigger is best) and a way to plug it into your PC.
 
 ## Step 1: Get a Linux terminal
