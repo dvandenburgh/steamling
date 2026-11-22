@@ -33,6 +33,8 @@ Build options
   -j, --jobs N          kernel compile jobs (default: every core)
   --update              only the kernel and the packages that changed, no rootfs or SD image:
                         what you need to update a handheld over the network (docs/building/updating-from-your-pc.md)
+  --publish             after the build, publish every package that's newer than the package
+                        repo, both trees (make publish-changed; docs/building/publishing.md)
   --no-sd-image         stop at the finished rootfs (build/rootfs), without the SD image
   --no-seed             compile every package instead of downloading the published ones
   --no-host-setup       stop when host packages are missing instead of installing them
@@ -45,7 +47,8 @@ Build options
 Every option has an environment / make variable form, e.g. `make image SSH=1 SD_IMAGE=off`,
 or `export SSH=1` to turn SSH on for every build:
   SSH=1 (or SD_SSH=on)  SD_ROOT_PASSWORD=  SD_WIFI_SSID=  SD_WIFI_PSK=  SD_WIFI_COUNTRY=
-  STEAMLING_EMULATION=1  STEAMLING_CORES=1  DEVICE=  JOBS=  STEAMLING_UPDATE=1  SD_IMAGE=off  STEAMLING_SEED=off  STEAMLING_HOST_SETUP=off
+  STEAMLING_EMULATION=1  STEAMLING_CORES=1  DEVICE=  JOBS=  STEAMLING_UPDATE=1  STEAMLING_PUBLISH=1  SD_IMAGE=off
+  STEAMLING_SEED=off  STEAMLING_HOST_SETUP=off
   STEAMLING_STATUS_BAR=off   (switches take on/off, 1/0, yes/no or true/false)
 
 From another shell: make status shows how far it is and the time left; make watch follows it.
@@ -86,6 +89,7 @@ while [ "$#" -gt 0 ]; do
                export JOBS="${val}" ;;
     --no-sd-image|--rootfs-only) export SD_IMAGE=off ;;
     --update) export STEAMLING_UPDATE=on ;;
+    --publish) export STEAMLING_PUBLISH=on ;;
     --no-seed) export STEAMLING_SEED=off ;;
     --no-host-setup) export STEAMLING_HOST_SETUP=off ;;
     --no-status-bar) export STEAMLING_STATUS_BAR=off ;;
@@ -120,10 +124,11 @@ STEAMLING_SEED="$(onoff STEAMLING_SEED "${STEAMLING_SEED:-on}")"
 STEAMLING_HOST_SETUP="$(onoff STEAMLING_HOST_SETUP "${STEAMLING_HOST_SETUP:-on}")"
 STEAMLING_STATUS_BAR="$(onoff STEAMLING_STATUS_BAR "${STEAMLING_STATUS_BAR:-on}")"
 STEAMLING_UPDATE="$(onoff STEAMLING_UPDATE "${STEAMLING_UPDATE:-off}")"
+STEAMLING_PUBLISH="$(onoff STEAMLING_PUBLISH "${STEAMLING_PUBLISH:-off}")"
 STEAMLING_CORES="$(onoff STEAMLING_CORES "${STEAMLING_CORES:-off}")"
 emu="$(onoff STEAMLING_EMULATION "${STEAMLING_EMULATION:-0}")"
 if [ "${emu}" = on ]; then STEAMLING_EMULATION=1; else STEAMLING_EMULATION=0; fi
-export SD_SSH SD_IMAGE STEAMLING_SEED STEAMLING_HOST_SETUP STEAMLING_STATUS_BAR STEAMLING_EMULATION STEAMLING_UPDATE STEAMLING_CORES
+export SD_SSH SD_IMAGE STEAMLING_SEED STEAMLING_HOST_SETUP STEAMLING_STATUS_BAR STEAMLING_EMULATION STEAMLING_UPDATE STEAMLING_CORES STEAMLING_PUBLISH
 
 # --- the plan ----------------------------------------------------------------------------------
 STEPS=(host)
@@ -326,6 +331,17 @@ fi
 if [ -n "${SD_WIFI_SSID}" ] && [ -z "${SD_WIFI_PSK}" ]; then
   die "Wi-Fi '${SD_WIFI_SSID}' needs its passphrase too: --wifi-psk '<passphrase>' (or SD_WIFI_PSK=)"
 fi
+# --publish runs at the very end, so find out now, not hours from now, if it can't.
+if [ "${STEAMLING_PUBLISH}" = on ]; then
+  [ "$(id -u)" -ne 0 ] || die "--publish needs ./build.sh run as yourself, not with sudo: gh and your signing key live in your account"
+  [ -n "${STEAMLING_REPO_PUBLIC}" ] || die "--publish: no package repo is set up (STEAMLING_REPO_URL / STEAMLING_REPO_GITHUB)"
+  [ -n "${STEAMLING_REPO_GPG_KEY}" ] || die "--publish: set STEAMLING_REPO_GPG_KEY in config/local.conf to the key that signs the repo"
+  gpg --list-secret-keys "${STEAMLING_REPO_GPG_KEY}" >/dev/null 2>&1 \
+    || die "--publish: gpg has no secret key for ${STEAMLING_REPO_GPG_KEY}"
+  if [ -n "${STEAMLING_REPO_GITHUB}" ]; then
+    gh auth status >/dev/null 2>&1 || die "--publish: gh isn't logged in: run 'gh auth login' first"
+  fi
+fi
 # One build per checkout: two would share build/rootfs and the chroots.
 if progress_load && [ "${P_STATE}" = running ] && [ -n "${P_PID}" ] \
    && grep -qa build-all "/proc/${P_PID}/cmdline" 2>/dev/null; then
@@ -349,6 +365,7 @@ total=0; for e in "${EST_ARR[@]}"; do total=$((total + e)); done
 log "steamling image build for ${DEVICE} (${DEVICE_PRETTY:-${SOC}}): ${plan}"
 if [ "${STEAMLING_UPDATE}" = on ]; then
   echo "    update build: only what changed since the last build, no rootfs or SD image"
+  [ "${STEAMLING_PUBLISH}" = off ] || echo "    then publishes every package that's newer than the package repo (--publish)"
   [ "${STEAMLING_CORES}" = off ] || echo "    with the source-built RetroArch cores (--cores)"
   if [ "${SD_SSH}" = on ] || [ -n "${SD_WIFI_SSID}" ] || [ "${SD_ROOT_PASSWORD}" != root ] || [ "${STEAMLING_EMULATION}" = 1 ]; then
     warn "SSH, Wi-Fi, the password and the emulation layer only go into an image, so --update ignores them"
@@ -396,7 +413,11 @@ for ((i = 0; i < ${#STEPS[@]}; i++)); do
 done
 echo
 ok "steamling ${DEVICE} build finished in $(fmt_dur "${PR_ELAPSED}"): ${summary}"
-if [ "${STEAMLING_UPDATE}" = on ]; then
+if [ "${STEAMLING_PUBLISH}" = on ]; then
+  echo
+  log "publishing what changed (--publish)"
+  "${S}/publish-changed.sh"
+elif [ "${STEAMLING_UPDATE}" = on ]; then
   log "packages ready in ${LOCALREPO_DIR} and ${LOCALREPO_SHARED_DIR}; docs/building/updating-from-your-pc.md shows how to put them on the handheld"
 elif [ "${SD_IMAGE}" = off ]; then
   log "rootfs ready in ${ROOTFS_DIR}; 'sudo make sd-image' (or ./build.sh without --no-sd-image) turns it into an SD image"
