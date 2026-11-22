@@ -1,6 +1,6 @@
 [Unit]
 Description=steamling: present the FEX x86 rootfs at the path Steam's FEX compat tool expects
-Documentation=https://github.com/dvandenburgh/steamling
+Documentation=https://github.com/Steamling/steamling
 ConditionPathExists=/usr/share/fex-emu/RootFS/ArchLinux.sqsh
 Before=graphical.target
 
