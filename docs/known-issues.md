@@ -1,7 +1,7 @@
 # Known issues
 
 Things that are known not to work, or not to work well yet. Something missing from this list?
-Open an [issue on GitHub](https://github.com/dvandenburgh/steamling/issues).
+Open an [issue on GitHub](https://github.com/Steamling/steamling/issues).
 
 ## Steam and game mode
 

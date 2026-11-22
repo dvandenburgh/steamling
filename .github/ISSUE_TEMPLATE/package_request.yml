@@ -9,7 +9,7 @@ body:
         command away: `sudo steamling-base rolling` (unsupported). A package earns a place
         here when it serves the device as a handheld and rolling mode is overkill for
         that. The rules are in
-        [CONTRIBUTING.md](https://github.com/dvandenburgh/steamling/blob/main/CONTRIBUTING.md#requesting-a-package).
+        [CONTRIBUTING.md](https://github.com/Steamling/steamling/blob/main/CONTRIBUTING.md#requesting-a-package).
         Fill this in and the triage is mostly done.
   - type: input
     id: package

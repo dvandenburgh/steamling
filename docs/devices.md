@@ -101,7 +101,7 @@ for this: Konsole in desktop mode, or [SSH](governor.md#remote-access).
   `STEAMLING_GYRO_CORRECTION` in the same file rotates the axes before Steam sees them, written as
   three rows of three numbers, for example
   `STEAMLING_GYRO_CORRECTION="0, 1, 0; -1, 0, 0; 0, 0, 1"`. Working out the right rows is fiddly,
-  so please [open an issue](https://github.com/dvandenburgh/steamling/issues) with what you see
+  so please [open an issue](https://github.com/Steamling/steamling/issues) with what you see
   instead: if it's every RP6, the fix belongs in Steamling.
 
 ## Getting an image for your handheld
@@ -134,7 +134,7 @@ DMG is the exception: hold the **...** button above the volume wheel instead.
 ## Help test a device
 
 If you try Steamling on one of the untested handhelds, please
-[open an issue](https://github.com/dvandenburgh/steamling/issues) with:
+[open an issue](https://github.com/Steamling/steamling/issues) with:
 
 - which handheld, and which panel version if it has more than one
 - whether it booted to Steam, and how far it got if it didn't

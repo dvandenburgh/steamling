@@ -67,7 +67,7 @@ It will ask for your password. Type it and press Enter.
 
 ```bash
 cd ~
-git clone https://github.com/dvandenburgh/steamling
+git clone https://github.com/Steamling/steamling
 cd steamling
 ```
 
@@ -170,7 +170,7 @@ Then follow the [install guide](../install.md) to set up your handheld and boot 
 - Look up the error in [troubleshooting.md](troubleshooting.md). Most common problems are in there.
 - Running out of memory shows up as a random "Killed" error. On Windows, [wsl.md](wsl.md#2-give-wsl-enough-memory-and-disk)
   shows how to give Ubuntu more memory.
-- Still stuck? Open an [issue on GitHub](https://github.com/dvandenburgh/steamling/issues), paste
+- Still stuck? Open an [issue on GitHub](https://github.com/Steamling/steamling/issues), paste
   the last 30 or so lines from the terminal, and say what kind of PC you're on.
 
 ## More detail

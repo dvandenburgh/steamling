@@ -99,4 +99,4 @@ tinker, and plenty of room to make things better. Steamling is my way of getting
 ## Get involved
 
 Bug reports, fixes and emulator configs are all welcome. See [CONTRIBUTING.md](../CONTRIBUTING.md),
-or open an issue on [GitHub](https://github.com/dvandenburgh/steamling/issues).
+or open an issue on [GitHub](https://github.com/Steamling/steamling/issues).

@@ -47,7 +47,7 @@ Add `--sm8250`, `--sm8650` or `--sm8750` for the other chips (the long form, `--
 works too). [Supported devices](../devices.md) lists which handheld uses which.
 
 ```bash
-git clone https://github.com/dvandenburgh/steamling && cd steamling
+git clone https://github.com/Steamling/steamling && cd steamling
 ./build.sh                                   # -> build/image/sm8550/steamling-sm8550-sd.img
 ```
 
