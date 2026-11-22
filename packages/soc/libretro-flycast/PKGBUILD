@@ -3,9 +3,9 @@
 # has Vulkan and desktop GL, and the ARM64 dynarec. Bump = move _commit, pkgver
 # <last tag>.<commit date>.<short sha>.
 pkgname=libretro-flycast
-pkgver=2.7.20261121.027b105
+pkgver=2.7.20261122.105342d
 pkgrel=1
-_commit=027b1054a457008ed5317732f456f9fbbb400df4
+_commit=105342d53fc181493cd372c8f1ebf5c49621ed1a
 pkgdesc="Flycast libretro core — Dreamcast/NAOMI, Vulkan and OpenGL (SoC-tuned)"
 arch=('aarch64')
 url="https://github.com/flyinghead/flycast"
