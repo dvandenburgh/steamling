@@ -63,13 +63,20 @@ dl=""   # where people download the image from, once it's up somewhere
 if [ -n "${STEAMLING_IMAGE_SOURCEFORGE}" ]; then
   need_tool rsync
   need_tool ssh
+  need_tool sftp
   [ -n "${STEAMLING_IMAGE_SOURCEFORGE_USER}" ] \
     || die "set STEAMLING_IMAGE_SOURCEFORGE_USER to your SourceForge username in config/local.conf"
-  sf="${STEAMLING_IMAGE_SOURCEFORGE_USER}@frs.sourceforge.net:/home/frs/project/${STEAMLING_IMAGE_SOURCEFORGE}/${VERSION}/"
+  sfhost="${STEAMLING_IMAGE_SOURCEFORGE_USER}@frs.sourceforge.net"
+  sfdir="/home/frs/project/${STEAMLING_IMAGE_SOURCEFORGE}/${VERSION}"
+  sf="${sfhost}:${sfdir}/"
+  # SourceForge's rsync (3.1) is too old for --mkpath, so the version folder is made over sftp
+  # first; the leading '-' lets it already exist.
+  printf -- '-mkdir %s\n' "${sfdir}" | sftp -q -b - "${sfhost}" >/dev/null \
+    || die "couldn't reach SourceForge over sftp as ${STEAMLING_IMAGE_SOURCEFORGE_USER} (is your SSH key on your SourceForge account?)"
   # image first, checksum last: a visible .sha256 implies the image is complete. --partial lets
   # an interrupted upload carry on instead of starting over.
   log "uploading ${name} to SourceForge (${STEAMLING_IMAGE_SOURCEFORGE}, folder ${VERSION}); this takes a while"
-  rsync -e ssh --partial --progress --mkpath --chmod=F644 "${OUT}" "${sf}" \
+  rsync -e ssh --partial --progress --chmod=F644 "${OUT}" "${sf}" \
     || die "upload to SourceForge failed; run 'make publish-image' again to carry on"
   rsync -e ssh --chmod=F644 "${OUT}.sha256" "${sf}" || die "upload to SourceForge failed; run 'make publish-image' again"
   dl="https://sourceforge.net/projects/${STEAMLING_IMAGE_SOURCEFORGE}/files/${VERSION}/${name}/download"
