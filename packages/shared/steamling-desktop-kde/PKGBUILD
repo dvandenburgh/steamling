@@ -5,7 +5,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="steamling KDE defaults shared by the Plasma desktop flavours"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 depends=('bash'
          'plasma-workspace'

@@ -5,7 +5,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="steamling device metapackage: SM8250 family"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 depends=('steamling-bsp-sm8250'
          'linux-steamling-sm8250'

@@ -89,7 +89,7 @@ while IFS= read -r _f; do
   _l="$(grep -n '^license=' "${STEAMLING_ROOT}/${_f}" | head -1)"
   case "${_l#*:}" in "license=('GPL-2.0-or-later')"|*"#"*) continue ;; esac
   _lic="${_lic} ${_f}:${_l%%:*}"
-done < <(git -C "${STEAMLING_ROOT}" grep -l -F 'url="https://github.com/dvandenburgh/steamling"' \
+done < <(git -C "${STEAMLING_ROOT}" grep -l -F 'url="https://github.com/Steamling/steamling"' \
            -- 'packages/shared/*/PKGBUILD' 'packages/soc/*/PKGBUILD' 'devices/*/PKGBUILD')
 if [ -z "${_lic}" ]; then note "package licenses" "ok"
 else note "package licenses" "not GPL-2.0-or-later and no '# <third-party>' note:${_lic}"; fail=1; fi

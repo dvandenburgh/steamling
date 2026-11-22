@@ -5,7 +5,7 @@ pkgver=0.1.1
 pkgrel=1.1
 pkgdesc="steamling board support: SM8250 family (Retroid Pocket 5, Retroid Pocket Flip2, Retroid Pocket Mini, Retroid Pocket Mini V2, AYN Thor Lite, MANGMI Air Y Pro, MANGMI Pocket Max, AYANEO Pocket MICRO 2) - board dispatch, input maps, audio UCM"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # The firmware reaches the fleet through this edge: -Syu never installs a new name alone.
 depends=('steamling-bsp-common>=0.1.0-26.17' 'steamling-firmware-sm8250')

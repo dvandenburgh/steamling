@@ -6,7 +6,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="steamling optional layer: Steam gamescope session, FEX x86 runtime, Decky, Heroic"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 depends=('steamling-steam'
          'gamescope'            # must be ours: vanilla black-screens rotated panels

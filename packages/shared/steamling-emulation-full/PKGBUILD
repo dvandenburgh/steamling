@@ -6,7 +6,7 @@ pkgver=0.1.1
 pkgrel=2
 pkgdesc="steamling optional layer: ES-DE frontend, RetroArch cores, standalone emulators (Switch: bring your own)"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 depends=('steamling-emulation'
          'es-de'

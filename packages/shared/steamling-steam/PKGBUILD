@@ -5,7 +5,7 @@ pkgver=0.1.1
 pkgrel=1.14
 pkgdesc="Native ARM64 Steam Big Picture (gamescope) for the RP6 — installer + launcher"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # wget/unzip/curl/tar/xorg-server-xvfb serve steamling-steam-install, which runs in the image bake
 # and again at first launch if the client is missing, so they stay depends. The rest are dlopen

@@ -4,7 +4,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="steamling desktop flavour: Plasma (desktop shell)"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 depends=('steamling-desktop>=0.1.0-30'   # first picker that offers the plasma session
          'steamling-desktop-kde>=0.1.0-2.1'  # owns the /etc/xdg/kwinrc that picks plasma-keyboard from -2.1

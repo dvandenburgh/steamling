@@ -6,7 +6,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="SM8750 handheld vendor firmware (wifi, bluetooth, ADSP/CDSP, GPU zap, audio, VPU)"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('custom:qcom-firmware')   # Qualcomm vendor blobs
 # firmware blobs must ship byte-identical; some parse as ELF and strip would alter them
 options=('!strip')

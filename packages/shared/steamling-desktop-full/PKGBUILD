@@ -6,7 +6,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="steamling optional layer: Plasma Mobile desktop session, KDE apps, Waydroid, Flatpak"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 depends=('steamling-desktop'
          'steamling-desktop-plasma-mobile'   # the default flavour, named so no provider prompt

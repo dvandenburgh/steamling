@@ -5,7 +5,7 @@ pkgver=0.2.0
 pkgrel=31
 pkgdesc="steamling board support: SM8550 family (Retroid Pocket 6, Nova; AYN Odin 2 / Mini / Portal, Thor; AYANEO Pocket ACE / DMG / DS / EVO / S) - board dispatch, input maps, suspend config, audio UCM"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # The firmware reaches the fleet through this edge: -Syu never installs a new name alone.
 depends=('steamling-bsp-common>=0.1.1-1.6' 'steamling-firmware-sm8550>=0.1.1-2'

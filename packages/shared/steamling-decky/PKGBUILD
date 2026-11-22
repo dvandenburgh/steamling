@@ -8,7 +8,7 @@ pkgdesc="Decky Loader (native arm64) + the Governor QAM plugin"
 arch=('aarch64')
 # PluginLoader is a PyInstaller onefile build: stripping would cut off the archive appended to it.
 options=('!strip' '!debug')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # Every game's launch options name steamling-game-launch; older steamling-steam releases lack it.
 depends=('fex-emu' 'fex-rootfs' 'steamling-steam>=0.1.0-67')

@@ -5,7 +5,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="steamling board support: SM8650 family (AYANEO Pocket S2, KONKR Pocket FIT) - board dispatch, input maps, audio UCM"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # The firmware reaches the fleet through this edge: -Syu never installs a new name alone.
 depends=('steamling-bsp-common' 'steamling-firmware-sm8650')

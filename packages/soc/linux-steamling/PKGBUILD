@@ -7,7 +7,7 @@ pkgver="${STEAMLING_KERNEL_VERSION:?set by build-packages.sh}"
 pkgrel="${STEAMLING_KERNEL_PKGREL:?set by build-packages.sh}"
 pkgdesc="${STEAMLING_SOC^^} kernel (stock ${pkgver} + ROCKNIX patch stack, SoC board dtbs) — packaged from 'make kernel' output"
 arch=('aarch64')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-only')   # the Linux kernel
 # ALARM's generic linux-aarch64 is pre-installed in the base tarball and must go. KERNEL_LEGACY_NAMES
 # (kernel.conf) lists names this SoC's kernel shipped under before, so those installs migrate.

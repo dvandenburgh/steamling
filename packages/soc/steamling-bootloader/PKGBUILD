@@ -20,7 +20,7 @@ pkgdesc="${_SOC} qcom-abl boot payload: OpenABL install kit"
 arch=('aarch64')
 # !strip: a stripped bootloader is an unbootable one.
 options=('!strip')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-3.0-or-later' 'BSD-2-Clause-Patent')   # OpenABL (Abl/ part with a linking exception); kit scripts GPL-2.0
 source=("https://github.com/OpenHandheldCollective/OpenABL/releases/download/v${_ablver}/openabl-v${_ablver}.tar.gz"
         'README'

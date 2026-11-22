@@ -6,7 +6,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="SM8250 handheld vendor firmware (AYN Thor Lite ADSP and amp tuning, MANGMI Pocket Max MCU)"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('custom:qcom-firmware')   # Qualcomm vendor blobs
 # firmware blobs must ship byte-identical; some parse as ELF and strip would alter them
 options=('!strip')

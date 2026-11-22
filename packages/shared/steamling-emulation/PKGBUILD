@@ -5,7 +5,7 @@ pkgver=0.1.1
 pkgrel=21
 pkgdesc="ES-DE + preconfigured emulators: drop ROMs into ~/Emulation and play; star -> Steam"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # Build with ./nodeps: the meta dep would drag ES-DE/RetroArch/Qt into the chroot. The meta dep
 # is the pre-meta catch-up cycle, see steamling-steam.

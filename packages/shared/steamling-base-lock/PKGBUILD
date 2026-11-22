@@ -9,7 +9,7 @@ pkgver=$(sed -n 's/^#.*snapshot \([0-9][0-9.]*\).*/\1/p' "${startdir}/steamling-
 pkgrel=1
 pkgdesc="Manifest and version stamp of the frozen steamling ALARM base snapshot"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # Base 20260826 renamed mbedtls -> mbedtls3 with no conflicts= upstream: replaces=
 # drops the old copy in the same -Syu (default-yes under --noconfirm; conflicts= is not).

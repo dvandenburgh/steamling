@@ -5,7 +5,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="steamling desktop session launcher, Flathub seeding, flatpak fixes and Waydroid helpers"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # steamling-desktop-full: the same pre-meta catch-up cycle as steamling-steam -> steamling-steam-full.
 # >= -2: steamos-session-select moved there from -26, so the file never goes missing mid-upgrade.

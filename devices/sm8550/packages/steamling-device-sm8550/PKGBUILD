@@ -9,7 +9,7 @@ pkgver=0.2.0
 pkgrel=12
 pkgdesc="steamling device metapackage: SM8550 family (Retroid Pocket 6 and others)"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 depends=('steamling-bsp-sm8550'
          'linux-steamling-sm8550'

@@ -5,7 +5,7 @@ pkgver=0.1.1
 pkgrel=1
 pkgdesc="SteamOS update/branch/timezone/format/brightness helpers for the Steam Deck UI on a non-SteamOS base (until real OTA)"
 arch=('any')
-url="https://github.com/dvandenburgh/steamling"
+url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # The format shims pkexec /usr/lib/hwsupport/format-device.sh, shipped by steamling-sdcard-automount.
 depends=('steamling-sdcard-automount' 'polkit')
