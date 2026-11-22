@@ -94,6 +94,26 @@ source "${STEAMLING_ROOT}/devices/${DEVICE}/tuning.conf"
 # or GitHub's download address while the first publish is still being made. Images only get
 # a [steamling] stanza from STEAMLING_REPO_URL itself.
 STEAMLING_REPO_PUBLIC="${STEAMLING_REPO_URL:-${STEAMLING_REPO_GITHUB:+https://github.com/${STEAMLING_REPO_GITHUB}/releases/download}}"
+# Steamling's own copies of the files packages download from the Arch Linux Archive
+# (publish-sources.sh uploads them, build-packages.sh reads them before makepkg does).
+STEAMLING_SOURCES_URL="${STEAMLING_SOURCES_URL:-${STEAMLING_REPO_GITHUB:+https://github.com/${STEAMLING_REPO_GITHUB}/releases/download/sources}}"
+
+# The files a package downloads from archive.archlinux.org, one "<cache name> <sha256>" line
+# each, read from its PKGBUILD. The archive is the only place pinned old Arch packages stay,
+# so when it's down nothing that needs them can build; these are the files we keep copies of.
+archive_sources() {  # $1 = package dir
+  (
+    set +eu
+    cd "$1" 2>/dev/null && . ./PKGBUILD >/dev/null 2>&1 || exit 0
+    for i in "${!source[@]}"; do
+      s="${source[$i]}" sum="${sha256sums[$i]:-SKIP}"
+      case "${s#*::}" in https://archive.archlinux.org/*) ;; *) continue ;; esac
+      [ "${sum}" != SKIP ] || continue
+      case "${s}" in *::*) n="${s%%::*}" ;; *) n="${s##*/}" ;; esac
+      printf '%s %s\n' "${n}" "${sum}"
+    done
+  )
+}
 
 # Which repo tree stage-repo.sh/publish-repo.sh operate on: the per-SoC
 # [steamling] tree (default) or the SoC-neutral [steamling-shared] tree

@@ -313,6 +313,23 @@ build_one() {
   mkdir -p "${BROOT}/build/srccache"
   chroot "${BROOT}" chown -R builder:builder "/build/${name}"
   chroot "${BROOT}" chown builder:builder /build/srccache
+  # Files only the Arch Linux Archive still has come from Steamling's own copies first (make
+  # publish-sources), so the archive being down can't stall a build. A copy only goes into the
+  # cache when its sha256 matches the PKGBUILD's; anything else is left to makepkg as usual.
+  if [ -n "${STEAMLING_SOURCES_URL}" ]; then
+    local sn ssum sf
+    while read -r sn ssum; do
+      sf="${BROOT}/build/srccache/${sn}"
+      [ -n "${sn}" ] && [ ! -f "${sf}" ] || continue
+      if curl -fsSL --retry 2 --connect-timeout 15 -o "${sf}.part" "${STEAMLING_SOURCES_URL}/$(base_file_name "${sn}")" \
+          && [ "$(sha256sum "${sf}.part" | cut -d' ' -f1)" = "${ssum}" ]; then
+        mv -f "${sf}.part" "${sf}"
+        chroot "${BROOT}" chown builder:builder "/build/srccache/${sn}"
+        log "${name}: ${sn} from Steamling's own copy"
+      fi
+      rm -f "${sf}.part"
+    done < <(archive_sources "${pkgdir}")
+  fi
   # makepkg refuses to run as root; build as the 'builder' user.
   # -s syncs makedepends (gamescope needs many). Device packages (devices/*/packages/*:
   # BSPs + metapackages) are pure file-drop/meta packages built with --nodeps instead:
