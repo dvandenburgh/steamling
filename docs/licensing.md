@@ -64,7 +64,9 @@ wallpapers, avatars, and Steam Deck logo (splash and distributor icon) are not s
 
 ## Source availability
 
-Steamling images contain GPL-licensed binaries. If you share an image or packages you built,
-the corresponding source is this repository plus the pinned upstream sources referenced by
-each PKGBUILD (exact tags and hashes are in the PKGBUILDs and PATCHES.md), which
-satisfies the GPL source-offer requirement as long as this repo stays public.
+Steamling images and packages contain GPL-licensed binaries. For the released ones (the SD
+images on SourceForge, the package repo on [Steamling/packages](https://github.com/Steamling/packages)
+and the frozen base on [Steamling/base](https://github.com/Steamling/base)), and for any you
+build and share yourself, the corresponding source is this repository plus the pinned upstream
+sources referenced by each PKGBUILD (exact tags and hashes are in the PKGBUILDs and PATCHES.md).
+The base's packages are Arch Linux ARM's own builds, and their sources are Arch Linux ARM's.
