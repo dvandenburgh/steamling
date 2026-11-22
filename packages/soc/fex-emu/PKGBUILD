@@ -36,6 +36,7 @@ source=("fex::git+https://github.com/FEX-Emu/FEX.git#commit=${_commit}"
         'Config.json'
         '0001-CPUID-Fixes-for-CPU-count.patch'
         '0002-CPUID-Fixes-ApicIdSize.patch'
+        '0003-CMake-Drop-DEPENDS-from-the-guest-libs-install-calls.patch'
         "fexsysroot-glibc.pkg.tar.zst::${_arch}/g/glibc/glibc-${_glibc}-x86_64.pkg.tar.zst"
         "fexsysroot-lib32-glibc.pkg.tar.zst::${_arch}/l/lib32-glibc/lib32-glibc-${_glibc}-x86_64.pkg.tar.zst"
         "fexsysroot-gcc.pkg.tar.zst::${_arch}/g/gcc/gcc-${_gcc}-x86_64.pkg.tar.zst"
@@ -51,6 +52,7 @@ noextract=('fexsysroot-glibc.pkg.tar.zst'
 # The sysroot files are pinned by checksum too, so make publish-sources can keep copies of them
 # (the archive is the only other place they live). Moving _glibc, _gcc or _apihdr means new sums.
 sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
+            'SKIP'
             '2c20828b3a571b272697671c90b1e3a8c426d6a7e7fb99a242099373f2710fe1'
             '23180e188d93640712c7e3ba81c08eb517011454f4b2a389354f6338e3a0d831'
             '80ecc89c7ca567a2c1d460803e1efa434040861f824c34d8fe7000bf27ad82c0'

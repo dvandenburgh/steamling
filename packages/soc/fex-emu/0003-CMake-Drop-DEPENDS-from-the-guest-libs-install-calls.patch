@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: David J. Vandenburgh <david@vandenburgh.co>
+Date: Sun, 22 Nov 2026 09:50:00 -0500
+Subject: [PATCH] CMake: Drop DEPENDS from the guest-libs install() calls
+
+install(CODE) has no DEPENDS argument. Older CMake ignored it, but the
+CMake in Steamling's base stops at configure with "install CODE given
+unknown argument: DEPENDS". guest-libs and guest-libs-32 are external
+projects in the default build, so they're built before install either
+way.
+---
+ CMakeLists.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -776,7 +776,6 @@
+     CODE "
+       execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Guest)"
+-    DEPENDS guest-libs
+     COMPONENT Runtime)
+ 
+   install(
+@@ -784,7 +783,6 @@
+     CODE "
+       execute_process(COMMAND ${CMAKE_COMMAND} --build . --target install
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Guest_32)"
+-    DEPENDS guest-libs-32
+     COMPONENT Runtime)
+ 
+   add_custom_target(uninstall_guest-libs
+-- 
+2.34.1
+
