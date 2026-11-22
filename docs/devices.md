@@ -104,10 +104,13 @@ for this: Konsole in desktop mode, or [SSH](governor.md#remote-access).
   so please [open an issue](https://github.com/dvandenburgh/steamling/issues) with what you see
   instead: if it's every RP6, the fix belongs in Steamling.
 
-## Building for your handheld
+## Getting an image for your handheld
 
-Follow the [build guide](building/README.md), but add your chip from the list above as a flag.
-For example, for a Retroid Pocket 5:
+For the Snapdragon 8 Gen 2 handhelds there's a ready-made image:
+[download the latest one](https://sourceforge.net/projects/steamling/files/latest/download).
+
+For the other chips, build one. Follow the [build guide](building/README.md), but add your chip
+from the list above as a flag. For example, for a Retroid Pocket 5:
 
 ```bash
 ./build.sh --sm8250
