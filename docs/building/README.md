@@ -18,10 +18,10 @@ If you already know your way around, [advanced.md](advanced.md) has every option
 - **About 100 GB of free disk space.**
 - **An internet connection.** The build downloads a few gigabytes.
 - **Time.** The build downloads every package Steamling has already published for your chip and
-  only compiles the rest. For the Snapdragon 8 Gen 2 handhelds that's mostly the kernel, so expect
-  an hour or two. For the other chips nothing is published yet, so the first build compiles
-  everything from source: plan on leaving it running overnight, possibly longer. Later builds only
-  redo what changed, so they're much faster.
+  only compiles the rest. For the Snapdragon 8 Gen 2 handhelds that's mostly the kernel, and with
+  putting the system together around it, expect a few hours. For the other chips nothing is
+  published yet, so the first build compiles everything from source: plan on leaving it running
+  overnight, possibly longer. Later builds only redo what changed, so they're much faster.
 - **A microSD card** (128 GB or bigger is best) and a way to plug it into your PC.
 
 ## Step 1: Get a Linux terminal
