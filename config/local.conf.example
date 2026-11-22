@@ -62,3 +62,6 @@ STEAMLING_CCACHE_SIZE=20G
 #STEAMLING_IMAGE_GITHUB=
 #STEAMLING_IMAGE_RCLONE_REMOTE=r2:steamling/images
 #STEAMLING_IMAGE_URL=https://pub-REPLACE-ME.r2.dev/images
+# Packages to ship as already built instead of rebuilding them, for when their downloads are
+# down (archive.archlinux.org, say). PKG= still rebuilds one.
+#STEAMLING_KEEP_PKGS="fex-emu fex-rootfs steamling-turnip-x86"
