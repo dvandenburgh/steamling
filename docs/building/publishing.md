@@ -73,7 +73,7 @@ point builds at the repo by setting this in `config/steamling.conf`, and commit 
 Bump `pkgrel` in `packages/shared/steamling-base/PKGBUILD` in the same commit and publish
 `steamling-base` the normal way (below). That package carries the address and the key, and a
 handheld that was flashed before the repo existed adds the repo when it installs it. That first
-update has to come from your PC ([Updating Steamling](../updating.md)); after that it updates
+update has to come from your PC ([Updating a handheld from your own build](updating-from-your-pc.md)); after that it updates
 itself.
 
 A handheld you've been updating from your PC already has `[steamling]` sections pointing at it,

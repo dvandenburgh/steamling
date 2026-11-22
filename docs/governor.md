@@ -302,9 +302,7 @@ System updates, without leaving game mode:
 3. Restart when it finishes to apply everything (**Restart Now** appears right there).
 
 That covers Steamling's own packages, from its package repo, and the Arch Linux ARM side, from
-Steamling's frozen base. A handheld set up before the repo existed needs
-[switching over once](updating.md#switching-to-the-package-repo) first. If you build Steamling
-yourself and point the handheld at your PC, this button installs your own build instead.
+Steamling's frozen base ([what an update covers](updating.md#what-an-update-covers)).
 
 The update keeps running even if you close the Quick Access menu - reopen the tab to check
 on progress. If you prefer, the same update is just `sudo pacman -Syu` in a terminal, or the

@@ -41,7 +41,7 @@ Especially welcome:
    device. This is a hard requirement, see
    [What the PR must contain](#what-the-pr-must-contain).
 4. **Bump `pkgrel`** when you change what a package ships, otherwise a handheld updating from
-   a new build ([docs/updating.md](docs/updating.md)) never picks your change up.
+   a new build ([docs/building/updating-from-your-pc.md](docs/building/updating-from-your-pc.md)) or the package repo never picks your change up.
 5. **Fixes go in robust locations.** A change that only survives until the next `make sync`,
    the next session restart, or the next reboot is not a fix. See
    [Where changes go](#where-changes-go).
@@ -121,7 +121,7 @@ This tree builds four SoC families: `sm8550` (the Retroid Pocket 6, the referenc
 Packages compress as `.pkg.tar.zst` (older ones as `.pkg.tar.xz`), so glob `*.pkg.tar.*`.
 Handhelds update Steamling's own packages from its package repo on GitHub
 ([docs/building/publishing.md](docs/building/publishing.md) covers putting packages there). To try
-your own changes, update a handheld from your own build ([docs/updating.md](docs/updating.md)).
+your own changes, update a handheld from your own build ([docs/building/updating-from-your-pc.md](docs/building/updating-from-your-pc.md)).
 
 ## Testing on a device
 
@@ -141,7 +141,7 @@ journalctl -b -u <the-unit-you-touched>            # check it came up clean
 ```
 
 When you've rebuilt several packages, serving the whole build and running `sudo pacman -Syu` on the
-device is quicker: see [docs/updating.md](docs/updating.md).
+device is quicker: see [docs/building/updating-from-your-pc.md](docs/building/updating-from-your-pc.md).
 
 **Keep a rollback.** Images don't carry a copy of every package, so keep the old package
 yourself: copy it out of `build/localrepo/` before you rebuild, or build your test image with

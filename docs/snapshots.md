@@ -11,7 +11,8 @@ If your storage is nearly full, the snapshot is skipped. The update still instal
 can't undo that one.
 
 That covers every update, whichever way you install it: Governor's System tab, Steamling Updater,
-`sudo pacman -Syu`, or a new build from your PC ([Updating Steamling](updating.md)).
+`sudo pacman -Syu`, or your own build from your PC
+([Updating a handheld from your own build](building/updating-from-your-pc.md)).
 
 ## Rolling back
 

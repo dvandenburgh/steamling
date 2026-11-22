@@ -6,8 +6,7 @@ User guides for Steamling. New here? Start with the [project README](../README.m
   TV, the gyro, and how to help test one
 - [install.md](install.md) - flashing the SD card, installing the bootloader (OpenABL), and first
   boot
-- [updating.md](updating.md) - getting a newer build onto the handheld, by reflashing or over your
-  home network
+- [updating.md](updating.md) - system updates, what they cover, and rolling one back
 - [known-issues.md](known-issues.md) - what does not work, or not well, yet
 - [governor.md](governor.md) - the in-game control panel: per-game tweaks, fan/CPU
   modes, full clocks on a charger, adding non-Steam games, file sharing over the network or USB,

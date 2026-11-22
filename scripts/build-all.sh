@@ -32,7 +32,7 @@ Build options
   -d, --device NAME     image target, a family under devices/ (listed below)
   -j, --jobs N          kernel compile jobs (default: every core)
   --update              only the kernel and the packages that changed, no rootfs or SD image:
-                        what you need to update a handheld over the network (docs/updating.md)
+                        what you need to update a handheld over the network (docs/building/updating-from-your-pc.md)
   --no-sd-image         stop at the finished rootfs (build/rootfs), without the SD image
   --no-seed             compile every package instead of downloading the published ones
   --no-host-setup       stop when host packages are missing instead of installing them
@@ -129,7 +129,7 @@ export SD_SSH SD_IMAGE STEAMLING_SEED STEAMLING_HOST_SETUP STEAMLING_STATUS_BAR 
 STEPS=(host)
 if [ "${STEAMLING_SEED}" = on ] && [ -n "${STEAMLING_REPO_URL}" ]; then STEPS+=(seed); fi
 STEPS+=(kernel packages)
-# --update stops here: the handheld takes the packages over the network (docs/updating.md).
+# --update stops here: the handheld takes the packages over the network (docs/building/updating-from-your-pc.md).
 if [ "${STEAMLING_UPDATE}" = off ]; then
   STEPS+=(rootfs)
   if [ "${SD_IMAGE}" = on ]; then STEPS+=(image); fi
@@ -397,7 +397,7 @@ done
 echo
 ok "steamling ${DEVICE} build finished in $(fmt_dur "${PR_ELAPSED}"): ${summary}"
 if [ "${STEAMLING_UPDATE}" = on ]; then
-  log "packages ready in ${LOCALREPO_DIR} and ${LOCALREPO_SHARED_DIR}; docs/updating.md shows how to put them on the handheld"
+  log "packages ready in ${LOCALREPO_DIR} and ${LOCALREPO_SHARED_DIR}; docs/building/updating-from-your-pc.md shows how to put them on the handheld"
 elif [ "${SD_IMAGE}" = off ]; then
   log "rootfs ready in ${ROOTFS_DIR}; 'sudo make sd-image' (or ./build.sh without --no-sd-image) turns it into an SD image"
 fi

@@ -125,10 +125,9 @@ came back: …**. The menu's **Log** entry has the details. Here's what each one
 
 ## Updating
 
-Steamling updates from its package repo: **Governor → System → Check for Updates** in game mode,
-or the **Steamling Updater** app in desktop mode. If you build Steamling yourself, you can also send
-your own build to the handheld over your home network, or flash a new image (which wipes the card,
-so back up your saves first). [Updating Steamling](updating.md) walks through all of it.
+Steamling updates over the internet: **Governor → System → Check for Updates** in game mode, or
+the **Steamling Updater** app in desktop mode. There's no need to reflash for a new release.
+[Updating Steamling](updating.md) has the details.
 
 The Steam client updates itself separately and tells you when one is available. If an update goes
 wrong, see [snapshots and rollback](snapshots.md).

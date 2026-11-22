@@ -138,6 +138,6 @@ echo
 step "done: base $id is live at $url"
 echo "  Next: git add $conf packages/shared/steamling-base-lock/steamling-base.lock"
 echo "        git commit -m \"base: our own snapshot $id\""
-echo "  Handhelds move onto it the next time you update them from this build (docs/updating.md)."
+echo "  Handhelds move onto it the next time you update them from this build (docs/building/updating-from-your-pc.md)."
 string match -q live -- (local_conf STEAMLING_BASE_SNAPSHOT)
 and echo "  config/local.conf still says STEAMLING_BASE_SNAPSHOT=live: delete that line, or later builds skip your base."

@@ -117,7 +117,7 @@ environment (for example `make image SSH=1`, `export SSH=1` to make it the defau
 | `--jobs N` | `JOBS=N` | parallel jobs for the kernel build (default: all cores) |
 | (none) | `STEAMLING_CCACHE=off` | compile packages from scratch instead of reusing the ccache in `build/cache/ccache-pkg` (`STEAMLING_CCACHE_SIZE` sets its limit, 20G by default) |
 | `--no-sd-image` | `SD_IMAGE=off` | stop at the finished rootfs (`make rootfs`) |
-| `--update` | `STEAMLING_UPDATE=1` | build only the kernel and the packages that changed, with no rootfs or SD image (`make update`): what [updating over the network](../updating.md#updating-from-your-own-build-without-reflashing) needs |
+| `--update` | `STEAMLING_UPDATE=1` | build only the kernel and the packages that changed, with no rootfs or SD image (`make update`): what [updating a handheld from your own build](updating-from-your-pc.md) needs |
 | `--no-host-setup` | `STEAMLING_HOST_SETUP=off` | stop when host packages are missing instead of installing them |
 | `--no-status-bar` | `STEAMLING_STATUS_BAR=off` | plain output, without the status line at the bottom |
 | (none) | `STEAMLING_BASE_SNAPSHOT=live` | build straight from Arch Linux ARM's own repos and latest tarball instead of the frozen base: nothing to host or upload, but every build gets whatever ALARM has that day (put it in `config/local.conf` to keep it) | <!-- docs-check: allow -->
@@ -154,7 +154,7 @@ ssh -t deck@steamling 'sudo pacman -U /tmp/steamling-branding-*.pkg.tar.*'
 (Log in as `deck`: root can't log in over SSH.) A package whose build needs packages Steamling
 builds itself (for example `steamling-steam` needs `gamescope`) finds them in `build/localrepo/`,
 so build those first; after one full build they are all there. To send everything you rebuilt in
-one go instead of package by package, see [Updating Steamling](../updating.md). See
+one go instead of package by package, see [Updating a handheld from your own build](updating-from-your-pc.md). See
 [CONTRIBUTING.md](../../CONTRIBUTING.md) for how to test and submit a change.
 
 ## Space and time

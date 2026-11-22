@@ -78,7 +78,7 @@ explains how to build for it and what to report.
 - [Emulation](docs/emulation-setup.md): ES-DE, ROMs and BIOS files
 - [Heroic Games Launcher](docs/heroic.md): Epic, GOG and Amazon games
 - [Android apps](docs/waydroid.md): Waydroid
-- [Updating Steamling](docs/updating.md): getting a newer build onto your handheld without reflashing
+- [Updating Steamling](docs/updating.md): system updates, and what they cover
 - [Snapshots and rollback](docs/snapshots.md): getting back from a bad update
 - [Known issues](docs/known-issues.md)
 - [Building Steamling](docs/building/README.md) and [contributing](CONTRIBUTING.md)

@@ -181,4 +181,4 @@ Then follow the [install guide](../install.md) to set up your handheld and boot 
 - [troubleshooting.md](troubleshooting.md): common errors and what they mean
 - [own-base.md](own-base.md): building from live Arch Linux ARM, and hosting your own frozen base
 - [publishing.md](publishing.md): putting out a release, the package repo and SD images
-- [../updating.md](../updating.md): getting a new build onto a handheld without reflashing
+- [updating-from-your-pc.md](updating-from-your-pc.md): putting your own build on a handheld without reflashing

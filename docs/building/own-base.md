@@ -134,7 +134,7 @@ handheld for flashing and support.
 card image and leaves it at `build/image/sm8550/steamling-sm8550-sd.img`. Write that file to a microSD card
 as an image, with balenaEtcher, Rufus or `dd`, and follow the [install guide](../install.md). To
 get a later build onto a handheld that already runs Steamling, see
-[Updating Steamling](../updating.md).
+[Updating a handheld from your own build](updating-from-your-pc.md).
 
 You don't need a separate image-making tool. Arch's own `archiso` builds live installer ISOs for
 x86_64 PCs, not SD card images for Arm handhelds. What Steamling's build does is the Arm
