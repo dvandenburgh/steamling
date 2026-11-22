@@ -8,7 +8,7 @@ Three things get published, each to its own place:
 | What | Where | Made with |
 | --- | --- | --- |
 | The frozen Arch Linux ARM base | [Steamling/base](https://github.com/Steamling/base) releases | `./build.sh --build-base` ([own-base.md](own-base.md)) |
-| Steamling's own packages (kernel, Mesa, gamescope, Governor...) | [Steamling/packages](https://github.com/Steamling/packages) releases | `make stage` and `make publish` (below) |
+| Steamling's own packages (kernel, Mesa, gamescope, Governor...) | [Steamling/packages](https://github.com/Steamling/packages) releases | `./build.sh --update --publish`, or `make stage` and `make publish` (below) |
 | SD card images | the [steamling](https://sourceforge.net/projects/steamling/) project on SourceForge, linked from a draft release on [Steamling/steamling](https://github.com/Steamling/steamling/releases) | `make publish-image` (below) |
 
 Everything here runs as you, never with `sudo`: the logins for GitHub, SourceForge and your signing
@@ -55,8 +55,9 @@ folder: `sm8550`, `sm8250` and so on, and `shared`.
 
 ### The first publish
 
-There's nothing live to compare against the first time, so each tree goes up straight from the
-build's own packages:
+Steamling's `sm8550` and `shared` trees are already up, so this is only for a chip family's first
+packages, or a fork's own repo. There's nothing live to compare against the first time, so each
+tree goes up straight from the build's own packages:
 
 ```bash
 STEAMLING_PUBLISH_FROM=localrepo make publish
