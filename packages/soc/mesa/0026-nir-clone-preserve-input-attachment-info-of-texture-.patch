@@ -1,0 +1,38 @@
+From 9acd867d6041a596b7e3614080cee91cf3bfd683 Mon Sep 17 00:00:00 2001
+From: Trigger Huang <Trigger.Huang@amd.com>
+Date: Mon, 2 Nov 2026 17:12:04 +0800
+Subject: [PATCH] nir/clone: preserve input attachment info of texture
+ instructions
+
+clone_tex() doesn't copy texture_array_size and the input_attachment_*
+flags, so they are lost when a texture instruction is cloned, e.g. when
+a loop containing subpassLoad() is unrolled.
+
+Fixes: 1dc711c4074 ("nir: Add input attachment flags to nir_tex_instr")
+Signed-off-by: Trigger Huang <Trigger.Huang@amd.com>
+Reviewed-by: Samuel Pitoiset <samuel.pitoiset@gmail.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46018>
+(cherry picked from commit afae2eadaecd8388e892ebafc9d6035722453f5e)
+---
+ src/compiler/nir/nir_clone.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/compiler/nir/nir_clone.c b/src/compiler/nir/nir_clone.c
+index a6dd7528d72a..533f61d84f38 100644
+--- a/src/compiler/nir/nir_clone.c
++++ b/src/compiler/nir/nir_clone.c
+@@ -421,6 +421,11 @@ clone_tex(clone_state *state, const nir_tex_instr *tex)
+    ntex->sampler_index = tex->sampler_index;
+    ntex->can_speculate = tex->can_speculate;
+ 
++   ntex->texture_array_size = tex->texture_array_size;
++   ntex->input_attachment_index = tex->input_attachment_index;
++   ntex->input_attachment_depth = tex->input_attachment_depth;
++   ntex->input_attachment_stencil = tex->input_attachment_stencil;
++
+    ntex->texture_non_uniform = tex->texture_non_uniform;
+    ntex->sampler_non_uniform = tex->sampler_non_uniform;
+    ntex->embedded_sampler = tex->embedded_sampler;
+-- 
+2.34.1
+
