@@ -19,7 +19,7 @@ That covers every update, whichever way you install it: Governor's System tab, S
 There are three ways to do it. They all do the same thing, so use whichever one still works:
 
 - **In game mode:** open the Quick Access Menu, go to **Governor**, then the
-  **Updater** tab, and press **Roll Back Last Update**. It shows what will be restored. Confirm,
+  **System** tab, and press **Roll Back Last Update**. It shows what will be restored. Confirm,
   then press **Reboot Now**. This button only ever undoes the most recent update.
 - **In desktop mode:** open **Steamling Tools** and pick *Roll back the last update...*. This
   lists every snapshot, newest first. Pick one, confirm, and reboot when it asks. Use this one
@@ -60,16 +60,16 @@ boot at all and you can't get to a terminal, you can swap the old kernel back in
    (If Steamling is on internal storage, boot a Steamling SD card instead and open the internal
    boot partition from there.)
 2. Open the small boot partition (it's a FAT partition, so Windows, macOS and Linux can all read
-   it). In a terminal in that folder, run:
+   it). Rename `KERNEL` to `KERNEL.bad`, then rename `KERNEL.bak` to `KERNEL`.
+3. Write a new `KERNEL.md5` for it. Don't skip this: the bootloader checks that file and won't
+   boot a kernel that doesn't match it. Open a terminal in that folder and run the line for your
+   computer:
 
-   ```bash
-   mv KERNEL KERNEL.bad
-   mv KERNEL.bak KERNEL
-   md5sum KERNEL > KERNEL.md5
-   ```
+   - **Linux:** `md5sum KERNEL > KERNEL.md5`
+   - **macOS:** `printf '%s  KERNEL\n' "$(md5 -q KERNEL)" > KERNEL.md5`
+   - **Windows** (PowerShell):
+     ``"$((Get-FileHash KERNEL -Algorithm MD5).Hash.ToLower())  KERNEL`n" | Set-Content -NoNewline -Encoding ascii KERNEL.md5``
 
-   Don't skip the last line. The bootloader checks that file and won't boot a kernel that doesn't
-   match it.
-3. Put the card back and boot. The old kernel is now running with the newer system around it, so
+4. Put the card back and boot. The old kernel is now running with the newer system around it, so
    some things (Wi-Fi or sound, for example) may not work, but it boots. Run
    `sudo steamling-rollback` to put the rest of the system back in step with the old kernel.
