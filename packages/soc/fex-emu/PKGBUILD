@@ -97,6 +97,9 @@ build() {
   # armv9 host-tool SIGILL on the build host. Do not raise it to the device's prime core.
   # FEXConfig, FEX's Qt settings app, stays out: nothing here uses it, and with no Qt in the
   # base it made the build look for Qt5 and stop.
+  # FMT_MODULE: the bundled fmt turns on its C++ module build whenever clang, Ninja and CMake can
+  # do modules, and the base's CMake then wants libstdc++'s std module source, which isn't
+  # there. FEX only uses fmt as a normal library.
   cmake -G Ninja -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -107,6 +110,7 @@ build() {
     -DBUILD_TESTING=OFF \
     -DBUILD_FEX_LINUX_TESTS=OFF \
     -DBUILD_FEXCONFIG=OFF \
+    -DFMT_MODULE=OFF \
     -DBUILD_THUNKS=ON \
     -DENABLE_CLANG_THUNKS=ON \
     -DX86_DEV_ROOTFS="${srcdir}/sysroot" \
