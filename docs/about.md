@@ -25,8 +25,9 @@ these projects some love too.
 
 - **[Pocknix](https://github.com/shuuri-labs/pocknix-os)** by shuuri-labs. Steamling began as a
   fork of Pocknix, and its build system, packaging, session setup and a huge amount of careful
-  device work all come from there. Steamling also still builds from the frozen Arch Linux ARM
-  base that Pocknix hosts. Thank you for doing the hard groundwork and sharing it so openly.
+  device work all come from there, and Steamling built from the frozen Arch Linux ARM base that
+  Pocknix hosts until it had its own. Thank you for doing the hard groundwork and sharing it so
+  openly.
 - **[ROCKNIX](https://github.com/ROCKNIX/distribution)** and its contributors. The kernel, the
   bootloader (ABL) that lets these handhelds boot Linux at all, the Snapdragon device support,
   and the panel refresh calibration all come from ROCKNIX. None of this runs without them.
