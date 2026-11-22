@@ -5,16 +5,18 @@ tools...) and everything else, which comes from Arch Linux ARM. That second set 
 Arch Linux ARM changes every day, so Steamling uses a frozen copy of it, a snapshot, so every build
 and every device gets exactly the same versions.
 
-Until now we've borrowed that snapshot from the Pocknix project. That works, but it isn't ours:
-on 23 October they cut a new one at the same address, and our builds moved onto it overnight while
-our settings still named the old one. This page shows how to make and host your own, so the base
-only moves when you move it.
+Steamling's base lives on [Steamling/base](https://github.com/Steamling/base), and every build
+uses it without any setup. (It used to borrow Pocknix's, until Pocknix cut a new one at the same
+address and our builds moved onto it overnight; since November 2026 it's our own.) This page is
+for two things: cutting a newer base, when it's time to move Steamling forward, and hosting a
+base of your own for a fork, so it only moves when you move it.
 
 ## What you need
 
-- **The machine you already build on.** These steps were written for an x86_64 CachyOS laptop,
-  but any Arch-based Linux works. It needs to be set up for building already (see
-  [Building on a Linux host](linux-host.md)).
+- **The machine you already build on**, set up for building already (see
+  [Building on a Linux host](linux-host.md), or [wsl.md](wsl.md) on Windows). The script is
+  written in fish, so install that too (`sudo apt install fish` on Ubuntu, `sudo pacman -S fish`
+  on Arch).
 - **Somewhere public to put the files.** A base is a few GB. Steamling's own goes on GitHub, as
   releases of a `Steamling/base` repo, which costs nothing.
   Anything [rclone](https://rclone.org) can upload to works too, as long as it has a public web
@@ -28,17 +30,19 @@ only moves when you move it.
 
 1. Create a public repo for the base (Steamling's is `Steamling/base`). Tick **Add a README**:
    releases hang off a commit, so the repo can't be empty.
-2. Install the GitHub command line tool and log in with an account that can write to that repo:
+2. Install the GitHub command line tool (`sudo apt install gh` on Ubuntu,
+   `sudo pacman -S --needed github-cli` on Arch) and log in with an account that can write to
+   that repo:
 
    ```fish
-   sudo pacman -S --needed github-cli
    gh auth login
    ```
 
 That's all. You don't make any releases yourself; the script does.
 
 A GitHub release holds at most 1000 files and a base has over 2000 (every package comes with its
-signature), so the base is spread over a few releases: `base`, `base-2`, `base-3`. pacman gets told
+signature), so the base is spread over a few releases: `base`, `base-2` and so on (the current
+one fits in two). pacman gets told
 about all of them and finds each package wherever it is. Some file names get a `_` where Arch Linux
 ARM's have a `:` or `+`, because GitHub won't keep those characters. The packages and their
 signatures are untouched.
@@ -49,14 +53,14 @@ signatures are untouched.
    either with the `r2.dev` address Cloudflare offers or a domain of your own. Note the public
    address, for example `https://pub-1234.r2.dev`.
 2. Create an R2 API token with read and write access to that bucket.
-3. On the laptop, run `rclone config`, add a remote called `r2` of type **Amazon S3 / Cloudflare
+3. On your build machine, run `rclone config`, add a remote called `r2` of type **Amazon S3 / Cloudflare
    R2**, and paste in the token's keys and the account's endpoint.
 4. Check it works: `rclone lsf r2:steamling` should run without an error.
 
 ## 2. Fill in your settings
 
 Your settings live in one file, `config/local.conf`, which git never commits (so a Wi-Fi password in <!-- docs-check: allow -->
-it stays on your laptop). Every build reads it first, so whatever you put there wins over
+it stays on your machine). Every build reads it first, so whatever you put there wins over
 Steamling's defaults. Start from the example:
 
 ```fish
@@ -99,7 +103,7 @@ A plain `./build.sh` never touches the base; only `--build-base` does. (You can 
 
 The script:
 
-1. Checks the laptop has what it needs, including qemu for running Arm programs.
+1. Checks the machine has what it needs, including qemu for running Arm programs.
 2. Points `config/steamling.conf` at your storage.
 3. Builds everything against live Arch Linux ARM (`make image`).
 4. Freezes exactly what that build installed, uploads it, and pins the config to it
