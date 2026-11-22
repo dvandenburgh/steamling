@@ -37,3 +37,14 @@ mesa.git:deckard            https://github.com/evlav/deckard-mesa.git           
 
 # Valve's Proton Wine, the half of Proton that matters when a game misbehaves under FEX.
 wine.git                    https://github.com/ValveSoftware/wine.git                       blobless
+
+# CachyOS, for what's worth carrying from it. Its kernel tree rides in linux.git like Retroid's,
+# one branch per topic per kernel version (7.3/zram, 7.3/sched, ...); kernel-patches holds the
+# same work as flat patch files per version, linux-cachyos the PKGBUILDs and configs that pick
+# from them, CachyOS-Settings the sysctl, udev and systemd tuning, and CachyOS-PKGBUILDs the
+# recipes for the rest of their packages.
+linux.git:cachyos           https://github.com/CachyOS/linux.git                            blobless  7.*
+cachyos-kernel-patches.git  https://github.com/CachyOS/kernel-patches.git                   blobless
+linux-cachyos.git           https://github.com/CachyOS/linux-cachyos.git                    full
+cachyos-settings.git        https://github.com/CachyOS/CachyOS-Settings.git                 full
+cachyos-pkgbuilds.git       https://github.com/CachyOS/CachyOS-PKGBUILDs.git                blobless
