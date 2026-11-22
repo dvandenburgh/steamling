@@ -99,7 +99,8 @@ build() {
   # base it made the build look for Qt5 and stop.
   # FMT_MODULE: the bundled fmt turns on its C++ module build whenever clang, Ninja and CMake can
   # do modules, and the base's CMake then wants libstdc++'s std module source, which isn't
-  # there. FEX only uses fmt as a normal library.
+  # there. FEX only uses fmt as a normal library. FEX has no C++ modules of its own either, so
+  # module scanning and the std module are off for the whole build too.
   cmake -G Ninja -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/usr \
@@ -111,6 +112,8 @@ build() {
     -DBUILD_FEX_LINUX_TESTS=OFF \
     -DBUILD_FEXCONFIG=OFF \
     -DFMT_MODULE=OFF \
+    -DCMAKE_CXX_SCAN_FOR_MODULES=OFF \
+    -DCMAKE_CXX_MODULE_STD=OFF \
     -DBUILD_THUNKS=ON \
     -DENABLE_CLANG_THUNKS=ON \
     -DX86_DEV_ROOTFS="${srcdir}/sysroot" \
