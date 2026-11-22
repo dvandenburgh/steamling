@@ -64,7 +64,7 @@ Especially welcome:
 | `build/` | Build output (gitignored): rootfs, images, `localrepo/<soc>` and `localrepo/shared`. |
 | `vendor/` | **Do not edit.** Regenerated wholesale by `make sync` from ROCKNIX. |
 
-Three rules that catch most first-time contributors:
+Rules that catch most first-time contributors:
 
 - **Kernel config changes go in a delta**, not in `kernel/<soc>/config` - that file is a
   synced ROCKNIX snapshot and `make sync` overwrites it. Use `kernel/<soc>/config-delta` for
@@ -109,7 +109,7 @@ qemu-user - see [docs/building/](docs/building/README.md)):
 sudo make packages PKG="steamling-decky"    # -> build/localrepo/shared/ (per-SoC packages: build/localrepo/<soc>/)
 ```
 
-**A full image** (same Linux host with root; the kernel build is 1-2 hours the first time):
+**A full image** (same Linux host with root; the first build takes a few hours, see [docs/building/advanced.md](docs/building/advanced.md#space-and-time)):
 
 ```bash
 ./build.sh              # every step, asking sudo once -> build/image/<soc>/ (--ssh: SSH on)
@@ -126,8 +126,8 @@ your own changes, update a handheld from your own build ([docs/building/updating
 ## Testing on a device
 
 The normal loop is **build the package, copy it over, `pacman -U`, exercise it**. You do not
-need to reflash an image for a package change. SSH is off by default: turn it on in Steamling
-Control (Library → Remote access) or Steamling Tools, or build your image with `--ssh`. Log in as
+need to reflash an image for a package change. SSH is off by default: turn it on in Governor
+(System → Remote access) or Steamling Tools, or build your image with `--ssh`. Log in as
 `deck`; root can't log in over SSH.
 
 ```bash
@@ -181,20 +181,20 @@ Not everything applies to every PR. Cover what is relevant, and say which items 
    missing from a devicetree revision. Probe for the thing and degrade quietly when it is missing; never error the
    session. If you cannot test the absent-hardware path on hardware, at least show the code
    path that handles it.
-6. **Failure paths.** No network, missing config file, service disabled, permission denied.
+5. **Failure paths.** No network, missing config file, service disabled, permission denied.
    Especially: anything gated behind Decky or the network can be late or never arrive, so a
    feature that depends on it should not be the only thing restoring important state.
-7. **Neighbouring features.** Exercise the rest of the tab, service, or script you touched to
+6. **Neighbouring features.** Exercise the rest of the tab, service, or script you touched to
    show you did not regress it.
-8. **Game mode reality**, for anything in the Steam session. It must be **fully
+7. **Game mode reality**, for anything in the Steam session. It must be **fully
    gamepad-navigable** (no touch-only or mouse-only controls), readable at handheld distance,
    and it must not steal focus from the game.
-9. **Perf claims need numbers.** Before and after, same scene, same settings, from MangoHud or
+8. **Perf claims need numbers.** Before and after, same scene, same settings, from MangoHud or
    an fps counter. Two traps: `ps` `%CPU` is a **lifetime average**, not current load, and a
    paused or menu scene hides jitter.
-10. **Kernel changes**: boots on real hardware, no new errors in `dmesg`, suspend/resume still
-    works, and the patch series still applies from a clean tree.
-11. **Emulator configs**: emulator version, the exact ROM or title you tested, before/after
+9. **Kernel changes**: boots on real hardware, no new errors in `dmesg`, suspend/resume still
+   works, and the patch series still applies from a clean tree.
+10. **Emulator configs**: emulator version, the exact ROM or title you tested, before/after
     behaviour, and any CPU core pinning (`taskset`) the emulator needed to perform well.
 
 ## What the PR must contain
