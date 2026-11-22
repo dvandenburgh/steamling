@@ -6,9 +6,14 @@ body:
     id: device
     attributes:
       label: Device
+      description: For an untested port, name the exact handheld in "What happened" below.
       options:
         - Retroid Pocket 6
         - Retroid Pocket 6 TOP-DPAD
+        - Another Snapdragon 8 Gen 2 handheld (untested port)
+        - A Snapdragon 865 handheld (untested port)
+        - A Snapdragon 8 Gen 3 handheld (untested port)
+        - A Snapdragon 8 Elite handheld (untested port)
         - Other / not device-specific
     validations:
       required: true
@@ -17,9 +22,10 @@ body:
     attributes:
       label: Steamling version
       description: >
-        The release you installed, or the version of the affected package if you
-        know it (`pacman -Q steamling-steam`, `pacman -Qs linux-steamling`, ...).
-      placeholder: "the release tag, or the output of pacman -Q <package>"
+        Steam's Settings → System shows it, as does the bottom of Governor's System tab.
+        If you know the affected package, its version helps too
+        (`pacman -Q steamling-steam`, `pacman -Qs linux-steamling`, ...).
+      placeholder: "0.1.1, or the output of pacman -Q <package>"
     validations:
       required: true
   - type: dropdown
