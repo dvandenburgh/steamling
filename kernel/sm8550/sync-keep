@@ -44,3 +44,5 @@ patches/30-sm8550/0504-Enable-64-bit-processes-to-use-compat-input-syscalls.patc
 patches/30-sm8550/0508-ROCKNIX-rp6-panel-frame-length-calibration.patch
 patches/30-sm8550/0509-ROCKNIX-thor-panel-frame-length-calibration.patch
 -patches/30-sm8550/v6_20260210_quic_utiwari_crypto_qce_add_runtime_pm_and_interconnect_bandwidth_scaling_support.patch
+# btusb.c is now btusb_main.c and friends; 0005's USB id hunk follows it there (PATCHES.md).
+patches/10-mainline/0005-Bluetooth-btrtl-Add-the-support-for-RTL8733BU.patch
