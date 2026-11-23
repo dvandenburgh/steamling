@@ -5,7 +5,7 @@
 # libplasma this build can't load instead of installing it.
 pkgname=plasma-mobile
 pkgver=6.8.3
-pkgrel=1
+pkgrel=2
 _commit=db5fae30e56962c69f95dcd4ad48d267e4e4e31c  # v6.8.3
 pkgdesc='Plasma shell and components targeted for phones'
 arch=('aarch64')
@@ -17,7 +17,13 @@ depends=('gcc-libs' 'glibc'
          'kpipewire' 'kservice' 'kwayland' 'kwin' 'kwindowsystem' 'layer-shell-qt' 'libepoxy'
          'libkscreen' "libplasma>=${pkgver}" "libplasma<${pkgver%.*}.90" 'libxcb' 'modemmanager-qt' 'networkmanager-qt'
          "plasma-activities>=${pkgver}" 'plasma-nano' "plasma-workspace>=${pkgver}" 'qcoro'
-         'qt6-base' 'qt6-declarative' 'systemd-libs' 'wayland')
+         'qt6-base' 'qt6-declarative' 'systemd-libs' 'wayland'
+         # Loaded at runtime by the shell's QML and scripts, so nothing links them and nothing
+         # else here pulls them in: without them the volume, network, battery and rotation
+         # controls are missing, and the base snapshot (built from what an image installs)
+         # leaves them out. Arch's own plasma-mobile lists the same set.
+         'bash' 'bluez-qt' 'kdeclarative' 'knewstuff' 'ksvg' 'milou' 'plasma-keyboard'
+         'plasma-nm' 'plasma-pa' 'powerdevil' 'qt6-5compat' 'qt6-sensors' 'solid')
 # vulkan-headers: Qt6Gui's CMake package looks for them (qt6-base is built with Vulkan) and,
 # without them, reports Qt6Gui as not found, so Qt6Quick and everything after it fails to configure.
 makedepends=('extra-cmake-modules' 'git' 'plasma-wayland-protocols' 'vulkan-headers')
