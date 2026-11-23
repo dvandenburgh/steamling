@@ -95,6 +95,7 @@ render_all() {  # $1 template dir, $2 out dir
   [ -f "${src}/dolphin-Dolphin.ini.in" ] && cp "${src}/dolphin-Dolphin.ini.in" "${out}/Dolphin.ini"
   [ -f "${src}/dolphin-GFX.ini.in" ] && cp "${src}/dolphin-GFX.ini.in" "${out}/GFX.ini"
   [ -f "${src}/dolphin-GCPadNew.ini.in" ] && cp "${src}/dolphin-GCPadNew.ini.in" "${out}/GCPadNew.ini"
+  [ -f "${src}/dolphin-WiimoteNew.ini.in" ] && cp "${src}/dolphin-WiimoteNew.ini.in" "${out}/WiimoteNew.ini"
   [ -f "${src}/cemu-settings.xml.in" ] && sed "s|__ROMS__|${ROMS}|g" "${src}/cemu-settings.xml.in" > "${out}/settings.xml"
   # the largest 272-row multiple that fits the panel, +8 rows slack (4x on 1080 crops 8)
   local res=$(( (LOGICAL_H + 8) / 272 )); [ "${res}" -lt 1 ] && res=1
@@ -164,20 +165,41 @@ seed_armsx2() {
 seed_eden()    { seed_b ini qt-config.ini "${HOME}/.config/eden/qt-config.ini" eden-qt-config; }
 seed_ryujinx() { seed_b json Config.json "${HOME}/.config/Ryujinx/Config.json" ryujinx-Config; }
 
+# The section's device in a Dolphin pad file ("[GCPad1]" -> "evdev/0/...").
+dolphin_pad_device() {  # $1 file, $2 section
+  awk -v sec="[$2]" '$0 == sec { on = 1; next } /^\[/ { on = 0 }
+    on && /^Device *=/ { sub(/^Device *= */, ""); print; exit }' "$1" 2>/dev/null
+}
+
 seed_dolphin() {
-  seed_b ini Dolphin.ini "${HOME}/.config/dolphin-emu/Dolphin.ini"
-  seed_b ini GFX.ini     "${HOME}/.config/dolphin-emu/GFX.ini"
-  # The GameCube pad file used to be copied whole, and only while it still matched the last copy.
-  # Once Dolphin had saved it, it kept whatever buttons it had then, and the recorded baseline
-  # moved on without it. Now it merges key by key; the first time, the old baseline is dropped
+  local cfg="${HOME}/.config/dolphin-emu" f sec
+  seed_b ini Dolphin.ini "${cfg}/Dolphin.ini"
+  seed_b ini GFX.ini     "${cfg}/GFX.ini"
+  # A pad file Dolphin wrote before we ever seeded it binds player 1 to the keyboard and mouse
+  # (an XInput2 device), which game mode doesn't have. That file is set aside as .bak-<date> so
+  # the seed goes in whole; a player 1 on any controller is left to the merge below.
+  for f in GCPadNew.ini:GCPad1 WiimoteNew.ini:Wiimote1; do
+    sec="${f#*:}"; f="${f%%:*}"
+    case "$(dolphin_pad_device "${cfg}/${f}" "${sec}")" in
+      XInput2/*) reset_target "${cfg}/${f}" ;;
+    esac
+  done
+  # Both pad files used to be copied whole, and only while they still matched the last copy.
+  # Once Dolphin had saved one, it kept whatever buttons it had then, and the recorded baseline
+  # moved on without it. They now merge key by key; the first time, the old baseline is dropped
   # so each button is judged by the values earlier seeds put there (dolphin-GCPadNew.policy).
   local pad_merged="${STATE}/steamling/dolphin-gcpad-merged"
   if [ ! -e "${pad_merged}" ]; then
     rm -f "${STATE}/steamling/seed-baseline/.config/dolphin-emu/GCPadNew.ini" "${TMP}/prev/GCPadNew.ini"
   fi
-  seed_b ini GCPadNew.ini "${HOME}/.config/dolphin-emu/GCPadNew.ini" dolphin-GCPadNew
+  seed_b ini GCPadNew.ini "${cfg}/GCPadNew.ini" dolphin-GCPadNew
   mkdir -p "${pad_merged%/*}" 2>/dev/null && : > "${pad_merged}"
-  seed_a dolphin-WiimoteNew.ini.in "${HOME}/.config/dolphin-emu/WiimoteNew.ini"
+  local wii_merged="${STATE}/steamling/dolphin-wiimote-merged"
+  if [ ! -e "${wii_merged}" ]; then
+    rm -f "${STATE}/steamling/seed-baseline/.config/dolphin-emu/WiimoteNew.ini" "${TMP}/prev/WiimoteNew.ini"
+  fi
+  seed_b ini WiimoteNew.ini "${cfg}/WiimoteNew.ini"
+  : > "${wii_merged}"
 }
 
 seed_cemu() {
