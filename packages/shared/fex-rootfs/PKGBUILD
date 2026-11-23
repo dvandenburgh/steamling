@@ -6,13 +6,13 @@
 
 pkgname=fex-rootfs
 _rootfsdate=2026-01-08             # pinned dated image from FEX's rootfs CDN (immutable path)
-_mesaver=26.2.4-1                  # x86_64 turnip dropped INTO the image (see repack below)
+_mesaver=26.3.1-3                  # x86_64 turnip dropped INTO the image (see repack below)
 # Per-game Mesa Version payloads (same pins as steamling-turnip-x86) must live INSIDE the image:
 # pressure-vessel captures graphics against this rootfs, not the host, so host-only payloads are
 # invisible to it. vk-x86-container.list ships to the host as steamling-game-launch's SLR pin gate.
-_vkvers=('25.2.7-1' '25.3.5-1' '26.0.6-1' '26.1.6-1' "${_mesaver}")
+_vkvers=('25.2.7-1' '25.3.5-1' '26.0.6-1' '26.1.6-1' '26.2.4-1' "${_mesaver}")
 pkgver=${_rootfsdate//-/}          # 20260108
-pkgrel=10
+pkgrel=11
 pkgdesc="x86_64 ArchLinux RootFS for FEX (x86 game userland + native Turnip GPU passthrough)"
 arch=('aarch64')
 url="https://rootfs.fex-emu.gg/"
@@ -32,7 +32,8 @@ source=("ArchLinux-${_rootfsdate}.sqsh::https://rootfs.fex-emu.gg/ArchLinux/${_r
         "vulkan-freedreno-25.2.7-1-x86_64.pkg.tar.zst::https://archive.archlinux.org/packages/v/vulkan-freedreno/vulkan-freedreno-1%3A25.2.7-1-x86_64.pkg.tar.zst"
         "vulkan-freedreno-25.3.5-1-x86_64.pkg.tar.zst::https://archive.archlinux.org/packages/v/vulkan-freedreno/vulkan-freedreno-1%3A25.3.5-1-x86_64.pkg.tar.zst"
         "vulkan-freedreno-26.0.6-1-x86_64.pkg.tar.zst::https://archive.archlinux.org/packages/v/vulkan-freedreno/vulkan-freedreno-1%3A26.0.6-1-x86_64.pkg.tar.zst"
-        "vulkan-freedreno-26.1.6-1-x86_64.pkg.tar.zst::https://archive.archlinux.org/packages/v/vulkan-freedreno/vulkan-freedreno-1%3A26.1.6-1-x86_64.pkg.tar.zst")
+        "vulkan-freedreno-26.1.6-1-x86_64.pkg.tar.zst::https://archive.archlinux.org/packages/v/vulkan-freedreno/vulkan-freedreno-1%3A26.1.6-1-x86_64.pkg.tar.zst"
+        "vulkan-freedreno-26.2.4-1-x86_64.pkg.tar.zst::https://archive.archlinux.org/packages/v/vulkan-freedreno/vulkan-freedreno-1%3A26.2.4-1-x86_64.pkg.tar.zst")
 noextract=("ArchLinux-${_rootfsdate}.sqsh"
            "vulkan-freedreno-${_mesaver}-x86_64.pkg.tar.zst"
            "libdisplay-info-0.3.0-1-x86_64.pkg.tar.zst"
@@ -40,15 +41,17 @@ noextract=("ArchLinux-${_rootfsdate}.sqsh"
            "vulkan-freedreno-25.2.7-1-x86_64.pkg.tar.zst"
            "vulkan-freedreno-25.3.5-1-x86_64.pkg.tar.zst"
            "vulkan-freedreno-26.0.6-1-x86_64.pkg.tar.zst"
-           "vulkan-freedreno-26.1.6-1-x86_64.pkg.tar.zst")
+           "vulkan-freedreno-26.1.6-1-x86_64.pkg.tar.zst"
+           "vulkan-freedreno-26.2.4-1-x86_64.pkg.tar.zst")
 sha256sums=('cb059973b7953ad9165845529655189b96f9a174b14a6a149c87ec884b0c5e90'
-            'da30385afabfee1fba0456ff03e1a4f9d8168dc12679323f90bd496e5259e435'
+            '28e302fabb45242d0187ccf21b5a9751c3a797d21ea432b42cda4b59dd298f36'
             '07ab1479ec5e70aea174e2d0e340bd9364b507ed74f2df3bfd51b3c6f40e5787'
             '312213911881c0742e2a825432feac761e863945b74bb3a6daca97a99778d35e'
             'b5554bb73674d6a5e7772bee71abd0e9d40929c61b5b690f79aba041ccffb5a8'
             '6eecca2a8b639458371eca29e93605f83d7dc5ee7a3dab5980beddb758e90331'
             '3d0c11b665b3409c8b6372f0369192355743d821727248115f973bd2c15bbbde'
-            '6b5785d7b7d7993a828d3f79c6c0e369a619d6e786dd2cfdfd8ac4ab1ad8a2d2')
+            '6b5785d7b7d7993a828d3f79c6c0e369a619d6e786dd2cfdfd8ac4ab1ad8a2d2'
+            'da30385afabfee1fba0456ff03e1a4f9d8168dc12679323f90bd496e5259e435')
 
 package() {
   # Repack under fakeroot so the image's stored ownerships survive the round-trip, and match the
