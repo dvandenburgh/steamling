@@ -73,9 +73,9 @@ emu_log() {  # $1 name, then the command line: everything this shell runs from h
   log="${dir}/$1.log"; shift
   [ -f "${log}" ] && mv -f "${log}" "${log}.old" 2>/dev/null
   printf '%s: %s\n' "$(date '+%F %T')" "$*" > "${log}" 2>/dev/null || return 0
-  # The display and driver settings it started with, since those differ between ES-DE, a Steam
+  # The locale, display and driver settings it started with, since those differ between ES-DE, a Steam
   # tile and the desktop.
-  env | grep -E '^(DISPLAY|WAYLAND_DISPLAY|GAMESCOPE_WAYLAND_DISPLAY|ENABLE_GAMESCOPE_WSI|VK_|MESA_|TU_|QT_|SDL_)' \
+  env | grep -E '^(LANG|LC_|DISPLAY|WAYLAND_DISPLAY|GAMESCOPE_WAYLAND_DISPLAY|ENABLE_GAMESCOPE_WSI|VK_|MESA_|TU_|QT_|SDL_)' \
     | sort >> "${log}" 2>/dev/null
   printf -- '---\n' >> "${log}" 2>/dev/null
   exec >> "${log}" 2>&1
