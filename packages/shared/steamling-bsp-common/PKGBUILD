@@ -3,14 +3,14 @@
 # live in devices/<name>/packages/steamling-bsp-<name>, which depends on this package.
 pkgname=steamling-bsp-common
 pkgver=0.1.1
-pkgrel=1.9
+pkgrel=1.10
 pkgdesc="steamling shared board support: sleep.d dispatcher, suspend hooks, power-key policy, session udev rules, wheel sudo, fan/scheduler daemons, ABL updater, power profiles daemon, realtime priority ladder, zram swap and memory sysctls, deck session limits, kernel /flash deploy, volume rocker daemon, journal cap, iwd Wi-Fi backend, panel refresh calibration, controller MCU mode quirks, sensor core gyro"
 arch=('any')
 url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # steamling-core rides along so a plain -Syu delivers the mandatory layer to devices that
 # predate it: a new package name only reaches installed devices via a dep edge.
-depends=('bash' 'sudo' 'steamling-core' 'python' 'python-gobject' 'python-evdev' 'cpio' 'zram-generator')
+depends=('bash' 'sudo' 'steamling-core' 'diffutils' 'python' 'python-gobject' 'python-evdev' 'cpio' 'zram-generator')
 # Older kernels own the /flash deploy files: the versioned conflict makes pacman upgrade the
 # kernel in the same transaction instead of failing on file conflicts.
 conflicts=('linux-steamling-sm8550<7.2.10-3')

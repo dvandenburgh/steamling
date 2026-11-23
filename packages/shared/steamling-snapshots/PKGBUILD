@@ -4,12 +4,12 @@
 # pre-snapshot ext4 installs).
 pkgname=steamling-snapshots
 pkgver=0.1.1
-pkgrel=1
+pkgrel=2
 pkgdesc="steamling pre-update btrfs snapshots and rollback (subvolume set-default)"
 arch=('any')
 url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
-depends=('btrfs-progs' 'jq' 'util-linux')
+depends=('btrfs-progs' 'diffutils' 'jq' 'util-linux')
 backup=('etc/steamling/snapshots.conf')
 source=('05-steamling-snapshot.hook' '99-steamling-snapshot-post.hook'
         'snapshot-lib.sh'
