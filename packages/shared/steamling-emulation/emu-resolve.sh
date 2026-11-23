@@ -8,6 +8,11 @@ EMU_NAMES="armsx2 eden ryujinx rpcs3 vita3k xemu dolphin cemu azahar ppsspp"
 # to whatever it launches. The emulators are built against the system libraries and gain nothing
 # from the overlay hooks, so they start without either.
 unset LD_PRELOAD LD_LIBRARY_PATH
+# An AppImage mounts itself with fusermount, and looks for it on PATH. Where the PATH Steam hands
+# out has neither one, point it at the system's.
+if ! command -v fusermount3 >/dev/null 2>&1 && ! command -v fusermount >/dev/null 2>&1; then
+  [ -x /usr/bin/fusermount ] && export FUSERMOUNT_PROG=/usr/bin/fusermount
+fi
 
 # Heavy emulators pin to the board's game cores: scx_lavd otherwise parks the critical thread
 # on a little core (chop + audio crackle). Unlike the game pin, a board without the key still
