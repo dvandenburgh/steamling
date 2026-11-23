@@ -21,6 +21,17 @@
     </rule>
   </emulator>
 
+  <!-- %CORE_RETROARCH%: the cores we ship first, then RetroArch's own download folder. ES-DE's
+       bundled rule looks in ~/.config/retroarch/cores first, so a core once fetched with the
+       Online Updater shadowed our build of it in ES-DE but not on a Steam tile (steamling-play
+       loads /usr/lib/libretro). Cores we don't ship are still found in the download folder. -->
+  <core name="RETROARCH">
+    <rule type="corepath">
+      <entry>/usr/lib/libretro</entry>
+      <entry>~/.config/retroarch/cores</entry>
+    </rule>
+  </core>
+
   <!-- GameCube / Wii -->
   <emulator name="DOLPHIN">
     <rule type="staticpath">
