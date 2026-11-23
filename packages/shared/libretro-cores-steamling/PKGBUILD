@@ -10,7 +10,7 @@ _split=(fceumm snes9x gambatte mgba
         genesis_plus_gx picodrive yabasanshiro mednafen_pce_fast fbneo mednafen_ngp)
 pkgname=(libretro-cores-steamling "${_split[@]/#/libretro-cores-steamling-}")
 pkgver=0.1.1
-pkgrel=4
+pkgrel=5
 pkgdesc="Curated prebuilt aarch64 libretro cores for the RP6 (vendored, ArkOS/TheRA set)"
 arch=('aarch64')
 url="https://github.com/christianhaitian/retroarch-cores"
@@ -21,6 +21,10 @@ makedepends=('unzip')
 # Pinned: upstream force-updates the files in place, so a floating ref is not reproducible.
 _commit=913e84e8371aa252e1c520729fba04bb6a8bc1f1
 _base="https://raw.githubusercontent.com/christianhaitian/retroarch-cores/${_commit}/aarch64"
+# Stella at the pin is an old build linked against GNU libiconv, which Arch doesn't have (glibc
+# has iconv built in), so RetroArch couldn't load it and Atari 2600 games never started. This
+# later commit's build links only libc and libm.
+_stella_commit=b597508043c243009f7623bb6506839c42d8dc85
 
 # N64 (mupen64plus_next), Dreamcast (flycast) and PlayStation (swanstation, replacing
 # duckstation) are built from source in packages/soc/libretro-*, with Vulkan.
@@ -35,7 +39,9 @@ _cores=(
 source=()
 sha256sums=()
 for _c in "${_cores[@]}"; do
-  source+=("${_c}_libretro.so.zip::${_base}/${_c}_libretro.so.zip")
+  _url="${_base}/${_c}_libretro.so.zip"
+  [ "${_c}" = stella ] && _url="${_base/${_commit}/${_stella_commit}}/${_c}_libretro.so.zip"
+  source+=("${_c}_libretro.so.zip::${_url}")
   sha256sums+=('SKIP')
 done
 
