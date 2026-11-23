@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # mirrors.sh - clone what config/mirrors.list names into build/mirrors as bare repos, and fetch
-# the ones already there. Branches and tags only, never GitHub PR or GitLab MR refs. Safe to
+# the ones already there; `file` entries are downloaded instead. Branches and tags only, never GitHub PR or GitLab MR refs. Safe to
 # re-run; make clean keeps the mirrors. STEAMLING_MIRRORS_DIR moves them.
 set -uo pipefail
 
@@ -11,6 +11,14 @@ fail=0
 
 while read -r name url clone branches; do
   case "${name}" in ''|'#'*) continue ;; esac
+  # A plain file (a package database, an index page): downloaded fresh each run.
+  if [ "${clone}" = file ]; then
+    echo "==> fetching ${name}"
+    mkdir -p "$(dirname "${M}/${name}")"
+    curl -fsSL --retry 3 -o "${M}/${name}.part" "${url}" && mv -f "${M}/${name}.part" "${M}/${name}" \
+      || { rm -f "${M}/${name}.part"; echo "mirrors: fetch failed: ${name}" >&2; fail=1; }
+    continue
+  fi
   case "${clone}" in
     full)     args=() ;;
     shallow)  args=(--depth 1) ;;

@@ -1,5 +1,5 @@
 # mirrors.ps1 - scripts/mirrors.sh for a Windows checkout: clone what config/mirrors.list names
-# into build\mirrors as bare repos, and fetch the ones already there. Branches and tags only.
+# into build\mirrors as bare repos, and fetch the ones already there; `file` entries are downloaded. Branches and tags only.
 # Safe to re-run. $env:STEAMLING_MIRRORS_DIR moves them.
 #   powershell -ExecutionPolicy Bypass -File scripts\mirrors.ps1
 git config --global core.longpaths true
@@ -14,6 +14,15 @@ foreach ($line in Get-Content (Join-Path $Root 'config\mirrors.list')) {
     $f = $line -split '\s+'
     $name = $f[0]; $url = $f[1]; $clone = $f[2]
     $branches = if ($f.Count -gt 3) { $f[3] } else { '*' }
+    # A plain file (a package database, an index page): downloaded fresh each run.
+    if ($clone -eq 'file') {
+        $out = Join-Path $M $name
+        New-Item -ItemType Directory -Force (Split-Path -Parent $out) | Out-Null
+        Write-Host "==> fetching $name"
+        try { Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $out }
+        catch { Write-Warning "fetch failed: $name"; $failed = $true }
+        continue
+    }
     switch ($clone) {
         'full'     { $cloneArgs = @() }
         'shallow'  { $cloneArgs = @('--depth', '1') }

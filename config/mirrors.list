@@ -3,7 +3,8 @@
 # rebases and patch work: no build step reads them.
 #
 #   <name>             <url>                                                         <clone>  [<branches>]
-# clone: full | shallow (depth 1) | blobless (contents fetched on first read).
+# clone: full | shallow (depth 1) | blobless (contents fetched on first read) | file (the URL is
+# downloaded to <name>, which may name a subfolder, fresh each run).
 # <name>.git:<remote> adds a second remote to an existing mirror; its <branches> glob lands
 # under refs/heads/<remote>/.
 mesa.git                    https://gitlab.freedesktop.org/mesa/mesa.git                    full
@@ -48,3 +49,16 @@ cachyos-kernel-patches.git  https://github.com/CachyOS/kernel-patches.git       
 linux-cachyos.git           https://github.com/CachyOS/linux-cachyos.git                    full
 cachyos-settings.git        https://github.com/CachyOS/CachyOS-Settings.git                 full
 cachyos-pkgbuilds.git       https://github.com/CachyOS/CachyOS-PKGBUILDs.git                blobless
+
+# The x86 side of the compatibility layer. Arch's x86_64 Mesa packaging, then the package databases
+# whose desc files carry each package's version and sha256 (what fex-rootfs and steamling-turnip-x86
+# pin for the x86 vulkan-freedreno builds), the archive's index of every older build, and FEX's
+# index of dated rootfs images.
+arch-mesa.git                         https://gitlab.archlinux.org/archlinux/packaging/packages/mesa.git  full
+arch-x86/extra.db                     https://geo.mirror.pkgbuild.com/extra/os/x86_64/extra.db             file
+arch-x86/vulkan-freedreno.html        https://archive.archlinux.org/packages/v/vulkan-freedreno/          file
+fex-rootfs/RootFS_links.json          https://rootfs.fex-emu.gg/RootFS_links.json                         file
+fex-rootfs/ArchLinux.html             https://rootfs.fex-emu.gg/ArchLinux/                                file
+# The ARM64 Protons we package: their release tags name each build.
+proton-cachyos.git                    https://github.com/CachyOS/proton-cachyos.git                       blobless
+proton-ge.git                         https://github.com/GloriousEggroll/proton-ge-custom.git             blobless
