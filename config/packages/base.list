@@ -33,7 +33,6 @@ mesa
 vulkan-freedreno
 vulkan-icd-loader
 libdrm
-mesa-utils
 vulkan-tools
 
 # --- GPU firmware (Adreno) ---
