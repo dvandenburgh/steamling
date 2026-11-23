@@ -1,7 +1,7 @@
 # proton-ge — GE-Proton ARM64 build as a system compat tool; packaging rules are
 # proton-cachyos's (see its header).
 pkgname=proton-ge
-_srctag=GE-Proton11-7
+_srctag=GE-Proton11-14
 _ver=${_srctag#GE-Proton}
 _major=${_ver%%-*}
 pkgver=${_ver//-/.}
@@ -16,7 +16,7 @@ source=("https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$
         'compatibilitytool.vdf.in'
         'toolmanifest.vdf'
         'steamling-proton')
-sha512sums=('741cf70256f13b20d44952b590defd68b115814097f911c9ec053a64d33795267e2a982a5ce939407e8b649613eb3943bb2e2ebf4794d302ff96b83b61457cdd'
+sha512sums=('72b383298b9c2f7534a3e38562ea6a33115166ac5cd79857dbb4b7edc0039a234c533735e63f4fbf24a2c4063da630764c4c812303bcaa22c241bc64d3a9651b'
             'SKIP'
             'SKIP'
             'SKIP')
