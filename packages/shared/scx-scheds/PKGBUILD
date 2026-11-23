@@ -1,15 +1,16 @@
-# scx-scheds - sched_ext schedulers; scx_lavd is the default CPU scheduler (steamling-lavd.service).
+# scx-scheds - scx_lavd, the CPU scheduler steamling-lavd.service runs, and nothing else from sched_ext:
+# the other schedulers and scxtop came to about 120 MB nothing on the image starts.
 # Shadows the base's copy by repo order: a newer base scx never reaches devices while published.
 pkgname=scx-scheds
 pkgver=1.1.4
-pkgrel=6
+pkgrel=7
 _commit=e7b3a219617472cf78880ac424714e52c932db61
 _rustver=1.99.0
-pkgdesc='sched_ext schedulers and tools'
+pkgdesc='scx_lavd, the sched_ext scheduler steamling runs'
 arch=('aarch64')
 url='https://github.com/sched-ext/scx'
 license=('GPL-2.0-only')
-depends=('bash' 'bpf' 'libgcc' 'glibc' 'jq' 'libseccomp' 'libbpf' 'libelf' 'protobuf' 'zlib')
+depends=('libgcc' 'glibc' 'libelf' 'zlib')
 makedepends=('clang' 'git' 'llvm' 'llvm-libs' 'python')
 options=('!lto' '!debug')
 source=("scx::git+https://github.com/sched-ext/scx.git#commit=${_commit}"
@@ -70,16 +71,10 @@ prepare() {
 build() {
   _toolchain
   cd scx
-  # Same member set as the base's package, so this upgrade drops none of its binaries. The
-  # experimental schedulers and the arena self-tests stay out.
-  cargo build --release --frozen --workspace \
-    --exclude scx_rlfifo --exclude scx_mitosis --exclude scx_characterize \
-    --exclude xtask --exclude vmlinux_docify --exclude scx_arena_selftests \
-    --exclude scx_arena_libarena_selftests --exclude scx_nitosis --exclude scx_mavd
+  cargo build --release --frozen -p scx_lavd
 }
 
 package() {
   cd scx
-  find target/release -maxdepth 1 -type f -executable ! -name '*.so' \
-    -exec install -Dm755 -t "${pkgdir}/usr/bin/" {} +
+  install -Dm755 target/release/scx_lavd -t "${pkgdir}/usr/bin/"
 }
