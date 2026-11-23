@@ -1,11 +1,13 @@
-# steamling-turnip-x86 — archived x86_64 Turnip builds the "Mesa Version" tweak points
-# VK_DRIVER_FILES at. FEX resolves rootfs-first, so these .so bytes are inert; what this
-# package actually provides is the host-side catalog steamling-game-launch and the Decky
-# dropdown enumerate. Series start at 25.2: older ones predate Arch's per-driver x86_64 split.
+# steamling-turnip-x86 — the host-side catalog of the archived x86_64 Turnip builds the "Mesa
+# Version" tweak points VK_DRIVER_FILES at: one icd.json per version, which steamling-game-launch
+# and the Decky dropdown list. The drivers themselves live in fex-rootfs's image; FEX resolves
+# x86 paths there first, so a host copy of them was never loaded. _versions must therefore match
+# fex-rootfs's _vkvers: a version listed here and missing there would be offered with no driver.
+# Series start at 25.2: older ones predate Arch's per-driver x86_64 split.
 pkgname=steamling-turnip-x86
 pkgver=20261123
 pkgrel=1
-pkgdesc="Archived x86_64 Turnip builds for per-game Mesa selection under FEX"
+pkgdesc="Catalog of the x86_64 Turnip builds for per-game Mesa selection under FEX"
 arch=('aarch64')
 url="https://github.com/Steamling/steamling"
 license=("MIT AND BSD-3-Clause AND SGI-B-2.0")   # Mesa's Turnip builds, repackaged
@@ -31,9 +33,6 @@ package() {
     ver="${full%-*}"                                # 25.2.7-1 -> 25.2.7 (dir + tweak value)
     dir="${pkgdir}/usr/share/steamling/vk-x86/${ver}"
     install -d -m755 "${dir}"
-    tar --zstd -xOf "${srcdir}/vulkan-freedreno-${full}-x86_64.pkg.tar.zst" \
-      usr/lib/libvulkan_freedreno.so > "${dir}/libvulkan_freedreno.so"
-    chmod 0755 "${dir}/libvulkan_freedreno.so"
     # Reuse the package's own ICD json for its api_version, but rewrite library_path
     # unconditionally: 26.x switched it to a bare soname, which resolves to the rootfs copy.
     tar --zstd -xOf "${srcdir}/vulkan-freedreno-${full}-x86_64.pkg.tar.zst" \
