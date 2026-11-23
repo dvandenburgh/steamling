@@ -1,0 +1,42 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] ASoC: qcom: q6apm: probe asynchronously
+
+The GPR bus adds the APM service while it probes, and it probes from
+the ADSP's glink channel being opened, which glink does in its rx
+worker. If snd-q6apm is already loaded at that point, apm_probe() runs
+right there, sends APM_CMD_GET_SPF_STATE and waits up to 5 seconds for
+the response. glink's rx worker is also where the commands the ADSP
+needs answered first are handled (intent requests, for one), and it is
+stuck in that wait, so the response never comes:
+
+  [    4.021] Adding APR/GPR dev: gprsvc:service:2:1
+  [    9.184] qcom-apm gprsvc:service:2:1: CMD timeout for [1001021] opcode
+
+and the sound card registers 5 seconds late. When the module loads
+after the ADSP is up, the probe runs from modprobe instead and the
+same query is answered within 80 ms. On a Retroid Pocket 6 it went one
+way or the other depending on whether the ADSP or udev won, and five
+of six boots timed out.
+
+Probe asynchronously, so the wait never happens in glink's worker.
+
+Signed-off-by: David J. Vandenburgh <david@vandenburgh.co>
+---
+diff --git a/sound/soc/qcom/qdsp6/q6apm.c b/sound/soc/qcom/qdsp6/q6apm.c
+--- a/sound/soc/qcom/qdsp6/q6apm.c
++++ b/sound/soc/qcom/qdsp6/q6apm.c
+@@ -1045,6 +1045,14 @@
+ 	.driver = {
+ 		.name = "qcom-apm",
+ 		.of_match_table = of_match_ptr(apm_device_id),
++		/*
++		 * The APM service is added from glink's rx worker, while the ADSP
++		 * channel opens. A synchronous probe would wait for the APM state
++		 * response in that worker, which is also where the ADSP's intent
++		 * requests are handled, so the response could not be sent until
++		 * the wait timed out.
++		 */
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 	},
+ };
+ 
