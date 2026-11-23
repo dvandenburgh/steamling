@@ -1,0 +1,18 @@
+# Needs scripts/check-depends.py reports that are fine as they are: `<package> <need>  # why`.
+# Only for something the package really can run without. A need it has goes in its depends.
+
+# Optional at runtime: the script copes without it.
+steamling-session     plymouth                  # the handoff exits at once when plymouthd isn't running
+steamling-tools       iw                        # steamling-diag: each probe prints "n/a" when its tool is missing
+steamling-tools       iwctl                     # steamling-diag, as above
+steamling-tools       nmcli                     # steamling-diag, as above
+steamling-tools       wpctl                     # steamling-diag, as above
+steamling-tools       pdbedit                   # steamling-share installs samba itself, then checks for smbd first
+steamling-tools       smbpasswd                 # steamling-share, as above
+steamling-tools       steamling-desktop-select  # its menu entries only appear with the desktop layer in
+steamling-tools       steamling-roms-init       # its menu entries only appear with the emulation layer in
+steamling-tools       steamling-update-abl      # every device gets steamling-bsp-common through its steamling-device-<soc>
+
+# Not what the parser thinks.
+plasma-mobile         org.kde.plasma.mobileinitialstart.initialstart  # registered by the shell's own plugin, no qmldir
+wxwidgets-steamling   not                       # wx-config, a build-time helper, defines `not` itself

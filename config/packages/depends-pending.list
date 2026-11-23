@@ -1,0 +1,9 @@
+# Needs scripts/check-depends.py found in a package whose fix means a long rebuild:
+# `<package> <version> <depends to add...>`. They are tolerated only while the package is still
+# at that version. scripts/check.sh fails as soon as its PKGBUILD moves on without them, which is
+# when it is being rebuilt anyway: add them to depends then and drop the line.
+cemu                  2.6.20261120.2f49c07-1               sdl2 glslang speexdsp
+dolphin-emu           2609b-1                              fmt miniupnpc
+gamescope             1:3.17.0.rocknix.20261116.9fda8d1-2  lcms2
+mesa                  2:26.3.1-4                           spirv-tools
+wxwidgets-steamling   3.3.2-3                              sdl2
