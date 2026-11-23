@@ -292,7 +292,7 @@ target right away, and cards formatted here also work in a real Steam Deck (and 
 
 ## System
 
-![The System tab: Check for Updates, and the last snapshot under Rollback](images/governor-updater.jpeg)
+![The System tab: three updates from the package repo listed with their old and new versions, Check for Updates and Install Updates, then Rollback](images/governor-updater.jpeg)
 
 System updates, without leaving game mode:
 
@@ -340,15 +340,16 @@ less on these small screens.
 
 ### About
 
-The bottom of the tab shows your Steamling OS version, the kernel, and whether the bootloader
-on internal storage is the OpenABL this build ships. Handy when you're filing a bug.
+The bottom of the tab shows your Steamling OS version and the base snapshot it's on, the kernel,
+and whether the bootloader on internal storage is the OpenABL this build ships. Handy when you're filing a bug.
 
-![The About section: Steamling OS 0.1.1, kernel 7.3.1, OpenABL 1.2 and Restart Game Mode](images/governor-about.jpeg)
+![The About section: Steamling OS 0.1.1 (base 20261121), kernel 7.3.5, OpenABL 1.2 up to date, and Restart Game Mode](images/governor-about.jpeg)
 
 Steam's own **Settings → System** page shows the same details too: the OS name, the release
-codename, which handheld it is under **OS Variant**, the version, the build date and the kernel.
+codename, which handheld it is under **OS Variant**, the version, the kernel, and under **OS Build** the
+Arch Linux ARM base snapshot it's on.
 
-![Steam's System settings: Steamling OS, codename hatchling, OS Variant Retroid Pocket 6 (SM8550), version 0.1.1 and kernel 7.3.5](images/steam-settings-system.jpeg)
+![Steam's System settings: Steamling OS, codename hatchling, OS Variant Retroid Pocket 6 (SM8550), version 0.1.1, OS Build 20261121 and kernel 7.3.5](images/steam-settings-system.jpeg)
 
 **Restart Game Mode** closes Steam and brings game mode back up, for the times Steam or the
 screen gets stuck. Anything unsaved in a running game is lost.
