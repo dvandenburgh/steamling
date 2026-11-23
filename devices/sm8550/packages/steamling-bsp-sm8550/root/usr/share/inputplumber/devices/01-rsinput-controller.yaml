@@ -85,7 +85,11 @@ source_devices:
 
   # Every board here with sensor data has its IMU mounted the same way. Lying flat,
   # the deck-uhid pad must read gravity on +Z.
+  # passthrough: InputPlumber hides every source that isn't IIO or a tty by locking its node
+  # away, and this one is the DSP's FastRPC channel, which the sensor tools open too. Hiding it
+  # only failed so far ("Unable to create match rule"), so this keeps it that way on purpose.
   - group: imu
+    passthrough: true
     fastrpc:
       name: fastrpc-adsp
     config:
