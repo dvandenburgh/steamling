@@ -10,7 +10,7 @@ _split=(fceumm snes9x gambatte mgba
         genesis_plus_gx picodrive yabasanshiro mednafen_pce_fast fbneo mednafen_ngp)
 pkgname=(libretro-cores-steamling "${_split[@]/#/libretro-cores-steamling-}")
 pkgver=0.1.1
-pkgrel=5
+pkgrel=6
 pkgdesc="Curated prebuilt aarch64 libretro cores for the RP6 (vendored, ArkOS/TheRA set)"
 arch=('aarch64')
 url="https://github.com/christianhaitian/retroarch-cores"
@@ -54,6 +54,11 @@ _install_core() {  # $1 = core
 package_libretro-cores-steamling() {
   # Each split core is asked for by what it provides, so a source-built one satisfies it too.
   depends=("${_split[@]/#/steamling-libretro-}")
+  # Split cores that are gone for good: 3DS and PSP use the standalone Azahar and PPSSPP, and
+  # DS uses the melonDS core above. Every device has this package, so taking these over is
+  # what gets the old ones uninstalled on update.
+  replaces=('libretro-cores-steamling-azahar' 'libretro-cores-steamling-melondsds'
+            'libretro-cores-steamling-ppsspp')
   local c
   for c in "${_cores[@]}"; do
     case " ${_split[*]} " in *" ${c} "*) continue ;; esac
