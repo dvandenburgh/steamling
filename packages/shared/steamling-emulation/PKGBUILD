@@ -2,7 +2,7 @@
 # configs, shipped as an arch=any data/scripts package.
 pkgname=steamling-emulation
 pkgver=0.1.1
-pkgrel=22
+pkgrel=23
 pkgdesc="ES-DE + preconfigured emulators: drop ROMs into ~/Emulation and play; star -> Steam"
 arch=('any')
 url="https://github.com/Steamling/steamling"
@@ -20,14 +20,14 @@ source=('steamling-roms-init' 'steamling-roms-init.service' 'steamling-seed-merg
         'eden-qt-config.ini.in' 'ppsspp.ini.in' 'ryujinx-Config.json.in'
         'azahar-qt-config.ini.in' 'azahar-qt-config.policy'
         'cemu-settings.policy' 'armsx2-PCSX2.policy' 'eden-qt-config.policy' 'retroarch.policy' 'es_settings.policy'
-        'ryujinx-Config.policy'
+        'ryujinx-Config.policy' 'dolphin-GCPadNew.policy'
         'steamling-cemu-profile' 'cemu-settings.xml.in' 'cemu-controller0.xml.in'
         'dolphin-Dolphin.ini.in' 'dolphin-GFX.ini.in' 'dolphin-GCPadNew.ini.in'
         'dolphin-WiimoteNew.ini.in' 'rpcs3-Default.yml.in'
         # FLAT names: makepkg cannot retrieve local sources from subdirectory paths, so
         # package() maps retroarch-<Core>-<file> back into the retroarch-config/<Core>/ tree.
         'retroarch-mGBA-gba.cfg' 'retroarch-mGBA-gba.slangp')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   install -Dm755 "${srcdir}/steamling-roms-init" "${pkgdir}/usr/bin/steamling-roms-init"
@@ -78,7 +78,7 @@ package() {
     "${pkgdir}/usr/share/steamling-emulation/azahar-qt-config.ini.in"
   local pol
   for pol in cemu-settings armsx2-PCSX2 eden-qt-config retroarch es_settings ryujinx-Config \
-             azahar-qt-config; do
+             azahar-qt-config dolphin-GCPadNew; do
     install -Dm644 "${srcdir}/${pol}.policy" "${pkgdir}/usr/share/steamling-emulation/${pol}.policy"
   done
   install -Dm755 "${srcdir}/steamling-cemu-profile" "${pkgdir}/usr/lib/steamling/steamling-cemu-profile"

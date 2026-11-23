@@ -1,0 +1,11 @@
+# read by steamling-seed-merge. The face buttons sat on other positions in earlier seeds (by the
+# pad's positions first, then by letters as an Xbox pad has them). A file still holding one of
+# those values never had that button changed by hand, so it takes the RP6's letters.
+was GCPad1/Buttons/A SOUTH
+was GCPad1/Buttons/B WEST
+was GCPad1/Buttons/B NORTH
+was GCPad1/Buttons/B EAST
+was GCPad1/Buttons/X EAST
+was GCPad1/Buttons/X NORTH
+was GCPad1/Buttons/Y NORTH
+was GCPad1/Buttons/Y WEST

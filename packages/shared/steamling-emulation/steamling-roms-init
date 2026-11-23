@@ -94,6 +94,7 @@ render_all() {  # $1 template dir, $2 out dir
   [ -f "${src}/azahar-qt-config.ini.in" ] && cp "${src}/azahar-qt-config.ini.in" "${out}/azahar-qt-config.ini"
   [ -f "${src}/dolphin-Dolphin.ini.in" ] && cp "${src}/dolphin-Dolphin.ini.in" "${out}/Dolphin.ini"
   [ -f "${src}/dolphin-GFX.ini.in" ] && cp "${src}/dolphin-GFX.ini.in" "${out}/GFX.ini"
+  [ -f "${src}/dolphin-GCPadNew.ini.in" ] && cp "${src}/dolphin-GCPadNew.ini.in" "${out}/GCPadNew.ini"
   [ -f "${src}/cemu-settings.xml.in" ] && sed "s|__ROMS__|${ROMS}|g" "${src}/cemu-settings.xml.in" > "${out}/settings.xml"
   # the largest 272-row multiple that fits the panel, +8 rows slack (4x on 1080 crops 8)
   local res=$(( (LOGICAL_H + 8) / 272 )); [ "${res}" -lt 1 ] && res=1
@@ -166,7 +167,16 @@ seed_ryujinx() { seed_b json Config.json "${HOME}/.config/Ryujinx/Config.json" r
 seed_dolphin() {
   seed_b ini Dolphin.ini "${HOME}/.config/dolphin-emu/Dolphin.ini"
   seed_b ini GFX.ini     "${HOME}/.config/dolphin-emu/GFX.ini"
-  seed_a dolphin-GCPadNew.ini.in "${HOME}/.config/dolphin-emu/GCPadNew.ini"
+  # The GameCube pad file used to be copied whole, and only while it still matched the last copy.
+  # Once Dolphin had saved it, it kept whatever buttons it had then, and the recorded baseline
+  # moved on without it. Now it merges key by key; the first time, the old baseline is dropped
+  # so each button is judged by the values earlier seeds put there (dolphin-GCPadNew.policy).
+  local pad_merged="${STATE}/steamling/dolphin-gcpad-merged"
+  if [ ! -e "${pad_merged}" ]; then
+    rm -f "${STATE}/steamling/seed-baseline/.config/dolphin-emu/GCPadNew.ini" "${TMP}/prev/GCPadNew.ini"
+  fi
+  seed_b ini GCPadNew.ini "${HOME}/.config/dolphin-emu/GCPadNew.ini" dolphin-GCPadNew
+  mkdir -p "${pad_merged%/*}" 2>/dev/null && : > "${pad_merged}"
   seed_a dolphin-WiimoteNew.ini.in "${HOME}/.config/dolphin-emu/WiimoteNew.ini"
 }
 
