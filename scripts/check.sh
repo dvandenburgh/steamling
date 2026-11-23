@@ -158,6 +158,12 @@ else note "power profiles" "BROKEN"; printf '%s\n' "${out}" | sed 's/^/    /'; f
 if out="$(python3 "${STEAMLING_ROOT}/scripts/check-pkg-versions.py" 2>&1)"; then note "package versions" "ok"
 else note "package versions" "BROKEN"; printf '%s\n' "${out}" | sed 's/^/    /'; fail=1; fi
 
+# steamling-turnip-x86 ships only the icd.json catalog; the drivers it names live in fex-rootfs's
+# image. A version in one list and not the other is offered with no driver behind it.
+_vk() { (cd "${STEAMLING_ROOT}/packages/shared/$1" && bash -c ". ./PKGBUILD >/dev/null 2>&1; printf '%s\\n' \"\${$2[@]}\" | sort") ; }
+if [ "$(_vk fex-rootfs _vkvers)" = "$(_vk steamling-turnip-x86 _versions)" ]; then note "x86 Turnip catalog vs fex-rootfs" "ok"
+else note "x86 Turnip catalog vs fex-rootfs" "MISMATCH (_versions vs _vkvers)"; fail=1; fi
+
 # --- code comments: no dead repo paths, provenance or ledger facts ------------
 if out="$(python3 "${STEAMLING_ROOT}/scripts/check-comments.py" 2>&1)"; then note "code comments" "ok"
 else note "code comments" "STALE"; printf '%s\n' "${out}" | sed 's/^/    /'; fail=1; fi
