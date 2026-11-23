@@ -24,11 +24,14 @@ for d in "${libdirs[@]}"; do
 done
 
 # Native programs, shared libraries and Qt plugins: where a Plasma, Qt or KDE mismatch shows up.
-# x86 trees (the FEX rootfs) and anything under /home are deliberately out of scope.
+# Libretro cores too: RetroArch loads them only when a game starts, so a missing library there
+# looks like a game that won't start. x86 trees (the FEX rootfs) and anything under /home are
+# deliberately out of scope.
 mapfile -t files < <(
   { find "${root}/usr/bin" -maxdepth 1 -type f
     find "${root}/usr/lib" -maxdepth 1 -type f -name '*.so*'
     find "${root}/usr/lib/qt6/plugins" "${root}/usr/lib/qt6/qml" -type f -name '*.so' 2>/dev/null
+    find "${root}/usr/lib/libretro" -maxdepth 1 -type f -name '*.so' 2>/dev/null
   } | LC_ALL=C sort)
 
 stale=() absent=()
