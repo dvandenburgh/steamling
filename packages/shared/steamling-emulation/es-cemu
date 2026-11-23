@@ -3,4 +3,5 @@
 . /usr/lib/steamling/emu-resolve.sh
 exe="$(emu_path cemu)" || emu_missing cemu
 /usr/lib/steamling/steamling-cemu-profile 2>/dev/null || true
+emu_log cemu "${exe}" "$@"
 exec taskset -c "$(big_cores)" "${exe}" "$@"

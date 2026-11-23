@@ -2,4 +2,5 @@
 # ES-DE launch wrapper; es-armsx2 explains why the pin lives here.
 . /usr/lib/steamling/emu-resolve.sh
 exe="$(emu_path rpcs3)" || emu_missing rpcs3
+emu_log rpcs3 "${exe}" "$@"
 exec taskset -c "$(big_cores)" "${exe}" "$@"

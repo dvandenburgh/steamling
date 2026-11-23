@@ -214,6 +214,21 @@ resolution. With both present, choose which one runs in ES-DE under *Other Setti
 Emulators*; Steam favorites follow that choice. If you had Eden installed by an earlier Steamling
 version, it is moved into `~/Emulation/emulators/eden/` for you and keeps working.
 
+## When a game won't start
+
+ES-DE and Steam don't show what an emulator prints, and that's usually where it says what went
+wrong. Every launch of a standalone emulator saves it to a file named after the emulator in
+`~/.local/state/steamling/emulators/`, `dolphin.log` for Dolphin, `eden.log` for Eden and so on.
+Each launch replaces the file, and the one before it is kept as `dolphin.log.old`. The first lines
+are the command that ran and the display settings it got. Open the file from the desktop, or over
+SSH with:
+
+```
+cat ~/.local/state/steamling/emulators/dolphin.log
+```
+
+Attach it when you report a problem with a game.
+
 ## What is already set up for you
 
 - **RetroArch**: controller mapping, 120Hz-panel frame pacing, and sensible per-system tuning

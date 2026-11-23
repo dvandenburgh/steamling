@@ -5,4 +5,5 @@
 # route to them.
 . /usr/lib/steamling/emu-resolve.sh
 exe="$(emu_path armsx2)" || emu_missing armsx2
+emu_log armsx2 "${exe}" "$@"
 exec taskset -c "$(big_cores)" "${exe}" "$@"

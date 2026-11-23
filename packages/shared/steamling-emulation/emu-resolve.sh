@@ -59,6 +59,23 @@ emu_path() {  # $1 name -> prints the executable, or returns 1
   return 1
 }
 
+# ES-DE and Steam throw away whatever an emulator prints, and that's where it says why a game
+# didn't start. Each launch writes it to ~/.local/state/steamling/emulators/<name>.log instead;
+# the launch before that one is kept as <name>.log.old.
+emu_log() {  # $1 name, then the command line: everything this shell runs from here goes there
+  local dir="${XDG_STATE_HOME:-${HOME}/.local/state}/steamling/emulators" log
+  mkdir -p "${dir}" 2>/dev/null || return 0
+  log="${dir}/$1.log"; shift
+  [ -f "${log}" ] && mv -f "${log}" "${log}.old" 2>/dev/null
+  printf '%s: %s\n' "$(date '+%F %T')" "$*" > "${log}" 2>/dev/null || return 0
+  # The display and driver settings it started with, since those differ between ES-DE, a Steam
+  # tile and the desktop.
+  env | grep -E '^(DISPLAY|WAYLAND_DISPLAY|GAMESCOPE_WAYLAND_DISPLAY|ENABLE_GAMESCOPE_WSI|VK_|MESA_|TU_|QT_|SDL_)' \
+    | sort >> "${log}" 2>/dev/null
+  printf -- '---\n' >> "${log}" 2>/dev/null
+  exec >> "${log}" 2>&1
+}
+
 emu_missing() {  # $1 name: the user-facing "not installed" exit
   echo "steamling: $1 is not installed. Drop its AppImage into ${EMU_DROP}/$1/ (see ~/Emulation/README.txt)." >&2
   exit 1
