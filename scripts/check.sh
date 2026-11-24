@@ -164,6 +164,58 @@ _vk() { (cd "${STEAMLING_ROOT}/packages/shared/$1" && bash -c ". ./PKGBUILD >/de
 if [ "$(_vk fex-rootfs _vkvers)" = "$(_vk steamling-turnip-x86 _versions)" ]; then note "x86 Turnip catalog vs fex-rootfs" "ok"
 else note "x86 Turnip catalog vs fex-rootfs" "MISMATCH (_versions vs _vkvers)"; fail=1; fi
 
+# --- depends a package is known to lack (config/packages/depends-pending.list) -----------
+# check-depends.py tolerates those only at the listed version. A PKGBUILD that moved on is being
+# rebuilt anyway, so that is when they go into its depends.
+_pkgdir_of() {  # <pkgname> -> the folder whose PKGBUILD builds it
+  local f
+  for f in "${STEAMLING_ROOT}"/packages/*/*/PKGBUILD "${STEAMLING_ROOT}"/devices/*/packages/*/PKGBUILD; do
+    grep -qE "^pkgname=(\(.*)?['\"]?$1['\"]?([ )]|$)" "${f}" && { dirname "${f}"; return; }
+  done
+}
+_pend=""
+while read -r _p _want _deps; do
+  case "${_p}" in ''|'#'*) continue ;; esac
+  _d="$(_pkgdir_of "${_p}")"
+  [ -n "${_d}" ] || { _pend+="${_p}: in depends-pending.list but no PKGBUILD builds it"$'\n'; continue; }
+  read -r _ver _have < <(cd "${_d}" && bash -c '. ./PKGBUILD >/dev/null 2>&1
+    d=("${depends[@]}")
+    if declare -f "package_$1" >/dev/null; then
+      l="$(declare -f "package_$1" | grep -E "^\s*depends=\(" | head -1)"; [ -z "$l" ] || { eval "$l"; d=("${depends[@]}"); }
+    fi
+    printf "%s %s\n" "${epoch:+${epoch}:}${pkgver}-${pkgrel}" "${d[*]%%[<>=]*}"' _ "${_p}")
+  _lack=""
+  for _x in ${_deps}; do grep -qw -- "${_x}" <<< "${_have}" || _lack+=" ${_x}"; done
+  if [ "${_ver}" != "${_want}" ] && [ -n "${_lack}" ]; then
+    _pend+="${_p} is at ${_ver} now: add${_lack} to its depends and drop its line from depends-pending.list"$'\n'
+  elif [ -z "${_lack}" ]; then
+    _pend+="${_p} declares everything depends-pending.list lists for it: drop its line"$'\n'
+  fi
+done < "${CONFIG_DIR}/packages/depends-pending.list"
+if [ -z "${_pend}" ]; then note "pending depends" "ok"
+else note "pending depends" "DUE"; printf '%s' "${_pend}" | sed 's/^/    /'; fail=1; fi
+
+# --- downloads the source cache could mix up ----------------------------------------------
+# build-packages.sh keeps every download in one cache and reuses a file by name. A source with
+# no checksum (SKIP) whose name doesn't carry its pin is never fetched again when the pin moves:
+# the old Stella core kept shipping that way after its pin was changed.
+_cache=""
+for _f in "${STEAMLING_ROOT}"/packages/*/*/PKGBUILD "${STEAMLING_ROOT}"/devices/*/packages/*/PKGBUILD; do
+  _cache+="$(cd "$(dirname "${_f}")" && bash -c '. ./PKGBUILD >/dev/null 2>&1
+    sums=("${sha256sums[@]}"); [ "${#sums[@]}" -gt 0 ] || sums=("${sha512sums[@]}"); [ "${#sums[@]}" -gt 0 ] || sums=("${b2sums[@]}")
+    for i in "${!source[@]}"; do
+      s="${source[$i]}"; [ "${sums[$i]:-}" = SKIP ] || continue
+      case "$s" in *::git+*|*::svn+*|*::hg+*|git+*|svn+*|hg+*|*"://"*"#commit="*) continue ;; *"://"*) ;; *) continue ;; esac
+      url="${s#*::}"; name="${s%%::*}"; [ "$name" != "$s" ] || name="${url##*/}"
+      for pin in $(grep -oE "[0-9a-f]{7,40}" <<< "$url" | sort -u); do
+        [[ "$name" == *"${pin:0:7}"* ]] || { printf "%s: %s is saved as %s, without its pin %s\n" "${PWD##*/}" "$url" "$name" "${pin:0:12}"; break; }
+      done
+    done' || true)"$'\n'
+done
+_cache="$(sed '/^$/d' <<< "${_cache}")"
+if [ -z "${_cache}" ]; then note "cached downloads" "ok"
+else note "cached downloads" "STALE RISK"; printf '%s\n' "${_cache}" | sed 's/^/    /'; fail=1; fi
+
 # --- code comments: no dead repo paths, provenance or ledger facts ------------
 if out="$(python3 "${STEAMLING_ROOT}/scripts/check-comments.py" 2>&1)"; then note "code comments" "ok"
 else note "code comments" "STALE"; printf '%s\n' "${out}" | sed 's/^/    /'; fail=1; fi
