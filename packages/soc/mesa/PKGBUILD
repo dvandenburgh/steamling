@@ -6,7 +6,7 @@ pkgname=(mesa vulkan-freedreno)
 epoch=2
 pkgver=26.3.1
 _srcver=${pkgver}
-pkgrel=4
+pkgrel=5
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${pkgver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -38,6 +38,9 @@ options=(!lto)
 # 0025 makes the Vulkan runtime ignore blend attachments a pipeline sets entirely as dynamic state (26.3 branch).
 # 0026 keeps input attachment flags on texture instructions NIR clones (26.3 branch).
 # 0027 fixes NIR's varying optimiser on geometry shaders that store outputs in a loop (26.3 branch).
+# 0028 keeps a DRM swapchain's image type, so implicit sync is chosen again (26.3 branch).
+# 0029 makes Turnip wait for query writes before copying results with their availability (main).
+# 0030 doubles private memory per wave on the first A8xx generation, the A830's erratum (main).
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
@@ -59,7 +62,10 @@ source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0024-tu-Lower-UBO-access-sizes-before-lowering-inline-uni.patch'
         '0025-vulkan-ignore-cbAttachmentCount-when-needed.patch'
         '0026-nir-clone-preserve-input-attachment-info-of-texture-.patch'
-        '0027-nir-opt_varyings-clear-output_equal_mask-when-GS-has.patch')
+        '0027-nir-opt_varyings-clear-output_equal_mask-when-GS-has.patch'
+        '0028-vulkan-wsi-Preserve-the-swapchain-image-type.patch'
+        '0029-tu-Properly-wait-for-mem-writes-to-finish-in-emit_copy_query_pool_results.patch'
+        '0030-freedreno-a8xx-Implement-QCTDD10982019-for-gen8.patch')
 sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             'b302a6716d00d24cb33aaef758cc95a5b78bfc348cd4d103a66b673ae9125e42'
             '59aacd0c04f838834121822887e9c2218ba7d56012c8433696632d72fb619903'
@@ -81,7 +87,10 @@ sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             'dc8a3a86f8c4912cf5db03cf1f774d88e579f30050ef1c480fd510bbebfca524'
             'e526a43b7fa74a2ac0adca092efaff3273ac999cf4025da017aa11413423acdc'
             '813f4a4e404e5e7dfb4a7498555444ef6400e76d8c35b2f45d457bcc4edd3dae'
-            'a4503e4f1b0abd3e8d31f5f26ed453edc4b7655f76f2b5f050f594a0360edeed')
+            'a4503e4f1b0abd3e8d31f5f26ed453edc4b7655f76f2b5f050f594a0360edeed'
+            '4077b243e12eac178e4894f26a7338779a3939d7080046d74cc9632167977661'
+            'ce88c95e94e18af5a90583dcf1072de6aa382b6f6525db4b851f32564cafa447'
+            '3acd9ab8695c4d7c021b58b9d2e18ba84babf6d62f54975e89170ec8431fa2b3')
 
 prepare() {
   cd "mesa-${_srcver}"

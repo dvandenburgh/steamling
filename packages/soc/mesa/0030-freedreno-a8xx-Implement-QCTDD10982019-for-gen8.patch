@@ -1,0 +1,105 @@
+From 791d6d0fafe973e8bfbb9af6feed48c88ed252a8 Mon Sep 17 00:00:00 2001
+From: Rob Clark <rob.clark@oss.qualcomm.com>
+Date: Mon, 23 Nov 2026 09:53:06 -0800
+Subject: [PATCH] freedreno/a8xx: Implement QCTDD10982019 for gen8
+
+First a8xx gen needs to double pvtmem size in per-wave layout.
+
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16956
+Signed-off-by: Rob Clark <rob.clark@oss.qualcomm.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46640>
+---
+ src/freedreno/common/freedreno_dev_info.h       | 5 +++++
+ src/freedreno/common/freedreno_dev_info.py      | 1 +
+ src/freedreno/common/freedreno_devices.py       | 8 ++++++--
+ src/freedreno/computerator/a6xx.cc              | 3 +++
+ src/freedreno/vulkan/tu_shader.cc               | 2 ++
+ src/gallium/drivers/freedreno/ir3/ir3_gallium.c | 2 ++
+ 6 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/src/freedreno/common/freedreno_dev_info.h b/src/freedreno/common/freedreno_dev_info.h
+index 8ac1a9b250fc..591e2c61438f 100644
+--- a/src/freedreno/common/freedreno_dev_info.h
++++ b/src/freedreno/common/freedreno_dev_info.h
+@@ -553,6 +553,11 @@ struct fd_dev_info {
+       bool QCTDD10497382_rt_workaround;
+       /* Do not use a0 in early preamble. */
+       bool QCTDD10789828_no_a0_ep : 1;
++      /* Hw calculates pvtmem address using wave128, so driver needs
++       * to account for this by doubling the pvtmem size in per-wave
++       * layout.
++       */
++      bool QCTDD10982019_double_pvtmem_size : 1;
+       /* On a7xx alias.tex may hang when in between mova and (ul). */
+       bool QCTDD11147232_alias_mova : 1;
+       /* On some HW alias.tex may hang when predicated (i.e. between
+diff --git a/src/freedreno/common/freedreno_dev_info.py b/src/freedreno/common/freedreno_dev_info.py
+index 2dfad140967f..3931092e8aa0 100644
+--- a/src/freedreno/common/freedreno_dev_info.py
++++ b/src/freedreno/common/freedreno_dev_info.py
+@@ -49,6 +49,7 @@ quirk_names = {
+     "QCTDD10204462": "flat_ei",
+     "QCTDD10497382": "rt_workaround",
+     "QCTDD10789828": "no_a0_ep",
++    "QCTDD10982019": "double_pvtmem_size",
+     "QCTDD11147232": "alias_mova",
+     "QCTDD11183148": "alias_pred",
+     "QCTDD12766770": "r8g8_fc_alignment",
+diff --git a/src/freedreno/common/freedreno_devices.py b/src/freedreno/common/freedreno_devices.py
+index 3c6d1d6fa704..e43b3eb47f0c 100644
+--- a/src/freedreno/common/freedreno_devices.py
++++ b/src/freedreno/common/freedreno_devices.py
+@@ -1445,7 +1445,9 @@ a8xx_gen1 = GPUProps(
+         gmem_ccu_depth_cache_fraction = CCUColorCacheFraction.FULL.value,
+         gmem_per_ccu_depth_cache_size = 256 * 1024,
+ 
+-        has_salu_int_narrowing_quirk = True
++        has_salu_int_narrowing_quirk = True,
++
++        QCTDD10982019 = True,
+ )
+ 
+ a8xx_gen2 = GPUProps(
+diff --git a/src/freedreno/computerator/a6xx.cc b/src/freedreno/computerator/a6xx.cc
+index ec187abd109f..5f105150fd26 100644
+--- a/src/freedreno/computerator/a6xx.cc
++++ b/src/freedreno/computerator/a6xx.cc
+@@ -262,6 +262,9 @@ cs_program_emit_regs(fd_cs &cs, struct kernel *kernel)
+       uint32_t per_fiber_size = v->pvtmem_size;
+       uint32_t per_sp_size =
+          align(per_fiber_size * a6xx_backend->info->fibers_per_sp, 1 << 12);
++      if (v->pvtmem_per_wave &&
++          FD_QUIRK(a6xx_backend->info, QCTDD10982019_double_pvtmem_size))
++         per_sp_size *= 2;
+       uint32_t total_size = per_sp_size * a6xx_backend->info->num_sp_cores;
+ 
+       struct fd_bo *pvtmem = fd_bo_new(a6xx_backend->dev, total_size, 0, "pvtmem");
+diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.cc
+index 9927ea73c0f7..4b7cd3ac4e93 100644
+--- a/src/freedreno/vulkan/tu_shader.cc
++++ b/src/freedreno/vulkan/tu_shader.cc
+@@ -3181,6 +3181,8 @@ tu_setup_pvtmem(struct tu_device *dev,
+          align(pvtmem_bo->per_fiber_size *
+                   dev->physical_device->info->fibers_per_sp,
+                1 << 12);
++      if (per_wave && FD_QUIRK(dev->physical_device->info, QCTDD10982019_double_pvtmem_size))
++         pvtmem_bo->per_sp_size *= 2;
+       uint32_t total_size =
+          dev->physical_device->info->num_sp_cores * pvtmem_bo->per_sp_size;
+ 
+diff --git a/src/gallium/drivers/freedreno/ir3/ir3_gallium.c b/src/gallium/drivers/freedreno/ir3/ir3_gallium.c
+index 783f1fd583ea..106ae89bd551 100644
+--- a/src/gallium/drivers/freedreno/ir3/ir3_gallium.c
++++ b/src/gallium/drivers/freedreno/ir3/ir3_gallium.c
+@@ -626,6 +626,8 @@ ir3_get_private_mem(struct fd_screen *screen, const struct ir3_shader_variant *s
+          fd_bo_del(screen->pvtmem[so->pvtmem_per_wave].bo);
+ 
+       uint32_t per_sp_size = align(per_fiber_size * fibers_per_sp, 1 << 12);
++      if (so->pvtmem_per_wave && FD_QUIRK(screen->info, QCTDD10982019_double_pvtmem_size))
++         per_sp_size *= 2;
+       uint32_t total_size = per_sp_size * num_sp_cores;
+ 
+       screen->pvtmem[so->pvtmem_per_wave].per_fiber_size = per_fiber_size;
+-- 
+2.34.1
+

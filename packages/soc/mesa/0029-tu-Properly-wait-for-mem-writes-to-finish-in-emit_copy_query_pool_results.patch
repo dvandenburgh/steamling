@@ -1,0 +1,57 @@
+From a21787b3a3d4e1bfc797479044bd92263fcca456 Mon Sep 17 00:00:00 2001
+From: Danylo Piliaiev <dpiliaiev@igalia.com>
+Date: Mon, 23 Nov 2026 13:22:51 +0100
+Subject: [PATCH] tu: Properly wait for mem writes to finish in
+ emit_copy_query_pool_results
+
+emit_copy_query_pool_results may read from `available_iova` twice:
+- First time via CP_COND_EXEC that doesn't WAIT_FOR_ME;
+- Second time via CP_MEM_TO_MEM which does implicit WAIT_FOR_ME.
+
+Thus they can disagree on availability, so that from VK user perspective
+`availability == 1` but value is garbage.
+
+Fixes flaky:
+```
+dEQP-VK.transform_feedback.simple*query_with_availability*
+```
+
+Cc: mesa-stable
+Assisted-by: LLM
+Signed-off-by: Danylo Piliaiev <dpiliaiev@igalia.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46628>
+---
+ src/freedreno/vulkan/tu_query_pool.cc | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/freedreno/vulkan/tu_query_pool.cc b/src/freedreno/vulkan/tu_query_pool.cc
+index 70e6c9dfcea..7cd5688b72e 100644
+--- a/src/freedreno/vulkan/tu_query_pool.cc
++++ b/src/freedreno/vulkan/tu_query_pool.cc
+@@ -858,9 +858,6 @@ emit_copy_query_pool_results(struct tu_cmd_buffer *cmdbuf,
+                              VkDeviceSize stride,
+                              VkQueryResultFlags flags)
+ {
+-   /* Flush cache for the buffer to copy to. */
+-   tu_emit_cache_flush<CHIP>(cmdbuf);
+-
+    /* From the Vulkan 1.1.130 spec:
+     *
+     *    vkCmdCopyQueryPoolResults is guaranteed to see the effect of previous
+@@ -870,7 +867,12 @@ emit_copy_query_pool_results(struct tu_cmd_buffer *cmdbuf,
+     * To ensure that previous writes to the available bit are coherent, first
+     * wait for all writes to complete.
+     */
+-   tu_cs_emit_pkt7(cs, CP_WAIT_MEM_WRITES, 0);
++   cmdbuf->state.cache.flush_bits |= TU_CMD_FLAG_WAIT_MEM_WRITES |
++                                     /* For CP_COND_EXEC */
++                                     TU_CMD_FLAG_WAIT_FOR_ME;
++
++   /* Flush cache for the buffer to copy to. */
++   tu_emit_cache_flush<CHIP>(cmdbuf);
+ 
+    for (uint32_t i = 0; i < queryCount; i++) {
+       uint32_t query = firstQuery + i;
+-- 
+2.34.1
+

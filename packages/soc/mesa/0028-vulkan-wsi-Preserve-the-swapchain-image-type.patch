@@ -1,0 +1,52 @@
+From 6cd33b7f68ee04c5270215591b2d29535af291bd Mon Sep 17 00:00:00 2001
+From: hamb3r <hamber@bk.ru>
+Date: Tue, 17 Nov 2026 13:45:25 +0300
+Subject: [PATCH] vulkan/wsi: Preserve the swapchain image type
+
+Initialize the image info before dispatching to the WSI backend so the
+common helper cannot erase the image type. This restores the DRM
+implicit sync selection and keeps the DXGI image blit path from
+asserting on swapchains with storage image usage.
+
+Keep the color space assignment in the common helper and update the
+WARP expectations for swapchain image usage from Crash to Fail until
+the DXGI blit image usage bug is fixed separately.
+
+Fixes: c1401fda8a0e ("wsi/wayland: don't use explicit sync with sw")
+Assisted-by: LLM
+Signed-off-by: hamb3r <hamber@bk.ru>
+Reviewed-by: Hans-Kristian Arntzen <post@arntzen-software.no>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46391>
+(cherry picked from commit 257ad4001cb63b6f4ce153960dc0876cab234539)
+
+Conflicts:
+	src/microsoft/ci/warp-fails.txt
+---
+ src/vulkan/wsi/wsi_common.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/vulkan/wsi/wsi_common.c b/src/vulkan/wsi/wsi_common.c
+index f40f07840252..2e56b685f45f 100644
+--- a/src/vulkan/wsi/wsi_common.c
++++ b/src/vulkan/wsi/wsi_common.c
+@@ -449,8 +449,8 @@ configure_image(const struct wsi_swapchain *chain,
+                 const struct wsi_base_image_params *params,
+                 struct wsi_image_info *info)
+ {
++   memset(info, 0, sizeof(*info));
+    info->image_type = params->image_type;
+-   info->color_space = pCreateInfo->imageColorSpace;
+ 
+    switch (params->image_type) {
+    case WSI_IMAGE_TYPE_CPU: {
+@@ -706,7 +706,6 @@ wsi_configure_image(const struct wsi_swapchain *chain,
+                     VkExternalMemoryHandleTypeFlags handle_types,
+                     struct wsi_image_info *info)
+ {
+-   memset(info, 0, sizeof(*info));
+    uint32_t queue_family_count = 1;
+ 
+    if (pCreateInfo->imageSharingMode == VK_SHARING_MODE_CONCURRENT)
+-- 
+2.34.1
+
