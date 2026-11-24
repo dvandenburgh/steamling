@@ -28,12 +28,22 @@ while read -r n v; do nv["$n"]="$v"; done < <(grep -v '^#' "${new}")
 changed=()
 for n in "${!nv[@]}"; do [ "${ov[$n]:-}" = "${nv[$n]}" ] || changed+=("$n"); done
 mapfile -t changed < <(printf '%s\n' "${changed[@]}" | LC_ALL=C sort)
-removed=0; for n in "${!ov[@]}"; do [ -n "${nv[$n]:-}" ] || removed=$((removed + 1)); done
+removed=()
+for n in "${!ov[@]}"; do [ -n "${nv[$n]:-}" ] || removed+=("$n"); done
+mapfile -t removed < <(printf '%s\n' "${removed[@]}" | LC_ALL=C sort | sed '/^$/d')
 
 old_id="$(sed -n '1s/.*snapshot \([^ ]*\).*/\1/p' "${old}")"
 new_id="$(sed -n '1s/.*snapshot \([^ ]*\).*/\1/p' "${new}")"
-log "base ${old_id} -> ${new_id}: ${#changed[@]} changed/added, ${removed} removed"
-[ "${#changed[@]}" -gt 0 ] || { ok "nothing moved"; exit 0; }
+log "base ${old_id} -> ${new_id}: ${#changed[@]} changed/added, ${#removed[@]} removed"
+# A package leaves the base when no build installs it any more. That is right for a layer
+# that was dropped, and wrong when something still needs it but never said so: the 20261121
+# base lost plasma-pa that way. Read the names, devices on the old base keep a stale copy.
+if [ "${#removed[@]}" -gt 0 ]; then
+  log "no longer in the base (devices that have them keep the old copy, which never updates):"
+  printf '%s\n' "${removed[@]}" | fmt -w 96 | sed 's/^/    /'
+fi
+[ "${#changed[@]}" -gt 0 ] || [ "${#removed[@]}" -gt 0 ] || { ok "nothing moved"; exit 0; }
+[ "${#changed[@]}" -gt 0 ] || exit 0
 
 # 1:X-1 -> X: issue titles quote the upstream version, never epoch or pkgrel.
 upver() { local v="${1#*:}"; printf '%s' "${v%-*}"; }
