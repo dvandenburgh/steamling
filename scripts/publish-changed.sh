@@ -38,15 +38,18 @@ live_versions() {  # $1 = release/folder (sm8550, shared), $2 = repo name
 }
 
 # the names in localrepo dir $1 that are new to, or newer than, the live packages in $2
-# ("name version" lines, from live_versions)
+# ("name version" lines, from live_versions). Only what this checkout builds: a retired package's
+# old file can sit in localrepo long after its PKGBUILD went, and must not go out again.
 changed_in() {
-  local dir="$1" lines="$2" f b name ver live r
-  declare -A have=()
+  local dir="$1" lines="$2" f b name ver live r repo p v
+  declare -A have=() built=()
   while read -r name ver; do [ -n "${name}" ] && have["${name}"]="${ver}"; done <<< "${lines}"
+  while IFS='|' read -r repo _ p v _; do [ "${repo}" = "${dir}" ] && built["${p}"]="${v}"; done < <(local_artifacts)
   for f in "${dir}"/*.pkg.tar.*; do
     case "${f}" in *.sig) continue ;; esac
     b="$(basename "${f}")"; b="${b%.pkg.tar.*}"; b="${b%-*}"       # drop .pkg.tar.* and -<arch>
     name="${b%-*-*}"; ver="${b#"${name}"-}"
+    [ "${built[${name}]:-}" = "${ver}" ] || continue
     live="${have[${name}]:-}"
     if [ -z "${live}" ]; then
       printf '%s\n' "${name}"
