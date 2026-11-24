@@ -2,6 +2,10 @@
 # Only for something the package really can run without. A need it has goes in its depends.
 
 # Optional at runtime: the script copes without it.
+proton-cachyos        notify-send               # protonfixes only reaches for it to show an error it has already hit, after tkinter
+proton-cachyos        perl                      # winetricks uses perl only for its --gui download bar and on macOS; protonfixes runs it --unattended
+proton-ge             notify-send               # as proton-cachyos
+proton-ge             perl                      # as proton-cachyos
 steamling-branding    QtQuick                   # the splash is a Plasma look-and-feel; it only runs inside Plasma, which has it
 plasma-mobile         systemsettings            # a launcher for the desktop's settings app, which the shell doesn't need
 steamling-session     plymouth                  # the handoff exits at once when plymouthd isn't running
