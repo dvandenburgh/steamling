@@ -183,7 +183,7 @@ ${problems}"
 
 step_seed()     { "${S}/seed-localrepo.sh"; }
 step_kernel()   { "${S}/build-kernel.sh"; }
-step_packages() { "${S}/pending.sh"; "${S}/build-packages.sh"; }
+step_packages() { "${S}/pending.sh"; "${S}/build-packages.sh"; "${S}/check-depends.sh"; }
 step_rootfs()   { STEAMLING_PACKAGES_DONE=1 "${S}/build-image.sh"; }
 step_image()    { "${S}/build-sd-image.sh"; }
 

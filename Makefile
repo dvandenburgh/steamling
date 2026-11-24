@@ -9,7 +9,7 @@ SCRIPTS := scripts
 
 .DEFAULT_GOAL := help
 
-.PHONY: help image rootfs update status watch host-setup sync bootstrap build kernel packages seed pending sd-image snapshot base-diff extend-base stage stage-check publish stage-shared stage-check-shared publish-shared publish-changed publish-sources publish-image install check mirrors du trim clean distclean
+.PHONY: help image rootfs update status watch host-setup sync bootstrap build kernel packages seed pending sd-image snapshot base-diff extend-base stage stage-check publish stage-shared stage-check-shared publish-shared publish-changed publish-sources publish-image install check check-depends mirrors du trim clean distclean
 
 help: ## Show this help
 	@echo "steamling build targets:"
@@ -47,7 +47,7 @@ kernel: ## Build only the in-project kernel (linux-steamling-<soc>); does nothin
 	@$(SCRIPTS)/build-kernel.sh
 
 packages: ## Build local steamling-* packages -> build/localrepo/{<soc>,shared} (root); skips up-to-date ones. PKG="a b" forces a subset
-	@$(SCRIPTS)/build-packages.sh $(PKG)
+	@$(SCRIPTS)/build-packages.sh $(PKG) && $(SCRIPTS)/check-depends.sh
 
 seed: ## Fill build/localrepo from the published repo, so 'make build' compiles only what differs (root)
 	@$(SCRIPTS)/seed-localrepo.sh
@@ -99,6 +99,9 @@ install: ## Point at the on-device internal installer (steamling-install-interna
 
 check: ## Preflight: validate harness + any built artifacts
 	@$(SCRIPTS)/check.sh
+
+check-depends: ## Does every built package declare what it links, runs and imports? (local repos vs the live base; runs after every package build)
+	@$(SCRIPTS)/check-depends.sh
 
 mirrors: ## Clone or update the upstream reference mirrors in build/mirrors (config/mirrors.list; Windows: scripts/mirrors.ps1)
 	@$(SCRIPTS)/mirrors.sh
