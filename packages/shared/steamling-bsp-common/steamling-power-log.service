@@ -1,0 +1,16 @@
+[Unit]
+Description=steamling power and temperature log (steamling-power-report)
+After=basic.target
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/steamling/steamling-power-log
+Restart=on-failure
+RestartSec=30
+# Ten-second samples of sysfs and /proc: never in a game's way.
+Nice=19
+IOSchedulingClass=idle
+CPUSchedulingPolicy=idle
+
+[Install]
+WantedBy=multi-user.target

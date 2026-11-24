@@ -1,0 +1,147 @@
+#!/usr/bin/python3
+# steamling-power-log - every 10 s, one line of what the handheld is drawing and how hot it runs,
+# into /var/log/steamling/power/<date>.tsv: battery current and voltage, the hottest CPU and GPU
+# thermal zones, every CPU cluster's clock, the GPU clock, and the process that used the most CPU
+# since the last line. Each boot starts with a header naming the kernel and the clusters' top
+# clocks. steamling-power-report turns it into per-session figures, so one night can be compared
+# with another (a kernel update, a scheduler change) without guessing. /var/log is its own
+# subvolume, so the log survives a rollback. Thirty days are kept.
+import glob
+import os
+import signal
+import sys
+import time
+
+INTERVAL = 10
+KEEP_DAYS = 30
+LOG_DIR = "/var/log/steamling/power"
+FLUSH_EVERY = 6  # lines: one write a minute, not one every sample
+
+
+def read(path, default=""):
+    try:
+        with open(path) as f:
+            return f.read().strip()
+    except OSError:
+        return default
+
+
+def read_int(path, default=0):
+    try:
+        return int(read(path))
+    except ValueError:
+        return default
+
+
+def battery():
+    for d in sorted(glob.glob("/sys/class/power_supply/*")):
+        if read(f"{d}/type") == "Battery":
+            return d
+    return None
+
+
+def zones():
+    cpu, gpu = [], []
+    for z in sorted(glob.glob("/sys/devices/virtual/thermal/thermal_zone*")):
+        t = read(f"{z}/type")
+        if t.startswith("cpu"):
+            cpu.append(f"{z}/temp")
+        elif t.startswith("gpu"):
+            gpu.append(f"{z}/temp")
+    return cpu, gpu
+
+
+def policies():
+    ps = glob.glob("/sys/devices/system/cpu/cpufreq/policy*")
+    return sorted(ps, key=lambda p: int(p.rsplit("policy", 1)[1]))
+
+
+def cpu_times():
+    """pid -> (comm, utime + stime in ticks)"""
+    out = {}
+    for stat in glob.glob("/proc/[0-9]*/stat"):
+        try:
+            with open(stat) as f:
+                s = f.read()
+        except OSError:
+            continue
+        head, _, rest = s.rpartition(")")
+        fields = rest.split()
+        try:
+            out[int(stat.split("/")[2])] = (head.split("(", 1)[1], int(fields[11]) + int(fields[12]))
+        except (IndexError, ValueError):
+            continue
+    return out
+
+
+def prune():
+    cutoff = time.time() - KEEP_DAYS * 86400
+    for f in glob.glob(f"{LOG_DIR}/*.tsv"):
+        try:
+            if os.path.getmtime(f) < cutoff:
+                os.remove(f)
+        except OSError:
+            pass
+
+
+def main():
+    os.makedirs(LOG_DIR, exist_ok=True)
+    prune()
+    bat = battery()
+    cpu_zones, gpu_zones = zones()
+    pols = policies()
+    gpu = (glob.glob("/sys/class/devfreq/*gpu*") or [None])[0]
+    hz = os.sysconf("SC_CLK_TCK")
+    me = os.getpid()
+    header = (f"# boot {read('/proc/sys/kernel/random/boot_id')} kernel {os.uname().release} "
+              f"cluster_max_mhz {','.join(str(read_int(p + '/cpuinfo_max_freq') // 1000) for p in pols)}\n"
+              "# time\tstatus\tmA\tmV\tcpu_c\tgpu_c\tcluster_mhz\tgpu_mhz\ttop\ttop_pct\n")
+    day, f, pending = None, None, 0
+
+    def stop(*_):  # systemd stops it at shutdown: keep the lines still buffered
+        if f:
+            f.close()
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, stop)
+    prev, prev_t = cpu_times(), time.monotonic()
+    while True:
+        time.sleep(INTERVAL)
+        now = time.time()
+        today = time.strftime("%Y-%m-%d", time.localtime(now))
+        if today != day:
+            if f:
+                f.close()
+            prune()
+            day = today
+            # every file this boot opens starts with the boot's header: a new day, or the first
+            # line after a reboot into a day that already has a file
+            f = open(f"{LOG_DIR}/{day}.tsv", "a")
+            f.write(header)
+            pending = 0
+        cur, cur_t = cpu_times(), time.monotonic()
+        top, top_ticks = "-", 0
+        for pid, (comm, ticks) in cur.items():
+            if pid == me or pid not in prev:
+                continue
+            d = ticks - prev[pid][1]
+            if d > top_ticks:
+                top, top_ticks = comm, d
+        top_pct = round(100 * top_ticks / hz / max(cur_t - prev_t, 1))
+        prev, prev_t = cur, cur_t
+        status = read(f"{bat}/status", "-") if bat else "-"
+        ma = read_int(f"{bat}/current_now") // 1000 if bat else 0
+        mv = read_int(f"{bat}/voltage_now") // 1000 if bat else 0
+        cpu_c = max((read_int(z) for z in cpu_zones), default=0) // 1000
+        gpu_c = max((read_int(z) for z in gpu_zones), default=0) // 1000
+        clusters = ",".join(str(read_int(p + "/scaling_cur_freq") // 1000) for p in pols)
+        gpu_mhz = read_int(f"{gpu}/cur_freq") // 1000000 if gpu else 0
+        f.write(f"{int(now)}\t{status}\t{ma}\t{mv}\t{cpu_c}\t{gpu_c}\t{clusters}\t{gpu_mhz}\t{top}\t{top_pct}\n")
+        pending += 1
+        if pending >= FLUSH_EVERY:
+            f.flush()
+            pending = 0
+
+
+if __name__ == "__main__":
+    main()

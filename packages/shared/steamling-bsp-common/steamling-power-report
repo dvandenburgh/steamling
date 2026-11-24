@@ -1,0 +1,97 @@
+#!/usr/bin/python3
+# steamling-power-report [days] - what each play session on battery drew and how hot it ran,
+# from steamling-power-log's files in /var/log/steamling/power. A session is a stretch on battery
+# with no gap of more than a minute, at least five minutes long, named after the process that
+# used the most CPU in it (Steam's own processes and the compositor don't count). Default: the
+# last 7 days. The same game on two kernels, or before and after a settings change, is the
+# comparison this is for.
+import glob
+import statistics
+import sys
+import time
+
+LOG_DIR = "/var/log/steamling/power"
+GAP = 60
+MIN_LEN = 300
+NOT_A_GAME = {"steam", "steamwebhelper", "gamescope-wl", "gamescope", "Xwayland", "mangoapp",
+              "pipewire", "pipewire-pulse", "wireplumber", "inputplumber", "kwin_wayland",
+              "plasmashell", "es-de", "sugov:0", "sugov:3", "sugov:7", "kworker", "-"}
+
+
+def sessions(days):
+    since = time.time() - days * 86400
+    out, cur, kernel, cmax = [], None, "?", []
+    for path in sorted(glob.glob(f"{LOG_DIR}/*.tsv")):
+        with open(path) as f:
+            for line in f:
+                if line.startswith("# boot "):
+                    w = line.split()
+                    kernel = w[w.index("kernel") + 1] if "kernel" in w else "?"
+                    cmax = [int(x) for x in w[w.index("cluster_max_mhz") + 1].split(",")] if "cluster_max_mhz" in w else []
+                    if cur:
+                        out.append(cur)
+                        cur = None
+                    continue
+                if line.startswith("#"):
+                    continue
+                p = line.rstrip("\n").split("\t")
+                if len(p) < 10:
+                    continue
+                t = int(p[0])
+                if t < since or p[1] != "Discharging":
+                    if cur:
+                        out.append(cur)
+                        cur = None
+                    continue
+                s = {"t": t, "w": abs(int(p[2])) * int(p[3]) / 1e6, "cpu": int(p[4]), "gpu": int(p[5]),
+                     "clusters": [int(x) for x in p[6].split(",") if x], "top": p[8]}
+                if cur and t - cur["end"] <= GAP and cur["kernel"] == kernel:
+                    cur["samples"].append(s)
+                    cur["end"] = t
+                else:
+                    if cur:
+                        out.append(cur)
+                    cur = {"start": t, "end": t, "kernel": kernel, "cmax": cmax, "samples": [s]}
+    if cur:
+        out.append(cur)
+    return [x for x in out if x["end"] - x["start"] >= MIN_LEN]
+
+
+def name(samples):
+    counts = {}
+    for s in samples:
+        top = s["top"]
+        if top not in NOT_A_GAME and not top.startswith(("kworker", "sugov", "irq/")):
+            counts[top] = counts.get(top, 0) + 1
+    return max(counts, key=counts.get) if counts else "(desktop or idle)"
+
+
+def main():
+    days = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 7
+    found = sessions(days)
+    if not found:
+        print(f"no session on battery of 5 minutes or more in the last {days} days "
+              f"(logging starts with steamling-power-log.service)")
+        return
+    print(f"{'session':<24}{'length':>7}  {'game':<16}{'kernel':<10}{'median':>8}{'busy':>7}"
+          f"{'cpu avg/peak':>14}{'gpu avg':>9}{'top core':>10}")
+    for x in found:
+        ss = x["samples"]
+        ws = sorted(s["w"] for s in ss)
+        cpu = [s["cpu"] for s in ss]
+        gpu = [s["gpu"] for s in ss]
+        at_max = "-"
+        if x["cmax"]:
+            top = x["cmax"][-1]
+            at_max = f"{100 * sum(1 for s in ss if s['clusters'] and s['clusters'][-1] >= top) // len(ss)}%"
+        when = time.strftime("%a %m-%d %H:%M", time.localtime(x["start"]))
+        mins = (x["end"] - x["start"]) // 60
+        print(f"{when:<24}{mins:>5}m  {name(ss)[:15]:<16}{x['kernel'][:9]:<10}"
+              f"{statistics.median(ws):>7.1f}W{ws[int(len(ws) * 0.9)]:>6.1f}W"
+              f"{round(statistics.mean(cpu)):>9}/{max(cpu)}C{round(statistics.mean(gpu)):>8}C{at_max:>10}")
+    print("\nmedian/busy: the session's median and 90th-percentile draw. top core: share of the "
+          "time the fastest cluster sat at its top clock.")
+
+
+if __name__ == "__main__":
+    main()

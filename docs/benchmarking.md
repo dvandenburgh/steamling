@@ -121,6 +121,35 @@ A sensible routine for a new kernel or setting:
 Run each test twice. If the two runs on the same setup differ by about as much as the change
 does, the change made no difference you can measure.
 
+## Every session, without asking
+
+`steamling-bench` measures when you ask it to. The handheld also keeps a quieter record all the
+time: every 10 seconds it notes the battery draw, the hottest CPU and GPU temperatures, the CPU
+and GPU clocks, and which program was busiest. That's for the question that comes up after the
+fact: "it ran hot tonight, was that new?" To see the last week's play sessions on battery:
+
+```bash
+steamling-power-report
+steamling-power-report 30    # the last 30 days
+```
+
+The output looks like this (two evenings of the same game on two kernels):
+
+```
+session                  length  game            kernel      median   busy  cpu avg/peak  gpu avg  top core
+Mon 11-23 21:04            48m  eden            7.3.6         6.4W   8.8W       63/68C      55C       61%
+Tue 11-24 21:10            52m  eden            7.3.5         5.1W   6.6W       58/63C      54C       33%
+```
+
+A session is a stretch on battery of at least five minutes, named after the program that used the
+most CPU in it. `median` is the typical draw and `busy` the draw in its busiest tenth. `top core`
+is how much of the time the fastest CPU cluster sat at its top clock. The kernel comes from the
+boot the session was in, so a kernel update shows up as a change in that column. Sessions are
+kept for 30 days in `/var/log/steamling/power/`, which a [rollback](snapshots.md) leaves alone.
+
+Compare the same game in the same place, as with `steamling-bench`. A quiet menu and a busy town
+in one game are as different as two games.
+
 ## Trying lazy preemption
 
 The kernel can be told at boot, or while running, how readily it interrupts a running task for a

@@ -4,7 +4,7 @@
 pkgname=steamling-bsp-common
 pkgver=0.1.1
 pkgrel=1.10
-pkgdesc="steamling shared board support: sleep.d dispatcher, suspend hooks, power-key policy, session udev rules, wheel sudo, fan/scheduler daemons, ABL updater, power profiles daemon, realtime priority ladder, zram swap and memory sysctls, deck session limits, kernel /flash deploy, volume rocker daemon, journal cap, iwd Wi-Fi backend, panel refresh calibration, controller MCU mode quirks, sensor core gyro"
+pkgdesc="steamling shared board support: sleep.d dispatcher, suspend hooks, power-key policy, session udev rules, wheel sudo, fan/scheduler daemons, ABL updater, power profiles daemon, realtime priority ladder, zram swap and memory sysctls, deck session limits, kernel /flash deploy, volume rocker daemon, journal cap, iwd Wi-Fi backend, panel refresh calibration, controller MCU mode quirks, sensor core gyro, per-session power log"
 arch=('any')
 url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
@@ -51,8 +51,9 @@ source=('steamling-sleep' 'sdam-debug-pre' 'sdam-debug-post'
         'retroid.il97680a.oled.lua' 'retroid.rp6.oled.lua'
         'steamling-ssc' 'steamling-ssc.service' 'inputplumber-gyro.conf'
         '61-steamling-power.rules' '61-steamling-usb-writeback.rules'
-        'steamling-storage' 'steamling-storage.conf' '60-steamling-storage.rules')
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        'steamling-storage' 'steamling-storage.conf' '60-steamling-storage.rules'
+        'steamling-power-log' 'steamling-power-log.service' 'steamling-power-report')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
   # gamescope panel profiles, one per panel, whichever family carries it: each matches on
@@ -200,6 +201,14 @@ package() {
     "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/steamling-volumed.service"
   install -Dm644 "${srcdir}/10-steamling-journal.conf" \
     "${pkgdir}/usr/lib/systemd/journald.conf.d/10-steamling-journal.conf"
+
+  # Per-session power draw and temperatures, so one night can be compared with another.
+  install -Dm755 "${srcdir}/steamling-power-log" "${pkgdir}/usr/lib/steamling/steamling-power-log"
+  install -Dm755 "${srcdir}/steamling-power-report" "${pkgdir}/usr/bin/steamling-power-report"
+  install -Dm644 "${srcdir}/steamling-power-log.service" \
+    "${pkgdir}/usr/lib/systemd/system/steamling-power-log.service"
+  ln -sf "../steamling-power-log.service" \
+    "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/steamling-power-log.service"
   install -Dm644 "${srcdir}/20-steamling-wifi-backend.conf" \
     "${pkgdir}/usr/lib/NetworkManager/conf.d/20-steamling-wifi-backend.conf"
 
