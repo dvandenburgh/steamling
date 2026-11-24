@@ -10,7 +10,7 @@ url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 # steamling-core rides along so a plain -Syu delivers the mandatory layer to devices that
 # predate it: a new package name only reaches installed devices via a dep edge.
-depends=('bash' 'sudo' 'steamling-core' 'diffutils' 'python' 'python-gobject' 'python-evdev' 'cpio' 'zram-generator')
+depends=('bash' 'sudo' 'steamling-core' 'diffutils' 'wireplumber' 'python' 'python-gobject' 'python-evdev' 'cpio' 'zram-generator')
 # Older kernels own the /flash deploy files: the versioned conflict makes pacman upgrade the
 # kernel in the same transaction instead of failing on file conflicts.
 conflicts=('linux-steamling-sm8550<7.2.10-3')
