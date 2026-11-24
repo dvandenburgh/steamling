@@ -2,12 +2,14 @@
 # which live here rather than in the image overlay so fixes reach fielded SDs on -Syu (#34).
 pkgname=steamling-tools
 pkgver=0.1.1
-pkgrel=1.16
+pkgrel=1.17
 pkgdesc="Steamling maintenance app: snapshot rollback, base mode switch, internal install, SSH, file sharing and USB file transfer toggles, emulation layer, desktop picker, first-boot diagnostics and root expansion"
 arch=('any')
 url="https://github.com/Steamling/steamling"
 license=('GPL-2.0-or-later')
 depends=('steamling-snapshots' 'steamling-base' 'kdialog' 'cloud-guest-utils'  # growpart: steamling-expand-root
+         'konsole'  # steamling-tools runs root actions in a terminal
+         'rsync' 'dosfstools'  # steamling-install-internal copies the system and makes the boot FAT
          'umtp-responder'  # steamling-mtp
          'python')  # steamling-bench
 install=steamling-tools.install
