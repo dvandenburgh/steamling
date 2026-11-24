@@ -81,8 +81,10 @@ package_libretro-cores-steamling-snes9x()   { _split_package snes9x; }
 package_libretro-cores-steamling-gambatte() { _split_package gambatte; }
 package_libretro-cores-steamling-mgba()     { _split_package mgba; }
 package_libretro-cores-steamling-genesis_plus_gx()   { _split_package genesis_plus_gx; }
-package_libretro-cores-steamling-picodrive()         { _split_package picodrive; }
-package_libretro-cores-steamling-yabasanshiro()      { _split_package yabasanshiro; }
+# These two link more than glibc: PicoDrive plays Sega CD's Ogg Vorbis audio tracks, and
+# YabaSanshiro renders through GLES.
+package_libretro-cores-steamling-picodrive()         { depends=('libvorbis' 'libogg'); _split_package picodrive; }
+package_libretro-cores-steamling-yabasanshiro()      { depends=('libglvnd'); _split_package yabasanshiro; }
 package_libretro-cores-steamling-mednafen_pce_fast() { _split_package mednafen_pce_fast; }
 package_libretro-cores-steamling-fbneo()             { _split_package fbneo; }
 package_libretro-cores-steamling-mednafen_ngp()      { _split_package mednafen_ngp; }
