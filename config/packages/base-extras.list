@@ -41,3 +41,6 @@ plasma-desktop
 systemsettings
 kmenuedit
 polkit-kde-agent
+plasma-pa
+pulseaudio-qt
+qt6-sensors
