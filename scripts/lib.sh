@@ -516,8 +516,12 @@ artifact_on_base() {  # <repo dir> <artifact file>
   case "$2" in *-any.pkg.tar.*) return 0 ;; esac
   b="$(cat "$(built_base_file "$1" "$2")" 2>/dev/null)" \
     || b="$(cat "${BUILD_DIR}/pkgbuild-root-${SOC}/.base-snapshot" 2>/dev/null)" || return 0
-  [ -z "${b}" ] || [ "${b}" = "${want}" ]
+  [ -z "${b}" ] || [ "${b}" = "${want}" ] || grep -qxF -- "${b}" "$(base_compat_file "${want}")" 2>/dev/null
 }
+# The bases this SoC's build found to change nothing its chroot has (build-packages.sh
+# base_keeps_chroot): a package built on one of them counts as built on <base>. Per SoC, since
+# each SoC has its own chroot.
+base_compat_file() { printf '%s/compat-%s-%s' "${BUILT_BASE_DIR}" "${SOC}" "$1"; }
 
 pending_artifacts() {
   local -A stale=()

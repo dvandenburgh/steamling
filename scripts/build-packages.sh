@@ -90,6 +90,28 @@ progress_pkg() {
   fi
 }
 
+# Does the wanted (pinned) base leave every package installed in the chroot as it is? Its
+# packages, makedepends included, are what our binaries were linked against, so if none of
+# them changes version and none goes away, what the chroot built is as good on the new base.
+base_keeps_chroot() {  # <the chroot's base id>
+  [ -n "${STEAMLING_BASE_SNAPSHOT}" ] && [ -n "$1" ] && [ "$1" != live ] || return 1
+  local ours moved="" gone="" ok=0 db
+  render_base_pacman_conf "${BROOT}/etc/pacman.conf"
+  chroot_mount "${BROOT}"
+  if chroot "${BROOT}" pacman -Sy --noconfirm >/dev/null 2>&1; then
+    # pacman -Sl marks an installed package "[installed: <its version>]" when the repo has another
+    moved="$(chroot "${BROOT}" pacman -Sl 2>/dev/null | grep -F '[installed: ' || true)"
+    # installed but in no repo: fine for our own packages (makedepends from the local repos)
+    ours="$(for db in "${LOCALREPO}/${REPO_DB}" "${LOCALREPO_SHARED}/${SHARED_REPO_DB}"; do
+              [ -f "${db}" ] && bsdtar -tf "${db}" 2>/dev/null; done | sed -n 's|^\([^/]*\)/$|\1|p' | sed 's/-[^-]*-[^-]*$//')"
+    gone="$(chroot "${BROOT}" pacman -Qmq 2>/dev/null | grep -vxF -f <(printf '%s\n' "${ours}" | sed '/^$/d') || true)"
+    [ -z "${moved}" ] && [ -z "${gone}" ] && ok=1
+  fi
+  chroot_umount "${BROOT}"
+  [ "${ok}" = 1 ] || [ -z "${moved}${gone}" ] || log "base ${STEAMLING_BASE_SNAPSHOT} changes $(printf '%s\n' "${moved}" "${gone}" | sed '/^$/d' | wc -l) of this chroot's packages"
+  [ "${ok}" = 1 ]
+}
+
 setup_chroot() {
   # Base fingerprint: the chroot is built FROM a base (pinned snapshot id, or
   # "live" ALARM) and must be recreated when the pin changes — an old-base chroot
@@ -100,6 +122,18 @@ setup_chroot() {
     # adopt pre-stamp chroots as live-based (the -Syu below converges them)
     if [ -z "${have_base}" ] && [ -z "${STEAMLING_BASE_SNAPSHOT}" ]; then
       printf 'live\n' > "${BROOT}/.base-snapshot"; have_base=live
+    fi
+    # make extend-base gives the base a new id (20261121 -> 20261121.1) but only adds packages,
+    # so a chroot on the old id can already be exactly on the new one. Throwing it away, and
+    # everything built in it, rebuilt every package for nothing.
+    if [ "${have_base}" != "${want_base}" ] && base_keeps_chroot "${have_base}"; then
+      log "base ${want_base} changes nothing this chroot has from ${have_base}: keeping the chroot and the packages it built"
+      mkdir -p "${BUILT_BASE_DIR}"
+      { printf '%s\n' "${have_base}"; cat "$(base_compat_file "${have_base}")" 2>/dev/null; } \
+        >> "$(base_compat_file "${want_base}")"
+      sort -u -o "$(base_compat_file "${want_base}")" "$(base_compat_file "${want_base}")"
+      _progress_own "${BUILT_BASE_DIR}" "$(base_compat_file "${want_base}")"
+      printf '%s\n' "${want_base}" > "${BROOT}/.base-snapshot"; have_base="${want_base}"
     fi
     if [ "${have_base}" != "${want_base}" ]; then
       log "build chroot base is '${have_base:-unknown}', want '${want_base}' — recreating"
