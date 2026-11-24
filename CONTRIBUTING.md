@@ -252,6 +252,19 @@ check it, which is the single biggest reason a PR stalls.
 - **Never ship different contents under an existing package version.** A handheld that already
   has that version won't take the new one. In practice this means: always bump, never quietly
   rebuild.
+- **Declare everything a package needs** in its own `depends=()`: the libraries its binaries
+  link, the commands its scripts run, the QML and Python modules it imports. Something that's
+  only there because another package pulls it in disappears when that package goes, whether
+  that's a cleanup's orphan removal or a base snapshot that stops carrying it. `make
+  check-depends` checks this. It also runs after every package build, at `make stage` and
+  before a base snapshot ships. A need that really is optional (the script checks for the tool
+  first, or the feature only exists inside a layer that brings it) goes in
+  `config/packages/depends-ok.list` with its reason. A gap whose fix would force a long
+  rebuild can wait in `config/packages/depends-pending.list` until that package is rebuilt for
+  another reason, and `make check` says when that has happened.
+- **A source with no checksum (`SKIP`) needs its pin in the file name it's saved as**
+  (`name-${_commit:0:12}.zip::https://...`). The build keeps one download cache and reuses a
+  file by name, so without the pin a new commit never gets downloaded. `make check` catches it.
 - **Committed build output must be reproducible.** `packages/shared/steamling-decky/steamling-control/dist/`
   is committed and I rebuild it from your sources during review; it should come out
   byte-identical with the pinned toolchain (`npm ci && npm run build`), and `npx tsc --noEmit`
