@@ -168,7 +168,7 @@ package_mesa() {
   pkgdesc="Open-source OpenGL drivers, trimmed for Qualcomm handhelds (freedreno + zink + softpipe)"
   depends=(
     expat glibc libdrm libglvnd libx11 libxcb libxext libxshmfence libxxf86vm
-    wayland zlib zstd
+    spirv-tools wayland zlib zstd
   )
   provides=("mesa-libgl=${epoch}:${pkgver}-${pkgrel}" opengl-driver)
   conflicts=('mesa-libgl<17.0.1-2')
