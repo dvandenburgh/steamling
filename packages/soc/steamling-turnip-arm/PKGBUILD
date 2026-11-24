@@ -3,7 +3,7 @@
 # Counterpart of steamling-turnip-x86; same per-SoC tuning contract as packages/soc/mesa.
 pkgname=steamling-turnip-arm
 pkgver=20261115
-pkgrel=1
+pkgrel=2
 pkgdesc="Pinned aarch64 Turnip builds for per-game Mesa selection (SoC-tuned)"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -29,10 +29,8 @@ declare -gA _commits=(
 # The series mesa itself ships comes from its vk-arm payload; pinning mesa's pkgver here = file conflict.
 # Older vulkan-freedreno builds own a payload dir this package now ships, hence the conflict.
 conflicts=('vulkan-freedreno<2:26.3.0')
-_versions=('25.0.7' '25.1.9' '25.2.8' '25.3.6' '26.0.8' '26.1.6' '26.2.7' '27.0.0devel')
+_versions=('25.2.8' '25.3.6' '26.0.8' '26.1.6' '26.2.7' '27.0.0devel')
 source=('0001-c11-threads-fix-build-on-c23.patch'
-        'https://archive.mesa3d.org/mesa-25.0.7.tar.xz'
-        'https://archive.mesa3d.org/mesa-25.1.9.tar.xz'
         'https://archive.mesa3d.org/mesa-25.2.8.tar.xz'
         'https://archive.mesa3d.org/mesa-25.3.6.tar.xz'
         'https://archive.mesa3d.org/mesa-26.0.8.tar.xz'
@@ -40,8 +38,6 @@ source=('0001-c11-threads-fix-build-on-c23.patch'
         'https://archive.mesa3d.org/mesa-26.2.7.tar.xz'
         "https://gitlab.freedesktop.org/mesa/mesa/-/archive/${_commits[27.0.0devel]}/mesa-${_commits[27.0.0devel]}.tar.gz")
 sha256sums=('SKIP'
-            '592272df3cf01e85e7db300c449df5061092574d099da275d19e97ef0510f8a6'
-            '412df33a1bb3c785ed698555a3972118a37c458e7accf6ae53f4bb87b3db454a'
             '097842f3e49d996868b38688db87b006f7d4541e93ce86d2f341d8b3e7be7c93'
             '59217efeac3b64e7ced958324b9db7494f1e0741aeb22d780276514cc1b8f206'
             'caf1c0061a68e88dfa74967a7e780c0e85d65b6c4e334cd69095a5dc54ad78bc'
