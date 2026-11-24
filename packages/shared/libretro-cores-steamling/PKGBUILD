@@ -10,7 +10,7 @@ _split=(fceumm snes9x gambatte mgba
         genesis_plus_gx picodrive yabasanshiro mednafen_pce_fast fbneo mednafen_ngp)
 pkgname=(libretro-cores-steamling "${_split[@]/#/libretro-cores-steamling-}")
 pkgver=0.1.1
-pkgrel=6
+pkgrel=7
 pkgdesc="Curated prebuilt aarch64 libretro cores for the RP6 (vendored, ArkOS/TheRA set)"
 arch=('aarch64')
 url="https://github.com/christianhaitian/retroarch-cores"
@@ -36,18 +36,22 @@ _cores=(
   mednafen_wswan mednafen_ngp mednafen_vb
 )
 
+# The build keeps downloads in a cache shared across builds and reuses them by file name, and
+# these have no checksum to tell a stale one apart. So the pin is part of each file's name: a
+# new pin is a new download, not last time's zip.
+_pin() { [ "$1" = stella ] && printf '%s' "${_stella_commit:0:12}" || printf '%s' "${_commit:0:12}"; }
 source=()
 sha256sums=()
 for _c in "${_cores[@]}"; do
   _url="${_base}/${_c}_libretro.so.zip"
   [ "${_c}" = stella ] && _url="${_base/${_commit}/${_stella_commit}}/${_c}_libretro.so.zip"
-  source+=("${_c}_libretro.so.zip::${_url}")
+  source+=("${_c}-$(_pin "${_c}")_libretro.so.zip::${_url}")
   sha256sums+=('SKIP')
 done
 
 _install_core() {  # $1 = core
   install -dm755 "${pkgdir}/usr/lib/libretro"
-  unzip -o "${srcdir}/${1}_libretro.so.zip" -d "${pkgdir}/usr/lib/libretro/" >/dev/null
+  unzip -o "${srcdir}/${1}-$(_pin "${1}")_libretro.so.zip" -d "${pkgdir}/usr/lib/libretro/" >/dev/null
   chmod 644 "${pkgdir}/usr/lib/libretro/${1}_libretro.so"
 }
 
