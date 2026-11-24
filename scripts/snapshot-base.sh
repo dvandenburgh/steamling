@@ -359,11 +359,14 @@ log "building ${BASE_DB} (repo-add over ${#want[@]} packages)"
 log "checking our packages against base ${ID}"
 need_tool zstd
 repos=(--repo "${OUT}/${BASE_DB}:${OUT}/${BASE_REPO}.files.tar.gz")
-pkgs=()
 for db in "${BUILD_DIR}"/localrepo/*/steamling*.db.tar.gz; do
   [ -f "${db/.db.tar.gz/.files.tar.gz}" ] && repos+=(--repo "${db}:${db/.db.tar.gz/.files.tar.gz}")
-  pkgs+=("$(dirname "${db}")")
 done
+# What this checkout builds, at the version it builds: not a retired package left in localrepo.
+pkgs=()
+while IFS='|' read -r repo _ p v a; do
+  f="$(artifact_file "${repo}" "${p}-${v}-${a}")" && pkgs+=("${f}")
+done < <(local_artifacts)
 if ! gaps="$(python3 "$(dirname "$0")/check-depends.py" --missing "${repos[@]}" \
         --ok "${CONFIG_DIR}/packages/depends-ok.list" --pending "${CONFIG_DIR}/packages/depends-pending.list" \
         "${pkgs[@]}")"; then
