@@ -8,7 +8,8 @@ volume control (nothing declared plasma-pa, so no image installed it and the sna
 
 For every package named on the command line this works out what its files need:
   lib     shared libraries its arm64 ELF files link (DT_NEEDED)
-  cmd     commands its shell and Python scripts run
+  cmd     commands its shell and Python scripts run, and the programs its systemd units,
+          .desktop files and udev rules start
   qml     QML modules its .qml files import
   python  Python modules its Python files import
 and checks each one is met inside the package's own dependency closure (depends and provides,
@@ -169,6 +170,8 @@ def read_pkg(path):
                 texts[p] = ("py", (head + f.read()).decode("utf-8", "replace"))
             elif p.endswith(".qml"):
                 texts[p] = ("qml", (head + f.read()).decode("utf-8", "replace"))
+            elif p.endswith((".service", ".socket", ".desktop", ".rules")) and m.size < 1024 * 1024:
+                texts[p] = ("exec", (head + f.read()).decode("utf-8", "replace"))
     proc.wait()
     return info, allp, elfs, texts
 
@@ -298,7 +301,16 @@ def shell_commands(text):
 PY_CALL_RE = re.compile(r"""(?:\brun|Popen|check_output|check_call|\bcall|exec[lv]p?e?)\(\s*\[?\s*["']([^"'\s]+)["']""")
 
 
+EXEC_RE = re.compile(r"^\s*(?:Exec(?:Start|StartPre|StartPost|Stop|StopPost|Reload|Condition)?|TryExec)=[-+!@:|]*\s*(\S+)", re.M)
+UDEV_RE = re.compile(r"""(?:RUN(?:\{program\})?\+?=|PROGRAM=)"([^"\s]+)""")
+
+
 def script_commands(kind, text):
+    if kind == "exec":  # systemd units, .desktop files, udev rules: the program each line starts
+        # A .desktop entry with TryExec= is hidden when that program is missing: optional.
+        tried = {os.path.basename(c) for c in re.findall(r"^\s*TryExec=\s*(\S+)", text, re.M)}
+        return {os.path.basename(c) for c in EXEC_RE.findall(text) + UDEV_RE.findall(text)
+                if not c.startswith(("%", "$"))} - tried
     guarded = {a or b for a, b in GUARD_RE.findall(text)}
     guarded |= set(re.findall(r"shutil\.which\(\s*[\"']([\w.+-]+)", text))
     if kind == "py":

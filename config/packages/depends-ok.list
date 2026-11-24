@@ -3,6 +3,7 @@
 
 # Optional at runtime: the script copes without it.
 steamling-branding    QtQuick                   # the splash is a Plasma look-and-feel; it only runs inside Plasma, which has it
+plasma-mobile         systemsettings            # a launcher for the desktop's settings app, which the shell doesn't need
 steamling-session     plymouth                  # the handoff exits at once when plymouthd isn't running
 steamling-tools       iw                        # steamling-diag: each probe prints "n/a" when its tool is missing
 steamling-tools       iwctl                     # steamling-diag, as above
