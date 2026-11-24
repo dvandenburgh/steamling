@@ -30,13 +30,24 @@ ghr_assets() { gh release view "$1" --repo "${GHR_REPO}" --json assets --jq '.as
 # Make $2 an exact copy of release $1's packages and signatures: download what's missing or a
 # different size, delete local package files the release doesn't have. Returns 1 when the
 # release doesn't exist yet (the tree's first publish).
+# "Live" is what the release's database lists, since that is all a device ever installs. An upload
+# that died partway leaves new package files on the release that the database never got to name;
+# taking those as live made the retry refuse them as already published.
 ghr_mirror() {
-  local tag="$1" dir="$2" n s f
+  local tag="$1" dir="$2" n s f db tmp
   ghr_exists "${tag}" || return 1
   mkdir -p "${dir}"
-  declare -A live=()
+  declare -A live=() listed=()
+  tmp="$(mktemp -d)"
+  db="$(ghr_assets "${tag}" | awk '$1 ~ /\.db$/ {print $1; exit}')"
+  if [ -n "${db}" ] && gh release download "${tag}" --repo "${GHR_REPO}" --pattern "${db}" --dir "${tmp}" --clobber 2>/dev/null; then
+    while IFS= read -r n; do listed["${n}"]=1; listed["${n}.sig"]=1
+    done < <(tar -xOzf "${tmp}/${db}" --wildcards '*/desc' 2>/dev/null | awk 'f {print; f=0} /^%FILENAME%$/ {f=1}')
+  fi
+  rm -rf "${tmp}"
   while read -r n s; do
     [ -n "${n}" ] || continue
+    case "${n}" in *.pkg.tar.*) [ "${#listed[@]}" -eq 0 ] || [ -n "${listed[${n}]:-}" ] || continue ;; esac
     live["${n}"]=1
     case "${n}" in *.pkg.tar.*) ;; *) continue ;; esac
     [ -f "${dir}/${n}" ] && [ "$(stat -c %s "${dir}/${n}")" = "${s}" ] && continue
