@@ -8,6 +8,7 @@
 #   version  a swapped package is strictly newer than the live one
 #   shadow   a per-SoC copy of a shared name is not older than [steamling-shared]
 #   order    no device can still hold a version a staged conflicts= range excludes
+#   depends  what a new package links, runs and imports comes through its own depends
 # STEAMLING_STAGE_CHECK_OFFLINE=1 reuses the last downloaded dbs. A FAIL withdraws .staged-ok.
 
 source "$(dirname "$0")/lib.sh"
@@ -366,6 +367,46 @@ for n in "${!staged[@]}"; do
     done
   done <<< "${confl["${n}@stage"]:-}"
 done
+
+# --- declared dependencies of what goes out ------------------------------------
+# What a new package needs (the libraries it links, the commands its scripts run, the QML and
+# Python modules it imports) has to come through its own depends. A need met only because some
+# other package pulls it in breaks the day that one goes: a cleanup's orphan removal, or a base
+# snapshot that stops carrying it. scripts/check-depends.py has the details.
+if [ "${#added[@]}" -gt 0 ]; then
+  log "checking what the new packages need"
+  need_tool zstd; need_tool python3
+  files_ok=1
+  if [ "${STEAMLING_STAGE_CHECK_OFFLINE:-0}" = "1" ] && [ -f "${DBCACHE}/base.files.db" ]; then
+    note "db: base files" "cached (offline)"
+  elif [ -n "${STEAMLING_BASE_GITHUB}" ]; then
+    curl -fsSL --retry 3 -o "${DBCACHE}/base.files.db" "${STEAMLING_BASE_URL}/${STEAMLING_BASE_REPO}.files.tar.gz" \
+      && note "db: base files" "fetched" || files_ok=0
+  else
+    fetch_db base.files "${STEAMLING_BASE_RCLONE_REMOTE}/${STEAMLING_BASE_REPO}.files.tar.gz" || files_ok=0
+  fi
+  repos=(--repo "${DBCACHE}/base.db:${DBCACHE}/base.files.db")
+  fetch_db shared.files "${STEAMLING_REPO_RCLONE_REMOTE}/shared/steamling-shared.files" \
+    && repos+=(--repo "${DBCACHE}/shared.db:${DBCACHE}/shared.files.db") || files_ok=0
+  for s in "${LIVE_SOCS[@]}"; do
+    fetch_db "${s}.files" "${STEAMLING_REPO_RCLONE_REMOTE}/${s}/steamling.files" \
+      && repos+=(--repo "${DBCACHE}/${s}.db:${DBCACHE}/${s}.files.db") || files_ok=0
+  done
+  new=()
+  for f in "${STAGE}"/*.pkg.tar.zst; do
+    n="$(pkgbase "$f")"
+    [ -n "${added["${n}"]+x}" ] && [ "${added["${n}"]}" = "$(pkgver_of "$f")" ] && new+=("$f")
+  done
+  if [ "${files_ok}" = 0 ]; then
+    WARN "a repo's .files list could not be fetched: dependency check skipped"
+  elif [ "${#new[@]}" -gt 0 ]; then
+    mapfile -t gaps < <(python3 "${STEAMLING_ROOT}/scripts/check-depends.py" "${repos[@]}" \
+      --ok "${CONFIG_DIR}/packages/depends-ok.list" --pending "${CONFIG_DIR}/packages/depends-pending.list" \
+      "${new[@]}" || true)
+    for g in "${gaps[@]}"; do FAIL "${g}"; done
+    [ "${#gaps[@]}" -gt 0 ] || note "depends" "${#new[@]} new packages declare what they need"
+  fi
+fi
 
 echo
 if [ "${fail}" -eq 0 ]; then
