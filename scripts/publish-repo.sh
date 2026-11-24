@@ -85,6 +85,17 @@ pkgs=()
 for p in "${SRC}"/*.pkg.tar.*; do [[ "$p" == *.sig ]] || pkgs+=("$p"); done
 [ "${#pkgs[@]}" -gt 0 ] || die "no packages in ${SRC}"
 
+# gpg asks gpg-agent for the key's passphrase, and the agent prompts on GPG_TTY. With it unset
+# (a WSL shell, say) the prompt never shows and the first signature times out. Point it at this
+# terminal and sign something small first, so a locked key asks once, here, before the real work.
+gpg_unlock() {
+  if [ -z "${GPG_TTY:-}" ] && GPG_TTY="$(tty 2>/dev/null)"; then export GPG_TTY; fi
+  printf 'steamling\n' | gpg --clearsign -u "${STEAMLING_REPO_GPG_KEY}" >/dev/null 2>&1 \
+    || die "gpg can't sign with ${STEAMLING_REPO_GPG_KEY}. To see why: echo test | gpg --clearsign -u ${STEAMLING_REPO_GPG_KEY}
+  A passphrase prompt that never appears: export GPG_TTY=\$(tty), or put
+  pinentry-program /usr/bin/pinentry-curses in ~/.gnupg/gpg-agent.conf and run gpgconf --kill gpg-agent"
+}
+
 # --- GitHub releases (STEAMLING_REPO_GITHUB): scripts/repo-github.sh -------------------------
 # Signed and indexed in a copy under build/publish/repo/<tree>, under GitHub-safe names, so the
 # source dir (the stage, or the build's own localrepo on a first publish) is never touched.
@@ -95,6 +106,7 @@ if [ -n "${STEAMLING_REPO_GITHUB}" ] && [ "${serve}" -eq 0 ]; then
   one-time key setup: gpg --quick-gen-key 'Steamling Packaging <you@example.com>' ed25519 sign 2y"
   need_tool gpg
   need_tool cmp
+  gpg_unlock
   PUB="${BUILD_DIR}/publish/repo/${REPO_SEG}"
   mkdir -p "${PUB}" 2>/dev/null && [ -w "${PUB}" ] || die "${PUB} isn't writable: sudo install -d -o $(id -un) ${PUB}"
   declare -A want=()
@@ -131,6 +143,7 @@ if [ "${unsigned}" -eq 0 ]; then
   [ -n "${STEAMLING_REPO_GPG_KEY}" ] || die "STEAMLING_REPO_GPG_KEY unset (or pass --unsigned for LAN testing)
   one-time key setup: gpg --quick-gen-key 'Steamling Packaging <you@example.com>' ed25519 sign 2y"
   need_tool gpg
+  gpg_unlock
   log "signing ${#pkgs[@]} packages with ${STEAMLING_REPO_GPG_KEY}"
   for p in "${pkgs[@]}"; do
     # re-sign only when missing or older than the package (idempotent republish)
