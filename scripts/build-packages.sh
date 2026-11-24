@@ -276,36 +276,23 @@ build_one() {
     fi
     warn "${name} is in STEAMLING_KEEP_PKGS but localrepo has no copy of it, so it builds anyway"
   fi
+  # Incremental skip: if every artifact this PKGBUILD would produce (name-[epoch:]ver-rel-arch,
+  # split siblings included) is already in the localrepo AND newer than every file in the
+  # package dir, there is nothing to do — so a re-run of `make build` doesn't recompile
+  # mesa/gamescope/the world. Editing any file in the package dir (patch, script, PKGBUILD)
+  # triggers a rebuild without needing a pkgrel bump. Force paths: `make packages PKG=<name>`
+  # always rebuilds the named packages; STEAMLING_FORCE_REBUILD=1 rebuilds everything. The kernel
+  # package also rebuilds whenever `make kernel` produced a newer Image than the packaged one.
+  # The list comes from lib.sh's pending_artifacts, which reads the PKGBUILDs on the host: asking
+  # makepkg --packagelist inside the chroot took seconds a package under qemu, every run.
+  if [ "${force}" -eq 0 ] && [ -z "${STALE_DIRS[${pkgdir%/}]:-}" ]; then
+    log "skip: ${name} (already in localrepo, sources unchanged — force with PKG=${name})"
+    return 0
+  fi
   rm -rf "${BROOT}/build/${name}"
   mkdir -p "${BROOT}/build"
   cp -r "${pkgdir}" "${BROOT}/build/${name}"
   chroot "${BROOT}" chown -R builder:builder "/build/${name}"
-  # Incremental skip: if every artifact this PKGBUILD would produce (per `makepkg
-  # --packagelist`: name-[epoch:]ver-rel-arch, split siblings included) is already in the
-  # localrepo AND newer than every file in the package dir, there is nothing to do — so a
-  # re-run of `make build` doesn't recompile mesa/gamescope/the world. Editing any file in
-  # the package dir (patch, script, PKGBUILD) triggers a rebuild without needing a pkgrel
-  # bump. Force paths: `make packages PKG=<name>` always rebuilds the named packages;
-  # STEAMLING_FORCE_REBUILD=1 rebuilds everything. The kernel package also rebuilds whenever
-  # `make kernel` produced a newer Image than the packaged one.
-  if [ "${force}" -eq 0 ]; then
-    local uptodate=1 nlist=0 p f
-    while IFS= read -r p; do
-      nlist=$((nlist+1))
-      # Matched without the extension: seeded and older builds are .xz, new ones .zst.
-      f="$(artifact_file "${repo_dir}" "$(basename "${p%.pkg.tar.*}")")" || f=""
-      [ -n "${f}" ] && artifact_current "${f}" "${pkgdir}" "${name}" || { uptodate=0; break; }
-      if ! artifact_on_base "${repo_dir}" "${f}"; then
-        log "${name}: built against base $(cat "$(built_base_file "${repo_dir}" "${f}")" 2>/dev/null || echo '?'), this build uses ${STEAMLING_BASE_SNAPSHOT:-live}; rebuilding"
-        uptodate=0; break
-      fi
-    done < <(chroot "${BROOT}" runuser -u builder -- \
-               bash -lc "cd /build/${name} && LC_ALL=C ${env} makepkg --packagelist" 2>/dev/null)
-    if [ "${nlist}" -gt 0 ] && [ "${uptodate}" -eq 1 ]; then
-      log "skip: ${name} (already in localrepo, sources unchanged — force with PKG=${name})"
-      return 0
-    fi
-  fi
   log "makepkg: ${name}"
   local t0; t0="$(now_s)"
   progress_pkg "${name}" started
@@ -474,6 +461,10 @@ main() {
 
   local built=0 name force devdir devsoc pkgsocs
   local -a failed=()
+  # Which package dirs have something to build, worked out once on the host (build_one's skip).
+  declare -gA STALE_DIRS=()
+  local _r _d _rest
+  while IFS='|' read -r _r _d _rest; do STALE_DIRS[${_d}]=1; done < <(pending_artifacts)
   # Per-SoC and device packages build only into the CURRENT SoC's repo: device packages by
   # their profile's SOC, packages/soc by ./socs. PKG= names and STEAMLING_FORCE_REBUILD=1 force
   # past the up-to-date skip.
