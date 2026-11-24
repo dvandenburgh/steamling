@@ -8,6 +8,20 @@ EMU_NAMES="armsx2 eden ryujinx rpcs3 vita3k xemu dolphin cemu azahar ppsspp"
 # to whatever it launches. The emulators are built against the system libraries and gain nothing
 # from the overlay hooks, so they start without either.
 unset LD_PRELOAD LD_LIBRARY_PATH
+# The arm64 client also asks for the Steam Frame's own Vulkan layers (VK_LAYER_VALVE_rpo and
+# VK_LAYER_VALVE_fdm_injection) in everything it starts, and points Turnip at a debug flags file.
+# Every Vulkan call an emulator makes would pass through those layers for features made for the
+# Frame's displays, so they're dropped here; any other layer asked for stays.
+if [ -n "${VK_INSTANCE_LAYERS:-}" ]; then
+  _layers=""
+  IFS=: read -ra _l <<< "${VK_INSTANCE_LAYERS}"
+  for _x in "${_l[@]}"; do
+    case "${_x}" in VK_LAYER_VALVE_rpo|VK_LAYER_VALVE_fdm_injection|"") ;; *) _layers+="${_layers:+:}${_x}" ;; esac
+  done
+  if [ -n "${_layers}" ]; then export VK_INSTANCE_LAYERS="${_layers}"; else unset VK_INSTANCE_LAYERS; fi
+  unset _layers _l _x
+fi
+unset TU_DEBUG_FILE
 # An AppImage mounts itself with fusermount, and looks for it on PATH. Where the PATH Steam hands
 # out has neither one, point it at the system's.
 if ! command -v fusermount3 >/dev/null 2>&1 && ! command -v fusermount >/dev/null 2>&1; then
