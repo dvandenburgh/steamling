@@ -193,17 +193,28 @@ def apply_mesa_version(settings, tool, args):
         log(f"mesa pick {value} is {arch} but this Proton is {flavor}, using default driver")
         return
     base = TURNIP_ARM_DIR if flavor == "arm" else TURNIP_X86_DIR
-    candidates = []
+
+    def key(v):
+        return tuple(int(x) for x in re.findall(r"[0-9]+", v))
+
     try:
-        for p in base.iterdir():
-            if (p.name == version or p.name.startswith(version + ".")) and (p / "icd.json").is_file():
-                candidates.append(p.name)
+        installed = [p.name for p in base.iterdir() if (p / "icd.json").is_file()]
     except OSError:
-        pass
+        installed = []
+    candidates = [n for n in installed if n == version or n.startswith(version + ".")]
     if not candidates:
-        log(f"no {base.name} turnip payload for mesa {version}, using default driver")
-        return
-    picked = max(candidates, key=lambda v: tuple(int(x) for x in re.findall(r"[0-9]+", v)))
+        # A pin to a series that is no longer shipped takes the oldest release series newer than
+        # it, the nearest to what was picked, rather than jumping all the way to the system
+        # driver. Never a main snapshot or a release candidate: nobody picked those.
+        newer = [n for n in installed if key(n)[:2] > key(version)[:2] and re.fullmatch(r"[0-9.]+", n)]
+        if not newer:
+            log(f"no {base.name} turnip payload for mesa {version}, using default driver")
+            return
+        series = min(key(n)[:2] for n in newer)
+        candidates = [n for n in newer if key(n)[:2] == series]
+        log(f"no {base.name} turnip payload for mesa {version} any more, using the nearest newer series "
+            f"{'.'.join(map(str, series))}")
+    picked = max(candidates, key=key)
     if flavor == "x86" and in_container(args):
         try:
             embedded = set(CONTAINER_VK_LIST.read_text().split())
