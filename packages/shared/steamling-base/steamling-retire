@@ -1,0 +1,33 @@
+#!/bin/bash
+# steamling-retire - once after an update, remove what /usr/share/steamling/retired-packages lists
+# and nothing still needs. Run by steamling-retire.service while /var/lib/steamling/retire-pending
+# exists (steamling-base's install scriptlet creates it); pacman can't run from inside the
+# transaction that installs this, hence the next boot. Rules in the list's header.
+LIST=/usr/share/steamling/retired-packages
+MARKER=/var/lib/steamling/retire-pending
+
+# Someone's pacman is running: try again next boot.
+[ -e /var/lib/pacman/db.lck ] && { echo "steamling-retire: pacman is busy, trying again next boot"; exit 0; }
+
+orphans=" $(pacman -Qdtq 2>/dev/null | tr '\n' ' ') "
+go=()
+while read -r name flag _; do
+  case "${name}" in ''|'#'*) continue ;; esac
+  [ "${flag}" = image ] || flag=""
+  info="$(LC_ALL=C pacman -Qi "${name}" 2>/dev/null)" || continue      # not installed
+  if [[ "${orphans}" == *" ${name} "* ]]; then
+    go+=("${name}")
+  elif [ -n "${flag}" ] && grep -q '^Install Reason *: Explicitly installed' <<< "${info}" \
+       && grep -q '^Required By *: None' <<< "${info}"; then
+    go+=("${name}")
+  fi
+done < "${LIST}"
+
+if [ "${#go[@]}" -gt 0 ]; then
+  echo "steamling-retire: removing ${go[*]}"
+  if ! pacman -Rns --noconfirm "${go[@]}"; then
+    echo "steamling-retire: pacman refused; leaving them, and trying again next boot"
+    exit 0
+  fi
+fi
+rm -f "${MARKER}"

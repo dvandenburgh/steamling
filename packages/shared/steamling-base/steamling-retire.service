@@ -1,0 +1,13 @@
+# Once after steamling-base is updated (its scriptlet creates the marker): remove the packages
+# Steamling has retired, when nothing needs them. See /usr/share/steamling/retired-packages.
+[Unit]
+Description=Steamling: remove packages Steamling no longer needs
+ConditionPathExists=/var/lib/steamling/retire-pending
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/steamling/steamling-retire
+
+[Install]
+WantedBy=multi-user.target

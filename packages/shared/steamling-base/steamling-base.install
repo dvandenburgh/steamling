@@ -58,6 +58,13 @@ _drop_alarm_user() {
     && echo "steamling: removed ALARM's default 'alarm' login (its files stay in /home/alarm)."
 }
 
+# pacman can't remove packages from inside this transaction, so the cleanup of what Steamling has
+# retired (/usr/share/steamling/retired-packages) runs at the next boot, once.
+_arm_retire() {
+  [ -d /run/systemd/system ] || return 0
+  mkdir -p /var/lib/steamling && : > /var/lib/steamling/retire-pending
+}
+
 # The hook only fires from the transaction AFTER it is installed.
 _stamp_os_release() {
   /usr/lib/steamling/steamling-os-release || true
@@ -69,6 +76,7 @@ post_install() {
   _add_shared_repo
   _drop_alarm_user
   _stamp_os_release
+  _arm_retire
 }
 
 post_upgrade() {
@@ -77,4 +85,5 @@ post_upgrade() {
   _add_shared_repo
   _drop_alarm_user
   _stamp_os_release
+  _arm_retire
 }

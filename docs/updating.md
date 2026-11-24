@@ -25,6 +25,12 @@ Decky offers its own updates, and games update through Steam as usual.
 You don't need to reflash for a new release: an installed handheld gets everything through
 updates. A new image is only for setting up a handheld from scratch.
 
+Updates also tidy up after themselves. When Steamling stops needing a package (a tool dropped
+from the image, a library only an old version used), the first boot after the update removes it,
+as long as nothing on the handheld still depends on it. The list, with the reason for each, is
+`/usr/share/steamling/retired-packages`, and `journalctl -u steamling-retire` shows what was
+removed. As with any update, a [snapshot](snapshots.md) is taken first, so a removal can be undone.
+
 ## If an update goes wrong
 
 Every update takes a snapshot of the system first. If something breaks, **Roll Back Last Update**

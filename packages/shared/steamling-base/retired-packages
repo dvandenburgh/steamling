@@ -1,0 +1,14 @@
+# Packages Steamling has stopped needing, which a handheld that has followed updates for a while may
+# still carry. steamling-retire removes each one once, after an update, and only when nothing
+# installed still requires it: a package pulled in as a dependency only when it's an orphan, and
+# one the image used to install explicitly ("image") only when nothing depends on it either.
+# pacman -Rns takes the dependencies only these needed with them. A snapshot comes first, as
+# with any pacman transaction. Format: <name> [image]  # why
+mesa-utils            image   # glxinfo, eglinfo and vkcube: dropped from the image, nothing uses them
+mkinitcpio            image   # Steamling boots without an initramfs (UFS and btrfs are built into the kernel)
+mkinitcpio-busybox            # only ever there for mkinitcpio
+vulkan-mesa-implicit-layers   # Steamling's Mesa ships no Vulkan layers; this only sorted GPUs, and there's one
+bpf                           # bpftool, for the scx-scheds that shipped every scheduler; scx_lavd alone doesn't use it
+libbpf                        # as bpf
+protobuf                      # as bpf
+libseccomp                    # as bpf
