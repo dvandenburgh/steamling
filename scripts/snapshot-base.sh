@@ -351,6 +351,29 @@ log "building ${BASE_DB} (repo-add over ${#want[@]} packages)"
   && ls *.pkg.tar.* | grep -v '\.sig$' | LC_ALL=C xargs repo-add -q "${BASE_DB}" ) \
   || die "repo-add failed"
 
+# --- our packages against the new base ------------------------------------------
+# The base is harvested from what a build installed, so a need one of our packages never
+# declared (plasma-mobile's volume applet, plasma-pa) is simply left out, and every device
+# on the new base loses it. Check what our built packages link, run and import against
+# this snapshot before it goes anywhere.
+log "checking our packages against base ${ID}"
+need_tool zstd
+repos=(--repo "${OUT}/${BASE_DB}:${OUT}/${BASE_REPO}.files.tar.gz")
+pkgs=()
+for db in "${BUILD_DIR}"/localrepo/*/steamling*.db.tar.gz; do
+  [ -f "${db/.db.tar.gz/.files.tar.gz}" ] && repos+=(--repo "${db}:${db/.db.tar.gz/.files.tar.gz}")
+  pkgs+=("$(dirname "${db}")")
+done
+if ! gaps="$(python3 "$(dirname "$0")/check-depends.py" --missing "${repos[@]}" \
+        --ok "${CONFIG_DIR}/packages/depends-ok.list" --pending "${CONFIG_DIR}/packages/depends-pending.list" \
+        "${pkgs[@]}")"; then
+  printf '%s\n' "${gaps}" | sed 's/^/  /' >&2
+  die "base ${ID} would leave our packages short (above). Declare the missing depends (a need
+  nothing ships any more means the base dropped it: name it in config/packages/base-extras.list
+  or fix what stopped installing it), rebuild those packages, then snapshot again"
+fi
+ok "our packages find everything they need in base ${ID}"
+
 # --- lockfile ----------------------------------------------------------------
 # Header is machine-read: steamling-base-lock's PKGBUILD takes its pkgver from the
 # snapshot id here, so the device's "which base am I on" answer can never
