@@ -1,6 +1,7 @@
 -- Matched on Steamling's board names (steamling-steam passes STEAMLING_DEVICE as GAMESCOPE_INTERNAL_DEVICE_ID). The boards'
 -- STEAMLING_PANEL_HDR_NITS matches max_content_light_level.
--- ICNA3520 OLED used by the AYN Odin 3 and Thor top displays. It exposes no EDID,
+-- ICNA3520 OLED used by the AYN Odin 3 and Thor top displays (and the Thor Lite's, which
+-- carries the same DDIC; armada has no profile for it, so its values are these). It exposes no EDID,
 -- so gamescope synthesizes one and identifies the display through
 -- GAMESCOPE_INTERNAL_DEVICE_ID; this profile supplies the panel's
 -- colorimetry and HDR capability. Refresh rates come from the kernel
@@ -21,7 +22,8 @@ gamescope.config.known_displays.steamling_ayn_icna3520_oled = {
         min_content_light_level = 0.002,
     },
     matches = function(display)
-        if (display.device_id == "odin3" or display.device_id == "thor")
+        if (display.device_id == "odin3" or display.device_id == "thor"
+            or display.device_id == "thorlite")
             and display.internal and not display.has_edid then
             return 6000
         end
