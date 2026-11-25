@@ -1,0 +1,32 @@
+From c950b8d67f3d2522083ad2bd08f51feda21cf717 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marek=20Ol=C5=A1=C3=A1k?= <maraeo@gmail.com>
+Date: Wed, 11 Nov 2026 17:18:40 -0500
+Subject: [PATCH] nir/opt_group_loads: fix stack overrun
+
+Fixes: 3bceb7b622 - nir/group_loads: don't use pass_flags to store the indirection level
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16796
+
+Reviewed-by: Samuel Pitoiset <samuel.pitoiset@gmail.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46212>
+---
+ src/compiler/nir/nir_opt_group_loads.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/compiler/nir/nir_opt_group_loads.c b/src/compiler/nir/nir_opt_group_loads.c
+index 52950379d2a4..1bb5070a41d2 100644
+--- a/src/compiler/nir/nir_opt_group_loads.c
++++ b/src/compiler/nir/nir_opt_group_loads.c
+@@ -396,6 +396,10 @@ process_block(nir_block *block, nir_load_grouping grouping,
+       if (is_grouped_load(instr)) {
+          unsigned indirections = get_num_indirections(instr, infos);
+ 
++         /* Give up if there are too many indirections. */
++         if (indirections >= ARRAY_SIZE(num_inst_per_level))
++            return;
++
+          num_inst_per_level[indirections]++;
+          infos[instr->index].indirection_level = indirections;
+ 
+-- 
+2.34.1
+

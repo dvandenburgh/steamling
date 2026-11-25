@@ -6,7 +6,7 @@ pkgname=(mesa vulkan-freedreno)
 epoch=2
 pkgver=26.3.1
 _srcver=${pkgver}
-pkgrel=5
+pkgrel=6
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${pkgver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -41,6 +41,11 @@ options=(!lto)
 # 0028 keeps a DRM swapchain's image type, so implicit sync is chosen again (26.3 branch).
 # 0029 makes Turnip wait for query writes before copying results with their availability (main).
 # 0030 doubles private memory per wave on the first A8xx generation, the A830's erratum (main).
+# 0031/0032 make Turnip's multisampled-render-to-single-sampled path use the right input
+# attachments when a game leaves their indices at the defaults (main).
+# 0033 stops empty Turnip shaders overwriting the dynamic buffer layout of a pipeline built from
+# independent libraries, which DXVK uses, so a shader no longer reads another set's buffer (main).
+# 0034 fixes a stack overrun in NIR's load grouping pass (main).
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
@@ -65,7 +70,11 @@ source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0027-nir-opt_varyings-clear-output_equal_mask-when-GS-has.patch'
         '0028-vulkan-wsi-Preserve-the-swapchain-image-type.patch'
         '0029-tu-Properly-wait-for-mem-writes-to-finish-in-emit_copy_query_pool_results.patch'
-        '0030-freedreno-a8xx-Implement-QCTDD10982019-for-gen8.patch')
+        '0030-freedreno-a8xx-Implement-QCTDD10982019-for-gen8.patch'
+        '0031-tu-Use-TU_DYN_INPUT_ATT_OFFSET-consistently.patch'
+        '0032-tu-Update-input-attachment-idx-when-MSRTSS-internal-is-used.patch'
+        '0033-tu-mark-dynamic-descriptor-sizes-of-empty-shaders-unknown.patch'
+        '0034-nir-opt_group_loads-fix-stack-overrun.patch')
 sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             'b302a6716d00d24cb33aaef758cc95a5b78bfc348cd4d103a66b673ae9125e42'
             '59aacd0c04f838834121822887e9c2218ba7d56012c8433696632d72fb619903'
@@ -90,7 +99,11 @@ sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             'a4503e4f1b0abd3e8d31f5f26ed453edc4b7655f76f2b5f050f594a0360edeed'
             '4077b243e12eac178e4894f26a7338779a3939d7080046d74cc9632167977661'
             'ce88c95e94e18af5a90583dcf1072de6aa382b6f6525db4b851f32564cafa447'
-            '3acd9ab8695c4d7c021b58b9d2e18ba84babf6d62f54975e89170ec8431fa2b3')
+            '3acd9ab8695c4d7c021b58b9d2e18ba84babf6d62f54975e89170ec8431fa2b3'
+            '8103884c199c04bf72675649ebbcc3e4ab6bf440983e0d75bfa6f704641accc8'
+            '77087f3139dec8ab1fdeef461e4271da3bf0dcca787862e341bdddfca9c4fd42'
+            'fb0cacbc0430963aaf8afe00f85e6021bb3f7790f1df65efa6fe9b4a6c6c7c25'
+            '733f7d0b54a49d14fcad862541bba2b1c3cab16ee97dd109718476274f085ec8')
 
 prepare() {
   cd "mesa-${_srcver}"

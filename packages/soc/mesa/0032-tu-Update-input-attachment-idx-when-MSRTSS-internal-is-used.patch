@@ -1,0 +1,42 @@
+From 793bc53b92cb4fcb82a6a376aa796a349453f799 Mon Sep 17 00:00:00 2001
+From: Karmjit Mahil <karmjit.mahil@igalia.com>
+Date: Wed, 11 Nov 2026 15:44:15 +0000
+Subject: [PATCH] tu: Update input attachment idx when MSRTSS internal is used
+
+The color/depth/stencil attachment indices were updated to the internal
+attachment used by MSRTSS, but the input attachment indices weren't.
+`tu_CmdSetRenderingInputAttachmentIndicesKHR()` handled this correctly, so
+if the function was called then everything would be fine, which is why
+CTS isn't catching this, but if the indecies are left to their defaults,
+this issue would show up.
+
+Fixes: f6c7f16322de ("tu: Implement VK_EXT_multisampled_render_to_single_sampled")
+Signed-off-by: Karmjit Mahil <karmjit.mahil@igalia.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46194>
+---
+ src/freedreno/vulkan/tu_pass.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/freedreno/vulkan/tu_pass.cc b/src/freedreno/vulkan/tu_pass.cc
+index 318b171cacdf..8076bf4cb7d6 100644
+--- a/src/freedreno/vulkan/tu_pass.cc
++++ b/src/freedreno/vulkan/tu_pass.cc
+@@ -1849,6 +1849,7 @@ tu_setup_dynamic_render_pass(struct tu_cmd_buffer *cmd_buffer,
+                                VK_ATTACHMENT_STORE_OP_DONT_CARE,
+                                VK_ATTACHMENT_STORE_OP_DONT_CARE);
+             subpass->color_attachments[i].attachment = att_idx;
++            subpass->input_attachments[i + TU_DYN_INPUT_ATT_OFFSET].attachment = att_idx;
+             att->will_be_resolved =
+                att_info->storeOp == VK_ATTACHMENT_STORE_OP_STORE;
+          }
+@@ -1885,6 +1886,7 @@ tu_setup_dynamic_render_pass(struct tu_cmd_buffer *cmd_buffer,
+                att->resolve_views = 0;
+                att->user_att = subpass->depth_stencil_attachment.attachment;
+                subpass->depth_stencil_attachment.attachment = att_idx;
++               subpass->input_attachments[0].attachment = att_idx;
+                att->will_be_resolved =
+                   (info->pDepthAttachment &&
+                    info->pDepthAttachment->imageView &&
+-- 
+2.34.1
+

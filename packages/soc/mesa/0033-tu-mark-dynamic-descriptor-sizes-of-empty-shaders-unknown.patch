@@ -1,0 +1,60 @@
+From 245fb9d0b813641fae90fd89eec82b3ab8262657 Mon Sep 17 00:00:00 2001
+From: Artem Peshkov <slimstalker@gmail.com>
+Date: Sat, 21 Nov 2026 19:04:32 +0500
+Subject: [PATCH] tu: mark dynamic descriptor sizes of empty shaders unknown
+
+tu_emit_program_state() merges dynamic_descriptor_sizes[] from all
+stages, accepting any non-negative value. Empty TCS/TES/GS shaders
+start with zeroed metadata, so they claim that every set has zero
+dynamic descriptor size and overwrite sizes from real shaders.
+
+With graphics pipeline libraries and independent sets, a fragment
+shader that loads its dynamic descriptor base from the driver UBO
+then gets the wrong base and can read another set's dynamic buffer.
+
+Mark every entry unknown (-1) in tu_shader_init(), and drop the
+redundant initialization in tu_empty_fs_create(). Shader creation
+fills in the sizes for known sets. Empty shaders have no layout
+information and must not contribute authoritative zeros to the merge.
+
+A840 CTS independent-set tests change from 12 Fail to 480/480 Pass.
+The 20% pipeline-library selection (23692 tests) and dynamic
+binding-model selection (7262 tests) have 0 Fail.
+
+Fixes failures in the following CTS test family:
+dEQP-VK.pipeline.pipeline_library.graphics_library.independent_sets_random.fast_lib.{vert_frag,vert_tesc_tese_frag}.case_{1,4,5,8}*
+
+Fixes: 88db736472b ("tu: Rework dynamic offset handling")
+Generated-by: LLM
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46592>
+---
+ src/freedreno/vulkan/tu_shader.cc         |  6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/freedreno/vulkan/tu_shader.cc b/src/freedreno/vulkan/tu_shader.cc
+index 248d776a24d..9927ea73c0f 100644
+--- a/src/freedreno/vulkan/tu_shader.cc
++++ b/src/freedreno/vulkan/tu_shader.cc
+@@ -3430,6 +3430,9 @@ tu_shader_init(struct tu_device *dev, const void *key_data, size_t key_size)
+    shader->const_state.inline_uniforms_ubo.idx = -1;
+    shader->const_state.bindless_base_addrs_ubo.idx = -1;
+ 
++   for (unsigned i = 0; i < MAX_SETS; i++)
++      shader->dynamic_descriptor_sizes[i] = -1;
++
+    return shader;
+ }
+ 
+@@ -4202,9 +4205,6 @@ tu_empty_fs_create(struct tu_device *dev, struct tu_shader **shader,
+    if (fragment_density_map && dev->physical_device->info->chip < 7)
+       (*shader)->fs.lrz.status = TU_LRZ_FORCE_DISABLE_LRZ;
+ 
+-   for (unsigned i = 0; i < MAX_SETS; i++)
+-      (*shader)->dynamic_descriptor_sizes[i] = -1;
+-
+    struct ir3_shader *ir3_shader =
+       ir3_shader_from_nir(dev->compiler, fs_b.shader, &options);
+    (*shader)->variant = ir3_shader_create_variant(ir3_shader, &key, false);
+-- 
+2.34.1
+
