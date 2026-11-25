@@ -39,4 +39,11 @@ fi
 # Same game-launch pin + CPU topology as game mode.
 . /usr/lib/steamling/steamling-steam-env
 
+# Steam's workaround for XRRGetOutputInfo/XRRGetCrtcInfo looks the real functions up in an
+# already loaded libXrandr, and the ARM client never loads it, so every output change fails and
+# plugging or unplugging a display crashes Steam on the desktop. From armada.
+if [ -f /usr/lib/libXrandr.so.2 ]; then
+  export LD_PRELOAD="/usr/lib/libXrandr.so.2${LD_PRELOAD:+:${LD_PRELOAD}}"
+fi
+
 exec "${CLIENT}" "$@"

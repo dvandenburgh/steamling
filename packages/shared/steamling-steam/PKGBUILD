@@ -2,7 +2,7 @@
 # gamescope launcher, and the ARM-Proton compat-tool plumbing.
 pkgname=steamling-steam
 pkgver=0.1.1
-pkgrel=1.16
+pkgrel=1.17
 pkgdesc="Native ARM64 Steam Big Picture (gamescope) for the RP6 — installer + launcher"
 arch=('any')
 url="https://github.com/Steamling/steamling"
@@ -17,7 +17,7 @@ license=('GPL-2.0-or-later')
 depends=('steamling-steam-full' 'steamling-bsp-common>=0.1.0-24'
          'gamescope' 'wget' 'unzip' 'curl' 'tar' 'gtk2' 'gdk-pixbuf2' 'openal' 'libcups' 'lsof'
          'noto-fonts' 'noto-fonts-cjk' 'noto-fonts-emoji' 'networkmanager' 'mangohud'
-         'steamling-steamos-shim' 'xorg-server-xvfb' 'ffmpeg' 'xorg-xprop' 'python')
+         'steamling-steamos-shim' 'xorg-server-xvfb' 'ffmpeg' 'xorg-xprop' 'python' 'libxrandr')
 install=steamling-steam.install
 source=('steamling-steam-install' 'steamling-steam' 'steamling-steam-splash' 'steamling-steam-sync' 'steam' 'steam.desktop'
         'steam-256.png' 'steam-512.png'
