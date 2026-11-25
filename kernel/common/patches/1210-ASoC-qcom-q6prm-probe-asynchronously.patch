@@ -1,0 +1,46 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] ASoC: qcom: q6prm: probe asynchronously
+
+The GPR bus adds the PRM service from glink's rx worker right after the
+APM service, while the ADSP channel opens. prm_probe() calls
+q6apm_is_adsp_ready(), which sends APM_CMD_GET_SPF_STATE through q6apm
+and takes q6apm's lock to do it. When q6apm's own probe has already
+started (it probes asynchronously since "ASoC: qcom: q6apm: probe
+asynchronously"), it holds that lock while it waits for its own
+GET_SPF_STATE response, and that response can only be delivered by the
+rx worker prm_probe() is now blocking. Both wait out the full 5 second
+timeout:
+
+  qcom-apm gprsvc:service:2:1: CMD timeout for [1001021] opcode
+
+and the sound card registers 5 seconds late. Whether it happens depends
+on which probe gets there first: when prm_probe() runs before q6apm has
+set g_apm it defers instead, and the retry runs off the rx worker. On a
+Retroid Pocket 6 it hit four boots in a row on 7.3.6.
+
+Probe q6prm asynchronously too, so nothing in the rx worker waits on
+the DSP.
+
+Signed-off-by: David J. Vandenburgh <david@vandenburgh.co>
+---
+ sound/soc/qcom/qdsp6/q6prm.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/sound/soc/qcom/qdsp6/q6prm.c b/sound/soc/qcom/qdsp6/q6prm.c
+--- a/sound/soc/qcom/qdsp6/q6prm.c
++++ b/sound/soc/qcom/qdsp6/q6prm.c
+@@ -245,6 +245,14 @@
+ 	.driver = {
+ 		.name = "qcom-prm",
+ 		.of_match_table = of_match_ptr(prm_device_id),
++		/*
++		 * Like q6apm, the PRM service is added from glink's rx worker.
++		 * Its probe asks q6apm for the DSP state, which waits on q6apm's
++		 * lock while q6apm's own probe holds it for the same answer, and
++		 * that answer can only arrive through the rx worker this probe
++		 * would be blocking.
++		 */
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 	},
+ };
+ 
