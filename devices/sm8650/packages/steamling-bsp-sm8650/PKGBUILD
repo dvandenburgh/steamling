@@ -2,7 +2,7 @@
 # and the input maps are model-gated, so one package serves every board.
 pkgname=steamling-bsp-sm8650
 pkgver=0.1.1
-pkgrel=1
+pkgrel=1.1
 pkgdesc="steamling board support: SM8650 family (AYANEO Pocket S2, KONKR Pocket FIT) - board dispatch, input maps, audio UCM"
 arch=('any')
 url="https://github.com/Steamling/steamling"
