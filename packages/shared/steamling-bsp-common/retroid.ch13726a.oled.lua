@@ -1,6 +1,7 @@
 -- Matched on Steamling's board names (steamling-steam passes STEAMLING_DEVICE as GAMESCOPE_INTERNAL_DEVICE_ID). The boards'
 -- STEAMLING_PANEL_HDR_NITS matches max_content_light_level.
--- CH13726A OLED used by the Retroid Pocket 5 and Flip2. It exposes no EDID, so
+-- CH13726A OLED used by the Retroid Pocket 5 and Flip2, and by the Pocket Mini and Mini V2
+-- (armada's profile covers only the first two; the Minis borrow its values). It exposes no EDID, so
 -- gamescope synthesizes one and identifies the display through
 -- GAMESCOPE_INTERNAL_DEVICE_ID; this profile supplies the panel's colorimetry
 -- (nominal DCI-P3, not measured) and HDR capability. Steam owns HDR behavior
@@ -22,7 +23,9 @@ gamescope.config.known_displays.steamling_retroid_ch13726a_oled = {
     },
     matches = function(display)
         if (display.device_id == "rp5"
-            or display.device_id == "rpflip2")
+            or display.device_id == "rpflip2"
+            or display.device_id == "rpmini"
+            or display.device_id == "rpminiv2")
             and display.internal and not display.has_edid then
             return 6000
         end
