@@ -8,4 +8,6 @@ fi
 # Games list from the handheld and any microSD card, as they are right now (emulation layer).
 [ -x /usr/bin/steamling-roms-sync ] && /usr/bin/steamling-roms-sync
 
-exec /opt/steamling/es-de/ES-DE.AppImage "$@"
+# The unpacked AppImage (see the PKGBUILD): its binary finds its libraries and resources from
+# its own path, as it does inside the AppImage.
+exec /opt/steamling/es-de/app/usr/bin/es-de "$@"

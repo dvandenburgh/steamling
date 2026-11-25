@@ -4,14 +4,16 @@
 # version is the same URL with the version changed, and a new sha256.
 pkgname=es-de
 pkgver=3.5.0
-pkgrel=2
-pkgdesc="ES-DE frontend for browsing and launching games (official aarch64 AppImage)"
+pkgrel=3
+pkgdesc="ES-DE frontend for browsing and launching games (official aarch64 AppImage, unpacked)"
 arch=('aarch64')
 url="https://es-de.org"
 license=('MIT')
 provides=('emulationstation-de')
 conflicts=('emulationstation-de')
-depends=('fuse2')
+# What the unpacked binary and the libraries it bundles load from the system (ldd on the RP6).
+depends=('alsa-lib' 'fontconfig' 'freetype2' 'fribidi' 'harfbuzz' 'graphite' 'libdrm' 'libx11' 'libxcb'
+         'libxau' 'libxdmcp' 'expat' 'gmp' 'e2fsprogs' 'libgpg-error' 'zlib' 'libstdc++' 'libgcc')
 options=('!strip')
 source=("ES-DE-${pkgver}.AppImage::https://packages.es-de.org/release/${pkgver}/ES-DE_aarch64.AppImage"
         'es-de-wrapper'
@@ -20,8 +22,25 @@ source=("ES-DE-${pkgver}.AppImage::https://packages.es-de.org/release/${pkgver}/
 sha256sums=('b6d34657842db89628d5bc42ed465b605108b45cb1d16b15332d6c9f60136a4b' 'SKIP' 'SKIP' 'SKIP')
 noextract=("ES-DE-${pkgver}.AppImage")
 
+# Unpacked here instead of run as an AppImage. A running AppImage reads its own files through a
+# FUSE helper process, and Steam's Exit Game stops the helper along with ES-DE: when the helper went
+# first, ES-DE lost its code mid-shutdown and died of SIGBUS, every time, before it could save.
+build() {
+  cd "${srcdir}"
+  rm -rf squashfs-root AppDir app
+  chmod +x "ES-DE-${pkgver}.AppImage"
+  "./ES-DE-${pkgver}.AppImage" --appimage-extract >/dev/null
+  # The runtime unpacks to AppDir and leaves a squashfs-root beside it: take the real directory.
+  local d
+  for d in AppDir squashfs-root; do [ -d "${d}" ] && [ ! -L "${d}" ] && [ -x "${d}/usr/bin/es-de" ] && break; done
+  [ -x "${d}/usr/bin/es-de" ] && [ ! -L "${d}" ] || { echo "es-de: the AppImage didn't unpack to AppDir or squashfs-root" >&2; return 1; }
+  mv "${d}" app
+  rm -rf squashfs-root AppDir
+}
+
 package() {
-  install -Dm755 "${srcdir}/ES-DE-${pkgver}.AppImage" "${pkgdir}/opt/steamling/es-de/ES-DE.AppImage"
+  install -d "${pkgdir}/opt/steamling/es-de"
+  cp -a "${srcdir}/app" "${pkgdir}/opt/steamling/es-de/app"
   install -Dm755 "${srcdir}/es-de-wrapper" "${pkgdir}/usr/bin/es-de"
   # The AppImage hides its icon inside the squashfs, so the desktop entry needs its own copy.
   install -Dm644 "${srcdir}/es-de-icon.png" "${pkgdir}/opt/steamling/es-de/icon.png"
