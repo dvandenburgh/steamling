@@ -1,0 +1,43 @@
+From 046f0aea54fa97700344af8eb4cf80b47d05bc02 Mon Sep 17 00:00:00 2001
+From: Job Noorman <jnoorman@igalia.com>
+Date: Fri, 6 Nov 2026 16:26:22 +0100
+Subject: [PATCH] ir3: fix is_{ss,sy}_producer for local atomics
+
+Local atomics synchronize their result using (ss). However,
+is_ss_producer returns false for local atomics. This means we may end up
+in a situation where WAR hazards on its sources are erroneously
+synchronized using (sy).
+
+Signed-off-by: Job Noorman <jnoorman@igalia.com>
+Fixes: ce5c0c21c44 ("ir3/legalize: don't add (ss) for WAR hazards synced with (sy)")
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46023>
+---
+ src/freedreno/ir3/ir3.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/freedreno/ir3/ir3.h b/src/freedreno/ir3/ir3.h
+index fda7dd12932..832f793f181 100644
+--- a/src/freedreno/ir3/ir3.h
++++ b/src/freedreno/ir3/ir3.h
+@@ -2146,7 +2146,8 @@ is_ss_producer(struct ir3_instruction *instr)
+    if (instr->block->in_early_preamble && writes_addr1(instr))
+       return true;
+ 
+-   return is_sfu(instr) || is_local_mem_load(instr) || instr->opc == OPC_SHFL;
++   return is_sfu(instr) || is_local_mem_load(instr) ||
++          is_local_atomic(instr->opc) || instr->opc == OPC_SHFL;
+ }
+ 
+ static inline bool
+@@ -2196,7 +2197,7 @@ is_sy_producer(struct ir3_instruction *instr)
+ {
+    return is_tex_or_prefetch(instr) ||
+       (is_load(instr) && !is_local_mem_load(instr)) ||
+-      is_atomic(instr->opc);
++      (is_atomic(instr->opc) && !is_local_atomic(instr->opc));
+ }
+ 
+ static inline bool
+-- 
+2.34.1
+

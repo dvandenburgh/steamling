@@ -1,0 +1,31 @@
+From b5578b09a8bde14b3ad534b0df2280c152bacbe2 Mon Sep 17 00:00:00 2001
+From: Karmjit Mahil <karmjit.mahil@igalia.com>
+Date: Wed, 11 Nov 2026 10:14:44 +0000
+Subject: [PATCH] vulkan/runtime: Return both aspects in DS feedback loops
+ helper
+
+Turnip check the STENCIL_BIT to detect stencil feedback loop.
+
+Fixes: ea3bfc00a49 ("tu: Allow LRZ writes in narrow "stencil tagging" case")
+Signed-off-by: Karmjit Mahil <karmjit.mahil@igalia.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46184>
+---
+ src/vulkan/runtime/vk_graphics_state.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vulkan/runtime/vk_graphics_state.h b/src/vulkan/runtime/vk_graphics_state.h
+index 1db6dd539d58..b6fb297bf36c 100644
+--- a/src/vulkan/runtime/vk_graphics_state.h
++++ b/src/vulkan/runtime/vk_graphics_state.h
+@@ -837,7 +837,7 @@ vk_pipeline_flags_feedback_loops(VkPipelineCreateFlags2KHR flags)
+       feedback_loops |= VK_IMAGE_ASPECT_COLOR_BIT;
+    if (flags &
+        VK_PIPELINE_CREATE_2_DEPTH_STENCIL_ATTACHMENT_FEEDBACK_LOOP_BIT_EXT)
+-      feedback_loops |= VK_IMAGE_ASPECT_DEPTH_BIT;
++      feedback_loops |= VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+    return feedback_loops;
+ }
+ 
+-- 
+2.34.1
+

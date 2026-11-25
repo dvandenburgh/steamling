@@ -6,7 +6,7 @@ pkgname=(mesa vulkan-freedreno)
 epoch=2
 pkgver=26.3.1
 _srcver=${pkgver}
-pkgrel=6
+pkgrel=7
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${pkgver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -46,6 +46,10 @@ options=(!lto)
 # 0033 stops empty Turnip shaders overwriting the dynamic buffer layout of a pipeline built from
 # independent libraries, which DXVK uses, so a shader no longer reads another set's buffer (main).
 # 0034 fixes a stack overrun in NIR's load grouping pass (main).
+# 0035 makes the shader compiler wait correctly after workgroup-shared atomics, so a later write
+# can't land before the atomic has read its operands (main).
+# 0036 counts stencil as well as depth in a pipeline's depth/stencil feedback loop flag, so Turnip
+# turns off LRZ writes for a stencil feedback loop too (main).
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
@@ -74,7 +78,9 @@ source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0031-tu-Use-TU_DYN_INPUT_ATT_OFFSET-consistently.patch'
         '0032-tu-Update-input-attachment-idx-when-MSRTSS-internal-is-used.patch'
         '0033-tu-mark-dynamic-descriptor-sizes-of-empty-shaders-unknown.patch'
-        '0034-nir-opt_group_loads-fix-stack-overrun.patch')
+        '0034-nir-opt_group_loads-fix-stack-overrun.patch'
+        '0035-ir3-fix-is_-ss-sy-_producer-for-local-atomics.patch'
+        '0036-vulkan-runtime-Return-both-aspects-in-DS-feedback-loops-helper.patch')
 sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             'b302a6716d00d24cb33aaef758cc95a5b78bfc348cd4d103a66b673ae9125e42'
             '59aacd0c04f838834121822887e9c2218ba7d56012c8433696632d72fb619903'
@@ -103,7 +109,9 @@ sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             '8103884c199c04bf72675649ebbcc3e4ab6bf440983e0d75bfa6f704641accc8'
             '77087f3139dec8ab1fdeef461e4271da3bf0dcca787862e341bdddfca9c4fd42'
             'fb0cacbc0430963aaf8afe00f85e6021bb3f7790f1df65efa6fe9b4a6c6c7c25'
-            '733f7d0b54a49d14fcad862541bba2b1c3cab16ee97dd109718476274f085ec8')
+            '733f7d0b54a49d14fcad862541bba2b1c3cab16ee97dd109718476274f085ec8'
+            '85d27bcc93558a7adcfb849aaef0388992ff1ffd4fbbfc7b07d487af1a6c34a3'
+            '671a523acbbda050df211a92ab4c0c898f219e89b70d4381df9f6bafaee4bcb0')
 
 prepare() {
   cd "mesa-${_srcver}"
