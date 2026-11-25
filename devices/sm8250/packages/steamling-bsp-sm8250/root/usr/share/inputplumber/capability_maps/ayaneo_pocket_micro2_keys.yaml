@@ -24,3 +24,25 @@ mapping:
     target_event:
       gamepad:
         button: Guide
+
+  # LC and RC on the shoulders. LeftTop and RightTop are what upstream's AYANEO maps use for
+  # these two; InputPlumber's default profile turns them into the L4 and R4 back buttons.
+  - name: LC
+    source_events:
+      - evdev:
+          event_type: KEY
+          event_code: KEY_PROG3
+          value_type: button
+    target_event:
+      gamepad:
+        button: LeftTop
+
+  - name: RC
+    source_events:
+      - evdev:
+          event_type: KEY
+          event_code: KEY_PROG4
+          value_type: button
+    target_event:
+      gamepad:
+        button: RightTop
