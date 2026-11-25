@@ -96,3 +96,9 @@
 		compatible = "konkr,pocket-fit-mcu";
 	};
 };
+
+&wcd939x {
+	qcom,hphl-jack-type-normally-closed;
+	qcom,ground-jack-type-normally-closed;
+};
+
