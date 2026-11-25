@@ -26,9 +26,11 @@ source=('steamling-steam-install' 'steamling-steam' 'steamling-steam-splash' 'st
         'steamling-guestos-mount' 'steamling-guestos.service' 'graphics_provider.json'
         'steamling-powerbuttond'
         'steamling-fex-binfmt' 'steamling-fex-binfmt.service' '90-steamling-fex-binfmt.hook'
-        'steamling-oobe-marker' 'steamling-oobe-marker.service')
+        'steamling-oobe-marker' 'steamling-oobe-marker.service'
+        'steamling-steam-overlay.conf')
 sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
-            'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+            'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
+            'SKIP')
 
 package() {
   install -Dm755 "${srcdir}/steamling-steam-install" "${pkgdir}/usr/bin/steamling-steam-install"
@@ -67,4 +69,6 @@ package() {
   install -Dm644 "${srcdir}/steamling-oobe-marker.service"   "${pkgdir}/usr/lib/systemd/system/steamling-oobe-marker.service"
   ln -sf "../steamling-oobe-marker.service" \
     "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/steamling-oobe-marker.service"
+  # The arm64 overlay layer for Vulkan games in Desktop Mode, set up in each user's home at login.
+  install -Dm644 "${srcdir}/steamling-steam-overlay.conf"    "${pkgdir}/usr/share/user-tmpfiles.d/steamling-steam-overlay.conf"
 }
