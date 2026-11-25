@@ -969,6 +969,11 @@
 	status = "okay";
 };
 
+/* Let the DisplayPort link run up to HBR3 (8.1 Gb/s per lane); without this it stops at HBR2. */
+&mdss_dp0_out {
+	link-frequencies = /bits/ 64 <1620000000 2700000000 5400000000 8100000000>;
+};
+
 &mdss_dsi0 {
 	vdda-supply = <&vreg_l3g_1p2>;
 
