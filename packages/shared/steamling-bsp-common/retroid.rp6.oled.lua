@@ -1,4 +1,5 @@
--- Retroid Pocket 6: Visionox VTDR6130 OLED.
+-- Retroid Pocket 6: Visionox VTDR6130 OLED. The RP5 and Flip 2 Visionox revisions carry the same
+-- panel driver chip and borrow these values (not measured on them).
 -- The panel exposes no EDID: gamescope synthesizes one (patch 0012) and matches this profile
 -- on GAMESCOPE_INTERNAL_DEVICE_ID, which steamling-steam sets to the board's STEAMLING_DEVICE
 -- (0013). It supplies the colorimetry (nominal DCI-P3, not measured) and the HDR range;
@@ -20,7 +21,9 @@ gamescope.config.known_displays.steamling_rp6_vtdr6130 = {
         min_content_light_level = 0,
     },
     matches = function(display)
-        if (display.device_id == "rp6") and display.internal and not display.has_edid then
+        if (display.device_id == "rp6" or display.device_id == "rp5-visionox"
+            or display.device_id == "rpflip2-visionox")
+            and display.internal and not display.has_edid then
             return 6000
         end
         return -1
