@@ -14,6 +14,7 @@ conflicts=('emulationstation-de')
 # What the unpacked binary and the libraries it bundles load from the system (ldd on the RP6).
 depends=('alsa-lib' 'fontconfig' 'freetype2' 'fribidi' 'harfbuzz' 'graphite' 'libdrm' 'libx11' 'libxcb'
          'libxau' 'libxdmcp' 'expat' 'gmp' 'e2fsprogs' 'libgpg-error' 'zlib' 'libstdc++' 'libgcc')
+makedepends=('squashfs-tools')
 options=('!strip')
 source=("ES-DE-${pkgver}.AppImage::https://packages.es-de.org/release/${pkgver}/ES-DE_aarch64.AppImage"
         'es-de-wrapper'
@@ -28,14 +29,18 @@ noextract=("ES-DE-${pkgver}.AppImage")
 build() {
   cd "${srcdir}"
   rm -rf squashfs-root AppDir app
-  chmod +x "ES-DE-${pkgver}.AppImage"
-  "./ES-DE-${pkgver}.AppImage" --appimage-extract >/dev/null
-  # The runtime unpacks to AppDir and leaves a squashfs-root beside it: take the real directory.
-  local d
-  for d in AppDir squashfs-root; do [ -d "${d}" ] && [ ! -L "${d}" ] && [ -x "${d}/usr/bin/es-de" ] && break; done
-  [ -x "${d}/usr/bin/es-de" ] && [ ! -L "${d}" ] || { echo "es-de: the AppImage didn't unpack to AppDir or squashfs-root" >&2; return 1; }
-  mv "${d}" app
-  rm -rf squashfs-root AppDir
+  # Unpacked with unsquashfs, not by running the AppImage: the build chroot runs it under
+  # qemu-user, where its runtime reads qemu instead of itself and finds nothing to extract. The
+  # image starts right after the runtime's ELF section headers.
+  local f="ES-DE-${pkgver}.AppImage" shoff shentsize shnum off
+  shoff=$(od -An -t u8 -j 40 -N 8 "${f}" | tr -d ' ')
+  shentsize=$(od -An -t u2 -j 58 -N 2 "${f}" | tr -d ' ')
+  shnum=$(od -An -t u2 -j 60 -N 2 "${f}" | tr -d ' ')
+  off=$((shoff + shentsize * shnum))
+  [ "$(dd if="${f}" bs=1 skip="${off}" count=4 2>/dev/null)" = hsqs ] \
+    || { echo "es-de: no squashfs image at byte ${off} of ${f}" >&2; return 1; }
+  unsquashfs -q -n -o "${off}" -d app "${f}" >/dev/null
+  [ -x app/usr/bin/es-de ] || { echo "es-de: the unpacked image has no usr/bin/es-de" >&2; return 1; }
 }
 
 package() {
