@@ -1,0 +1,70 @@
+From 07f3b0b45d36bffd5853c3ec71f414633a41db86 Mon Sep 17 00:00:00 2001
+From: Danylo Piliaiev <dpiliaiev@igalia.com>
+Date: Mon, 23 Nov 2026 21:20:09 +0100
+Subject: [PATCH] tu/a6xx: Limit combined image sampler preload to 16 per stage
+
+Combined image samplers are preloaded with two CP_LOAD_STATE6 packets per
+array element and stage. A 4096-element array therefore costs 2 * 4096 packets
+per stage on every rebind.
+
+Measured on A6XX, each preloaded element costs ~30-40ns of CP time per draw.
+And after 16 elements no performance benefit was observed.
+
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/work_items/16473
+Assisted-by: LLM
+Signed-off-by: Danylo Piliaiev <dpiliaiev@igalia.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/46648>
+---
+ src/freedreno/vulkan/tu_pipeline.cc | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/src/freedreno/vulkan/tu_pipeline.cc b/src/freedreno/vulkan/tu_pipeline.cc
+index 6b1446dbfa4..3bd7b228621 100644
+--- a/src/freedreno/vulkan/tu_pipeline.cc
++++ b/src/freedreno/vulkan/tu_pipeline.cc
+@@ -53,6 +53,11 @@ emit_load_state(struct tu_cs *cs, unsigned opcode, enum a6xx_state_type st,
+    tu_cs_emit_qw(cs, offset | (base << 28));
+ }
+ 
++/* Combined image samplers need two CP_LOAD_STATE6 packets per array element and stage, and each packet costs CP time,
++ * so we have to put some limit to reduce CP overhead. From tests preloading more than 16 is never beneficial.
++ */
++#define TU_MAX_PRELOAD_COMBINED_SAMPLERS_PER_STAGE 16
++
+ static unsigned
+ tu6_load_state_size(struct tu_pipeline *pipeline,
+                     struct tu_pipeline_layout *layout)
+@@ -98,7 +103,7 @@ tu6_load_state_size(struct tu_pipeline *pipeline,
+             /* Because of how we pack combined images and samplers, we
+              * currently can't use one packet for the whole array.
+              */
+-            count = stage_count * binding->array_size * 2;
++            count = stage_count * MIN2(binding->array_size, TU_MAX_PRELOAD_COMBINED_SAMPLERS_PER_STAGE) * 2;
+             break;
+          case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+          case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK:
+@@ -125,6 +130,10 @@ tu6_emit_load_state(struct tu_device *device,
+    struct tu_cs cs;
+    tu_cs_begin_sub_stream(&pipeline->cs, size, &cs);
+ 
++   unsigned combined_samplers_budget[MESA_SHADER_STAGES];
++   for (unsigned s = 0; s < MESA_SHADER_STAGES; s++)
++      combined_samplers_budget[s] = TU_MAX_PRELOAD_COMBINED_SAMPLERS_PER_STAGE;
++
+    for (unsigned i = 0; i < layout->num_sets; i++) {
+       /* From 13.2.7. Descriptor Set Binding:
+        *
+@@ -226,7 +235,9 @@ tu6_emit_load_state(struct tu_device *device,
+                /* TODO: We could emit less CP_LOAD_STATE6 if we used
+                 * struct-of-arrays instead of array-of-structs.
+                 */
+-               for (unsigned i = 0; i < count; i++) {
++               unsigned num = MIN2(count, combined_samplers_budget[stage]);
++               combined_samplers_budget[stage] -= num;
++               for (unsigned i = 0; i < num; i++) {
+                   unsigned tex_offset = offset + 2 * i * FDL6_TEX_CONST_DWORDS;
+                   unsigned sam_offset = offset + (2 * i + 1) * FDL6_TEX_CONST_DWORDS;
+                   emit_load_state(&cs, tu6_stage2opcode(stage),
+-- 
+2.34.1
+

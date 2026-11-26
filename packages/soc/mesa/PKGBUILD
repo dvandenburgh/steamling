@@ -6,7 +6,7 @@ pkgname=(mesa vulkan-freedreno)
 epoch=2
 pkgver=26.3.1
 _srcver=${pkgver}
-pkgrel=7
+pkgrel=8
 pkgdesc="Mesa trimmed for Qualcomm handhelds: freedreno GL + turnip Vulkan, SoC-tuned (${pkgver})"
 arch=('aarch64')
 url="https://www.mesa3d.org/"
@@ -50,6 +50,11 @@ options=(!lto)
 # can't land before the atomic has read its operands (main).
 # 0036 counts stencil as well as depth in a pipeline's depth/stencil feedback loop flag, so Turnip
 # turns off LRZ writes for a stencil feedback loop too (main).
+# 0037/0038 make Turnip's occlusion queries wait for the GPU's late result writes: availability is
+# written after the accumulated result, and a reset can't be overwritten by a write still in flight
+# (main; 0037 rebased onto 26.3.1's epilogue_cs).
+# 0039 caps the combined image samplers Turnip preloads per stage at 16 on the A6xx (SM8250), where a
+# large array cost two packets per element on every rebind for no gain (main).
 source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0001-tu-Synchronize-access-between-no-rast-order-and-rast.patch'
         '0002-tu-Add-numnonposvar-alignment-quirk-for-a7xx-gen1-gen2.patch'
@@ -80,7 +85,10 @@ source=("https://archive.mesa3d.org/mesa-${_srcver}.tar.xz"
         '0033-tu-mark-dynamic-descriptor-sizes-of-empty-shaders-unknown.patch'
         '0034-nir-opt_group_loads-fix-stack-overrun.patch'
         '0035-ir3-fix-is_-ss-sy-_producer-for-local-atomics.patch'
-        '0036-vulkan-runtime-Return-both-aspects-in-DS-feedback-loops-helper.patch')
+        '0036-vulkan-runtime-Return-both-aspects-in-DS-feedback-loops-helper.patch'
+        '0037-tu-Write-occlusion-query-availability-after-the-accumulated-result.patch'
+        '0038-tu-Wait-for-pending-occlusion-query-writes-before-resetting-the-query.patch'
+        '0039-tu-a6xx-Limit-combined-image-sampler-preload-to-16-per-stage.patch')
 sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             'b302a6716d00d24cb33aaef758cc95a5b78bfc348cd4d103a66b673ae9125e42'
             '59aacd0c04f838834121822887e9c2218ba7d56012c8433696632d72fb619903'
@@ -111,7 +119,10 @@ sha256sums=('4e4e438eac7b840a9383988cbb7c08dad8041da544b9319fc26d319fa7348961'
             'fb0cacbc0430963aaf8afe00f85e6021bb3f7790f1df65efa6fe9b4a6c6c7c25'
             '733f7d0b54a49d14fcad862541bba2b1c3cab16ee97dd109718476274f085ec8'
             '85d27bcc93558a7adcfb849aaef0388992ff1ffd4fbbfc7b07d487af1a6c34a3'
-            '671a523acbbda050df211a92ab4c0c898f219e89b70d4381df9f6bafaee4bcb0')
+            '671a523acbbda050df211a92ab4c0c898f219e89b70d4381df9f6bafaee4bcb0'
+            '83285343ed4af5728ac21ebf11373551df1103f1192a41f8fe94966c2e3dc91a'
+            '31e4edb3ab4b5ad568e50ef95cb3ff9a284789cad842d6c90d0d1a6695e1f9ae'
+            'b8278b519c806954182baaf905854d13ccac14bac0df297ff6355d5a7ebb4246')
 
 prepare() {
   cd "mesa-${_srcver}"
