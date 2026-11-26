@@ -12,7 +12,7 @@ license=('MIT')
 provides=('emulationstation-de')
 conflicts=('emulationstation-de')
 # What the unpacked binary and the libraries it bundles load from the system (ldd on the RP6).
-depends=('alsa-lib' 'fontconfig' 'freetype2' 'fribidi' 'harfbuzz' 'graphite' 'libdrm' 'libx11' 'libxcb'
+depends=('alsa-lib' 'fontconfig' 'freetype2' 'fribidi' 'harfbuzz' 'graphite' 'libdrm' 'libx11' 'libxcb' 'wayland'
          'libxau' 'libxdmcp' 'expat' 'gmp' 'e2fsprogs' 'libgpg-error' 'zlib' 'libstdc++' 'libgcc')
 makedepends=('squashfs-tools')
 options=('!strip')
