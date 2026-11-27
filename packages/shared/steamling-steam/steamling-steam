@@ -200,6 +200,12 @@ for _ in $(seq 1 50); do
   sleep 0.1
 done
 mark "user services ready"
+# Steam handles a display appearing or going away (a dock) by looking XRRGetOutputInfo and
+# XRRGetCrtcInfo up in an already loaded libXrandr, which the ARM client never loads itself:
+# without this every output change fails, as in Desktop Mode (the steam launcher does the same).
+STEAM_PRELOAD=""
+[ -f /usr/lib/libXrandr.so.2 ] && STEAM_PRELOAD="/usr/lib/libXrandr.so.2${LD_PRELOAD:+:${LD_PRELOAD}}"
+
 # gamescope paints black until a client presents; the splash covers that, then execs Steam.
 mark "starting gamescope"
 # gamepadui sizes its UI from the output's physical mm; the ~96 DPI default reads as a desktop
@@ -211,5 +217,5 @@ env -u WAYLAND_DISPLAY \
   gamescope "${GS_OUTPUT[@]}" -W "${GS_W}" -H "${GS_H}" -r "${REFRESH}" --rt --xwayland-count 2 --mangoapp --backend drm \
     --force-orientation "${ORIENT}" "${GS_ROTATE[@]}" "${GS_HDR[@]}" -e -- \
     /usr/lib/steamling/steamling-steam-splash "${GS_W}x${GS_H}" -- \
-    env LD_LIBRARY_PATH="${LDLP}" "${CLIENT}" -gamepadui -steamos3 -steampal -steamdeck -noverifyfiles -noshaders \
+    env LD_LIBRARY_PATH="${LDLP}" ${STEAM_PRELOAD:+LD_PRELOAD="${STEAM_PRELOAD}"} "${CLIENT}" -gamepadui -steamos3 -steampal -steamdeck -noverifyfiles -noshaders \
   >"${GS_LOG}" 2>&1
