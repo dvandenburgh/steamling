@@ -1,0 +1,56 @@
+From: David J. Vandenburgh <david@vandenburgh.co>
+Subject: [PATCH] drm/msm/dp: leave out YUV 4:2:0-only modes by default
+
+A 4K TV behind a USB-C dock typically lists 3840x2160 at 60 Hz as a
+YCbCr 4:2:0-only mode, and a compositor picks it as the preferred mode.
+Driving it takes the DPU's one CDM block, and dpu_rm hands that block
+out per CRTC as each CRTC's atomic_check runs: when the mode moves from
+one CRTC to another in a commit (gamescope moving game mode from the
+built-in panel to the dock), the new CRTC is checked while the old one
+still owns the block, and every commit fails with
+
+  [dpu error]CDM_0 is already allocated
+  [dpu error]failed to reserve hw resources: -5
+
+so the TV never gets a picture and the panel has already been given up.
+Seen on a Retroid Pocket 6 with the Retroid dock and a 65" 4K TV.
+
+Reject 4:2:0-only modes in mode_valid unless msm.dp_yuv420=1, so the
+sink is driven with an RGB mode (4K at 30 Hz, or 1080p) instead. The
+CDM ordering is the real bug; this keeps docking working until it is
+fixed.
+
+Signed-off-by: David J. Vandenburgh <david@vandenburgh.co>
+---
+ drivers/gpu/drm/msm/dp/dp_display.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/msm/dp/dp_display.c b/drivers/gpu/drm/msm/dp/dp_display.c
+--- a/drivers/gpu/drm/msm/dp/dp_display.c
++++ b/drivers/gpu/drm/msm/dp/dp_display.c
+@@ -32,6 +32,16 @@
+ module_param(psr_enabled, bool, 0);
+ MODULE_PARM_DESC(psr_enabled, "enable PSR for eDP and DP displays");
+ 
++/*
++ * A YUV 4:2:0-only mode needs the DPU's single CDM block, and the resource manager
++ * hands that block to a new CRTC before the CRTC giving it up has been checked, so
++ * moving a 4:2:0 mode between CRTCs (game mode moving to a docked TV) fails every
++ * commit. Leave those modes out unless asked for.
++ */
++static bool dp_yuv420;
++module_param(dp_yuv420, bool, 0644);
++MODULE_PARM_DESC(dp_yuv420, "Offer YUV 4:2:0-only DisplayPort modes (default: no)");
++
+ #define HPD_STRING_SIZE 30
+ 
+ enum {
+@@ -789,7 +799,7 @@
+ 	 * YUV 420 is carried over DP by signalling the colorimetry through a
+ 	 * VSC SDP, so a 420-only mode cannot be driven without VSC SDP support.
+ 	 */
+-	if (is_yuv_420 && !msm_dp_display->panel->vsc_sdp_supported)
++	if (is_yuv_420 && (!dp_yuv420 || !msm_dp_display->panel->vsc_sdp_supported))
+ 		return MODE_NO_420;
+ 
+ 	link_pclk_khz = is_yuv_420 ? mode_pclk_khz / 2 : mode_pclk_khz;
